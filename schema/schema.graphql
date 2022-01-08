@@ -1,0 +1,27 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+interface Node {
+	id: ID!
+}
+
+type Query {
+	node(id: ID!): Node
+	nodes(ids: [ID!]!): [Node]!
+	users: [User!]!
+}
+
+type User implements Node {
+	id: ID!
+	name: String
+	age: Int
+}
+
+type Placeholder {
+	id: ID!
+}
+
+type Mutation {
+	new_user(name: String): User
+}

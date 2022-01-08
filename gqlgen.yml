@@ -1,0 +1,28 @@
+schema:
+  - schema/*.graphql
+
+# Where should the generated server code go?
+exec:
+  filename: resolvers/generated/generated.go
+  package: generated
+
+# Where should any generated models go?
+model:
+  filename: schema/generated/models_gen.go
+  package: model
+
+resolver:
+  layout: follow-schema
+  dir: resolvers
+  package: resolvers
+
+autobind:
+  - 170-ag/ent/generated
+
+models:
+  ID:
+    model:
+      - github.com/99designs/gqlgen/graphql.IntID
+  Node:
+    model:
+      - 170-ag/ent/generated.Noder
