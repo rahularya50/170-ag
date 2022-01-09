@@ -8,5 +8,9 @@
 [lints]
 
 [options]
+relay_integration=true
+relay_integration.module_prefix=./__generated__/
+relay_integration.excludes=.*/__tests__/.*
+relay_integration.excludes=.*/__flowtests__/.*
 
 [strict]

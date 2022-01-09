@@ -3,25 +3,26 @@
 # https://gqlgen.com/getting-started/
 
 interface Node {
-	id: ID!
+  id: ID!
 }
 
 type Query {
-	node(id: ID!): Node
-	nodes(ids: [ID!]!): [Node!]!
-	users: [User!]!
+  node(id: ID!): Node
+  nodes(ids: [ID!]!): [Node!]!
+  users: [User!]!
+  user(id: ID!): User
 }
 
 type User implements Node {
-	id: ID!
-	name: String
-	age: Int
+  id: ID!
+  name: String
+  age: Int
 }
 
 type Placeholder {
-	id: ID!
+  id: ID!
 }
 
 type Mutation {
-	new_user(name: String): User
+  new_user(name: String): User
 }

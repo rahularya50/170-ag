@@ -25,6 +25,10 @@ func (r *queryResolver) Users(ctx context.Context) ([]*ent.User, error) {
 	return r.client.User.Query().All(ctx)
 }
 
+func (r *queryResolver) User(ctx context.Context, id int) (*ent.User, error) {
+	return r.client.User.Get(ctx, id)
+}
+
 // Mutation returns resolvers.MutationResolver implementation.
 func (r *Resolver) Mutation() resolvers.MutationResolver { return &mutationResolver{r} }
 
