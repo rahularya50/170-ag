@@ -5,13 +5,16 @@ import (
 	"170-ag/ent/generated/migrate"
 	_ "170-ag/ent/generated/runtime"
 	"170-ag/resolvers"
+	"170-ag/site"
 	"context"
-	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/99designs/gqlgen/graphql/playground"
-	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"net/http"
 	"os"
+	"time"
+
+	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/playground"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 const defaultPort = "8080"
@@ -38,11 +41,22 @@ func main() {
 		log.Fatal("running schema migration", err)
 	}
 
-	srv := handler.NewDefaultServer(resolvers.NewSchema(client))
+	srv := site.HandlerWithViewerContext(
+		handler.NewDefaultServer(resolvers.NewSchema(client)),
+		client,
+	)
 
 	http.Handle("/playground", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)
 
+	http.Handle("/login", site.LoginHandler(client))
+
 	log.Printf("connect to http://localhost:%s/playground for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+
+	httpSrv := &http.Server{
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		Addr:         ":" + port,
+	}
+	log.Fatal(httpSrv.ListenAndServe())
 }

@@ -23,7 +23,7 @@ func main() {
 	}
 	opts := []entc.Option{
 		entc.Extensions(ex),
-		entc.FeatureNames("privacy"),
+		entc.FeatureNames("privacy", "schema/snapshot", "sql/upsert"),
 	}
 
 	if err := entc.Generate("./schema", &conf, opts...); err != nil {

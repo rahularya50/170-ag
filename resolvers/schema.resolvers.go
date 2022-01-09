@@ -6,11 +6,21 @@ package resolvers
 import (
 	ent "170-ag/ent/generated"
 	resolvers "170-ag/resolvers/generated"
+	"170-ag/site"
 	"context"
 )
 
 func (r *mutationResolver) NewUser(ctx context.Context, name *string) (*ent.User, error) {
-	return r.client.User.Create().SetAge(10).SetName(*name).Save(ctx)
+	return r.client.User.Create().SetName(*name).Save(ctx)
+}
+
+func (r *queryResolver) Viewer(ctx context.Context) (*ent.User, error) {
+	viewer, ok := site.ViewerFromContext(ctx)
+	if ok {
+		return viewer, nil
+	} else {
+		return nil, nil
+	}
 }
 
 func (r *queryResolver) Node(ctx context.Context, id int) (ent.Noder, error) {
@@ -19,10 +29,6 @@ func (r *queryResolver) Node(ctx context.Context, id int) (ent.Noder, error) {
 
 func (r *queryResolver) Nodes(ctx context.Context, ids []int) ([]ent.Noder, error) {
 	return r.client.Noders(ctx, ids)
-}
-
-func (r *queryResolver) Users(ctx context.Context) ([]*ent.User, error) {
-	return r.client.User.Query().All(ctx)
 }
 
 func (r *queryResolver) User(ctx context.Context, id int) (*ent.User, error) {

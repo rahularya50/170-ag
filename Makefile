@@ -17,5 +17,7 @@ flow:
 	cd frontend && yarn flow
 
 # serve backend (run `yarn start` for frontend)
+view: export SESSION_KEY = abcdef
+
 view:
 	go run ./cmd/site

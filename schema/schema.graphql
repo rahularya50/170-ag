@@ -7,16 +7,16 @@ interface Node {
 }
 
 type Query {
+  viewer: User
   node(id: ID!): Node
   nodes(ids: [ID!]!): [Node!]!
-  users: [User!]!
   user(id: ID!): User
 }
 
 type User implements Node {
   id: ID!
+  email: String
   name: String
-  age: Int
 }
 
 type Placeholder {
