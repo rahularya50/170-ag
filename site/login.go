@@ -131,3 +131,14 @@ func (handler *loginHandler) ServeHTTP(resp http.ResponseWriter, req *http.Reque
 		panic("failed to write back to client")
 	}
 }
+
+func HandleLogout(resp http.ResponseWriter, req *http.Request) {
+	store := getSessionStore()
+	session, _ := store.Get(req, "login-session")
+	delete(session.Values, "user_id")
+	err := session.Save(req, resp)
+	if err != nil {
+		panic("failed to update session store")
+	}
+	http.Redirect(resp, req, "/", http.StatusFound)
+}

@@ -27,6 +27,7 @@ export default function LoginButton(): React.Node {
       theme: "outline",
       size: "large",
     });
+    window.google.accounts.id.prompt();
   });
 
   return <div ref={buttonRef}></div>;

@@ -50,6 +50,7 @@ func main() {
 	http.Handle("/query", srv)
 
 	http.Handle("/login", site.LoginHandler(client))
+	http.HandleFunc("/logout", site.HandleLogout)
 
 	log.Printf("connect to http://localhost:%s/playground for GraphQL playground", port)
 

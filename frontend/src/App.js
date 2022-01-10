@@ -4,10 +4,13 @@ import * as React from "react";
 import graphql from "babel-plugin-relay/macro";
 import { useLazyLoadQuery } from "react-relay";
 import Container from "react-bootstrap/Container";
+import Navbar from "react-bootstrap/Navbar";
+import Nav from "react-bootstrap/Nav";
 import LoginButton from "./LoginButton";
+import { BrowserRouter } from "react-router-dom";
 
 export default function App(): React.Node {
-  const data = useLazyLoadQuery(
+  const { viewer } = useLazyLoadQuery(
     graphql`
       query AppQuery {
         viewer {
@@ -19,14 +22,29 @@ export default function App(): React.Node {
   );
   return (
     <Container className="py-4">
-      <header className="pb-3 mb-4 border-bottom">
-        <a
-          href="/"
-          className="d-flex align-items-center text-dark text-decoration-none"
-        >
-          <span className="fs-4">CS 170 Online Judge</span>
-        </a>
-      </header>
+      <Navbar className="mb-4 border-bottom" expand="lg">
+        <Navbar.Brand className="fs-4" href="/">
+          CS 170 Online Judge
+        </Navbar.Brand>
+        {viewer && (
+          <>
+            <Navbar.Toggle aria-controls="navbar-nav" />
+            <Navbar.Collapse
+              className="me-auto justify-content-end"
+              id="navbar-nav"
+            >
+              <Nav>
+                <Nav.Link href="#home" active>
+                  Home
+                </Nav.Link>
+                <Nav.Link href="#features">Problems</Nav.Link>
+                <Nav.Link href="#pricing">Submissions</Nav.Link>
+                <Nav.Link href="/logout">Log Out</Nav.Link>
+              </Nav>
+            </Navbar.Collapse>
+          </>
+        )}
+      </Navbar>
       <div className="p-5 mb-4 bg-light rounded-3">
         <Container className="py-5" fluid>
           <h1 className="display-5 fw-bold">
@@ -37,13 +55,9 @@ export default function App(): React.Node {
             will have opinions on what to put here?
           </p>
           <p className="col-md-8 fs-4">
-            {data.viewer?.name ? (
-              <>Hello, {data.viewer?.name}!</>
-            ) : (
-              "Hello, mysterious stranger!"
-            )}
+            {viewer?.name && <>Welcome, {viewer?.name}!</>}
           </p>
-          <LoginButton />
+          {!viewer && <LoginButton />}
         </Container>
       </div>
     </Container>
