@@ -63,7 +63,7 @@ func (User) Policy() ent.Policy {
 				// check what the query resolves to
 				allow_ctx := privacy.DecisionContext(c, privacy.Allow)
 				id, err := uq.OnlyID(allow_ctx)
-				if err != nil || id == viewer.ID {
+				if err == nil && id == viewer.ID {
 					return privacy.Allow
 				}
 				return privacy.Skip
