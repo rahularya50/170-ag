@@ -36,6 +36,13 @@ export default function App(): React.Node {
             This is some placeholder text to be replaced later! Probably the TAs
             will have opinions on what to put here?
           </p>
+          <p className="col-md-8 fs-4">
+            {data.viewer?.name ? (
+              <>Hello, {data.viewer?.name}!</>
+            ) : (
+              "Hello, mysterious stranger!"
+            )}
+          </p>
           <LoginButton />
         </Container>
       </div>

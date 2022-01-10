@@ -109,7 +109,6 @@ func (handler *loginHandler) ServeHTTP(resp http.ResponseWriter, req *http.Reque
 		n := raw_name.(string)
 		name = &n
 	}
-
 	user_id := handler.client.User.
 		Create().
 		SetEmail(email).

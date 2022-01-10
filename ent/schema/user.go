@@ -52,6 +52,7 @@ func (User) Policy() ent.Policy {
 				}
 				return privacy.Allow
 			}),
+			// TODO: add rule for allowing user modification by themselves
 			privacy.AlwaysDenyRule(),
 		},
 		Query: privacy.QueryPolicy{
@@ -62,7 +63,7 @@ func (User) Policy() ent.Policy {
 				}
 				// check what the query resolves to
 				allow_ctx := privacy.DecisionContext(c, privacy.Allow)
-				id, err := uq.OnlyID(allow_ctx)
+				id, err := uq.Clone().OnlyID(allow_ctx)
 				if err == nil && id == viewer.ID {
 					return privacy.Allow
 				}
