@@ -3,6 +3,7 @@
 package generated
 
 import (
+	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/user"
 	"context"
 	"encoding/base64"
@@ -231,6 +232,233 @@ const (
 	pageInfoField   = "pageInfo"
 	totalCountField = "totalCount"
 )
+
+// CodingProblemEdge is the edge representation of CodingProblem.
+type CodingProblemEdge struct {
+	Node   *CodingProblem `json:"node"`
+	Cursor Cursor         `json:"cursor"`
+}
+
+// CodingProblemConnection is the connection containing edges to CodingProblem.
+type CodingProblemConnection struct {
+	Edges      []*CodingProblemEdge `json:"edges"`
+	PageInfo   PageInfo             `json:"pageInfo"`
+	TotalCount int                  `json:"totalCount"`
+}
+
+// CodingProblemPaginateOption enables pagination customization.
+type CodingProblemPaginateOption func(*codingProblemPager) error
+
+// WithCodingProblemOrder configures pagination ordering.
+func WithCodingProblemOrder(order *CodingProblemOrder) CodingProblemPaginateOption {
+	if order == nil {
+		order = DefaultCodingProblemOrder
+	}
+	o := *order
+	return func(pager *codingProblemPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultCodingProblemOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithCodingProblemFilter configures pagination filter.
+func WithCodingProblemFilter(filter func(*CodingProblemQuery) (*CodingProblemQuery, error)) CodingProblemPaginateOption {
+	return func(pager *codingProblemPager) error {
+		if filter == nil {
+			return errors.New("CodingProblemQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type codingProblemPager struct {
+	order  *CodingProblemOrder
+	filter func(*CodingProblemQuery) (*CodingProblemQuery, error)
+}
+
+func newCodingProblemPager(opts []CodingProblemPaginateOption) (*codingProblemPager, error) {
+	pager := &codingProblemPager{}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultCodingProblemOrder
+	}
+	return pager, nil
+}
+
+func (p *codingProblemPager) applyFilter(query *CodingProblemQuery) (*CodingProblemQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *codingProblemPager) toCursor(cp *CodingProblem) Cursor {
+	return p.order.Field.toCursor(cp)
+}
+
+func (p *codingProblemPager) applyCursors(query *CodingProblemQuery, after, before *Cursor) *CodingProblemQuery {
+	for _, predicate := range cursorsToPredicates(
+		p.order.Direction, after, before,
+		p.order.Field.field, DefaultCodingProblemOrder.Field.field,
+	) {
+		query = query.Where(predicate)
+	}
+	return query
+}
+
+func (p *codingProblemPager) applyOrder(query *CodingProblemQuery, reverse bool) *CodingProblemQuery {
+	direction := p.order.Direction
+	if reverse {
+		direction = direction.reverse()
+	}
+	query = query.Order(direction.orderFunc(p.order.Field.field))
+	if p.order.Field != DefaultCodingProblemOrder.Field {
+		query = query.Order(direction.orderFunc(DefaultCodingProblemOrder.Field.field))
+	}
+	return query
+}
+
+// Paginate executes the query and returns a relay based cursor connection to CodingProblem.
+func (cp *CodingProblemQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...CodingProblemPaginateOption,
+) (*CodingProblemConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newCodingProblemPager(opts)
+	if err != nil {
+		return nil, err
+	}
+
+	if cp, err = pager.applyFilter(cp); err != nil {
+		return nil, err
+	}
+
+	conn := &CodingProblemConnection{Edges: []*CodingProblemEdge{}}
+	if !hasCollectedField(ctx, edgesField) || first != nil && *first == 0 || last != nil && *last == 0 {
+		if hasCollectedField(ctx, totalCountField) ||
+			hasCollectedField(ctx, pageInfoField) {
+			count, err := cp.Count(ctx)
+			if err != nil {
+				return nil, err
+			}
+			conn.TotalCount = count
+			conn.PageInfo.HasNextPage = first != nil && count > 0
+			conn.PageInfo.HasPreviousPage = last != nil && count > 0
+		}
+		return conn, nil
+	}
+
+	if (after != nil || first != nil || before != nil || last != nil) && hasCollectedField(ctx, totalCountField) {
+		count, err := cp.Clone().Count(ctx)
+		if err != nil {
+			return nil, err
+		}
+		conn.TotalCount = count
+	}
+
+	cp = pager.applyCursors(cp, after, before)
+	cp = pager.applyOrder(cp, last != nil)
+	var limit int
+	if first != nil {
+		limit = *first + 1
+	} else if last != nil {
+		limit = *last + 1
+	}
+	if limit > 0 {
+		cp = cp.Limit(limit)
+	}
+
+	if field := getCollectedField(ctx, edgesField, nodeField); field != nil {
+		cp = cp.collectField(graphql.GetOperationContext(ctx), *field)
+	}
+
+	nodes, err := cp.All(ctx)
+	if err != nil || len(nodes) == 0 {
+		return conn, err
+	}
+
+	if len(nodes) == limit {
+		conn.PageInfo.HasNextPage = first != nil
+		conn.PageInfo.HasPreviousPage = last != nil
+		nodes = nodes[:len(nodes)-1]
+	}
+
+	var nodeAt func(int) *CodingProblem
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *CodingProblem {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *CodingProblem {
+			return nodes[i]
+		}
+	}
+
+	conn.Edges = make([]*CodingProblemEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		conn.Edges[i] = &CodingProblemEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+
+	conn.PageInfo.StartCursor = &conn.Edges[0].Cursor
+	conn.PageInfo.EndCursor = &conn.Edges[len(conn.Edges)-1].Cursor
+	if conn.TotalCount == 0 {
+		conn.TotalCount = len(nodes)
+	}
+
+	return conn, nil
+}
+
+// CodingProblemOrderField defines the ordering field of CodingProblem.
+type CodingProblemOrderField struct {
+	field    string
+	toCursor func(*CodingProblem) Cursor
+}
+
+// CodingProblemOrder defines the ordering of CodingProblem.
+type CodingProblemOrder struct {
+	Direction OrderDirection           `json:"direction"`
+	Field     *CodingProblemOrderField `json:"field"`
+}
+
+// DefaultCodingProblemOrder is the default ordering of CodingProblem.
+var DefaultCodingProblemOrder = &CodingProblemOrder{
+	Direction: OrderDirectionAsc,
+	Field: &CodingProblemOrderField{
+		field: codingproblem.FieldID,
+		toCursor: func(cp *CodingProblem) Cursor {
+			return Cursor{ID: cp.ID}
+		},
+	},
+}
+
+// ToEdge converts CodingProblem into CodingProblemEdge.
+func (cp *CodingProblem) ToEdge(order *CodingProblemOrder) *CodingProblemEdge {
+	if order == nil {
+		order = DefaultCodingProblemOrder
+	}
+	return &CodingProblemEdge{
+		Node:   cp,
+		Cursor: order.Field.toCursor(cp),
+	}
+}
 
 // UserEdge is the edge representation of User.
 type UserEdge struct {

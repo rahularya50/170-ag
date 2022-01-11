@@ -46,6 +46,20 @@ func (uu *UserUpdate) ClearName() *UserUpdate {
 	return uu
 }
 
+// SetIsStaff sets the "is_staff" field.
+func (uu *UserUpdate) SetIsStaff(b bool) *UserUpdate {
+	uu.mutation.SetIsStaff(b)
+	return uu
+}
+
+// SetNillableIsStaff sets the "is_staff" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableIsStaff(b *bool) *UserUpdate {
+	if b != nil {
+		uu.SetIsStaff(*b)
+	}
+	return uu
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
@@ -152,6 +166,13 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: user.FieldName,
 		})
 	}
+	if value, ok := uu.mutation.IsStaff(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: user.FieldIsStaff,
+		})
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
@@ -188,6 +209,20 @@ func (uuo *UserUpdateOne) SetNillableName(s *string) *UserUpdateOne {
 // ClearName clears the value of the "name" field.
 func (uuo *UserUpdateOne) ClearName() *UserUpdateOne {
 	uuo.mutation.ClearName()
+	return uuo
+}
+
+// SetIsStaff sets the "is_staff" field.
+func (uuo *UserUpdateOne) SetIsStaff(b bool) *UserUpdateOne {
+	uuo.mutation.SetIsStaff(b)
+	return uuo
+}
+
+// SetNillableIsStaff sets the "is_staff" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableIsStaff(b *bool) *UserUpdateOne {
+	if b != nil {
+		uuo.SetIsStaff(*b)
+	}
 	return uuo
 }
 
@@ -319,6 +354,13 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Column: user.FieldName,
+		})
+	}
+	if value, ok := uuo.mutation.IsStaff(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: user.FieldIsStaff,
 		})
 	}
 	_node = &User{config: uuo.config}

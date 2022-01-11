@@ -105,6 +105,13 @@ func Name(v string) predicate.User {
 	})
 }
 
+// IsStaff applies equality check predicate on the "is_staff" field. It's identical to IsStaffEQ.
+func IsStaff(v bool) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldIsStaff), v))
+	})
+}
+
 // EmailEQ applies the EQ predicate on the "email" field.
 func EmailEQ(v string) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
@@ -338,6 +345,20 @@ func NameEqualFold(v string) predicate.User {
 func NameContainsFold(v string) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldName), v))
+	})
+}
+
+// IsStaffEQ applies the EQ predicate on the "is_staff" field.
+func IsStaffEQ(v bool) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldIsStaff), v))
+	})
+}
+
+// IsStaffNEQ applies the NEQ predicate on the "is_staff" field.
+func IsStaffNEQ(v bool) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldIsStaff), v))
 	})
 }
 

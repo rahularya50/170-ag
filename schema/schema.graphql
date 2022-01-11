@@ -15,8 +15,9 @@ type Query {
 
 type User implements Node {
   id: ID!
-  email: String
+  email: String!
   name: String
+  is_staff: Boolean!
 }
 
 type Placeholder {

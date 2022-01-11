@@ -3,6 +3,7 @@
 package generated
 
 import (
+	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/user"
 	"context"
 	"encoding/json"
@@ -46,11 +47,46 @@ type Edge struct {
 	IDs  []int  `json:"ids,omitempty"`  // node ids (where this edge point to).
 }
 
+func (cp *CodingProblem) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     cp.ID,
+		Type:   "CodingProblem",
+		Fields: make([]*Field, 3),
+		Edges:  make([]*Edge, 0),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(cp.Name); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "string",
+		Name:  "name",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(cp.Statement); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "string",
+		Name:  "statement",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(cp.Released); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "bool",
+		Name:  "released",
+		Value: string(buf),
+	}
+	return node, nil
+}
+
 func (u *User) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     u.ID,
 		Type:   "User",
-		Fields: make([]*Field, 2),
+		Fields: make([]*Field, 3),
 		Edges:  make([]*Edge, 0),
 	}
 	var buf []byte
@@ -68,6 +104,14 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 	node.Fields[1] = &Field{
 		Type:  "string",
 		Name:  "name",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(u.IsStaff); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "bool",
+		Name:  "is_staff",
 		Value: string(buf),
 	}
 	return node, nil
@@ -140,6 +184,15 @@ func (c *Client) Noder(ctx context.Context, id int, opts ...NodeOption) (_ Noder
 
 func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error) {
 	switch table {
+	case codingproblem.Table:
+		n, err := c.CodingProblem.Query().
+			Where(codingproblem.ID(id)).
+			CollectFields(ctx, "CodingProblem").
+			Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
 	case user.Table:
 		n, err := c.User.Query().
 			Where(user.ID(id)).
@@ -222,6 +275,19 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		idmap[id] = append(idmap[id], &noders[i])
 	}
 	switch table {
+	case codingproblem.Table:
+		nodes, err := c.CodingProblem.Query().
+			Where(codingproblem.IDIn(ids...)).
+			CollectFields(ctx, "CodingProblem").
+			All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
 	case user.Table:
 		nodes, err := c.User.Query().
 			Where(user.IDIn(ids...)).

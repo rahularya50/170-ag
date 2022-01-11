@@ -3,6 +3,7 @@
 package generated
 
 import (
+	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/predicate"
 	"170-ag/ent/generated/user"
 	"context"
@@ -21,8 +22,409 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeUser = "User"
+	TypeCodingProblem = "CodingProblem"
+	TypeUser          = "User"
 )
+
+// CodingProblemMutation represents an operation that mutates the CodingProblem nodes in the graph.
+type CodingProblemMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int
+	name          *string
+	statement     *string
+	released      *bool
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*CodingProblem, error)
+	predicates    []predicate.CodingProblem
+}
+
+var _ ent.Mutation = (*CodingProblemMutation)(nil)
+
+// codingproblemOption allows management of the mutation configuration using functional options.
+type codingproblemOption func(*CodingProblemMutation)
+
+// newCodingProblemMutation creates new mutation for the CodingProblem entity.
+func newCodingProblemMutation(c config, op Op, opts ...codingproblemOption) *CodingProblemMutation {
+	m := &CodingProblemMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeCodingProblem,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withCodingProblemID sets the ID field of the mutation.
+func withCodingProblemID(id int) codingproblemOption {
+	return func(m *CodingProblemMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *CodingProblem
+		)
+		m.oldValue = func(ctx context.Context) (*CodingProblem, error) {
+			once.Do(func() {
+				if m.done {
+					err = fmt.Errorf("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().CodingProblem.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withCodingProblem sets the old CodingProblem of the mutation.
+func withCodingProblem(node *CodingProblem) codingproblemOption {
+	return func(m *CodingProblemMutation) {
+		m.oldValue = func(context.Context) (*CodingProblem, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m CodingProblemMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m CodingProblemMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, fmt.Errorf("generated: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *CodingProblemMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// SetName sets the "name" field.
+func (m *CodingProblemMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *CodingProblemMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the CodingProblem entity.
+// If the CodingProblem object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CodingProblemMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *CodingProblemMutation) ResetName() {
+	m.name = nil
+}
+
+// SetStatement sets the "statement" field.
+func (m *CodingProblemMutation) SetStatement(s string) {
+	m.statement = &s
+}
+
+// Statement returns the value of the "statement" field in the mutation.
+func (m *CodingProblemMutation) Statement() (r string, exists bool) {
+	v := m.statement
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatement returns the old "statement" field's value of the CodingProblem entity.
+// If the CodingProblem object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CodingProblemMutation) OldStatement(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldStatement is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldStatement requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatement: %w", err)
+	}
+	return oldValue.Statement, nil
+}
+
+// ResetStatement resets all changes to the "statement" field.
+func (m *CodingProblemMutation) ResetStatement() {
+	m.statement = nil
+}
+
+// SetReleased sets the "released" field.
+func (m *CodingProblemMutation) SetReleased(b bool) {
+	m.released = &b
+}
+
+// Released returns the value of the "released" field in the mutation.
+func (m *CodingProblemMutation) Released() (r bool, exists bool) {
+	v := m.released
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldReleased returns the old "released" field's value of the CodingProblem entity.
+// If the CodingProblem object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CodingProblemMutation) OldReleased(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldReleased is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldReleased requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldReleased: %w", err)
+	}
+	return oldValue.Released, nil
+}
+
+// ResetReleased resets all changes to the "released" field.
+func (m *CodingProblemMutation) ResetReleased() {
+	m.released = nil
+}
+
+// Where appends a list predicates to the CodingProblemMutation builder.
+func (m *CodingProblemMutation) Where(ps ...predicate.CodingProblem) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *CodingProblemMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (CodingProblem).
+func (m *CodingProblemMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *CodingProblemMutation) Fields() []string {
+	fields := make([]string, 0, 3)
+	if m.name != nil {
+		fields = append(fields, codingproblem.FieldName)
+	}
+	if m.statement != nil {
+		fields = append(fields, codingproblem.FieldStatement)
+	}
+	if m.released != nil {
+		fields = append(fields, codingproblem.FieldReleased)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *CodingProblemMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case codingproblem.FieldName:
+		return m.Name()
+	case codingproblem.FieldStatement:
+		return m.Statement()
+	case codingproblem.FieldReleased:
+		return m.Released()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *CodingProblemMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case codingproblem.FieldName:
+		return m.OldName(ctx)
+	case codingproblem.FieldStatement:
+		return m.OldStatement(ctx)
+	case codingproblem.FieldReleased:
+		return m.OldReleased(ctx)
+	}
+	return nil, fmt.Errorf("unknown CodingProblem field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *CodingProblemMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case codingproblem.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case codingproblem.FieldStatement:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatement(v)
+		return nil
+	case codingproblem.FieldReleased:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetReleased(v)
+		return nil
+	}
+	return fmt.Errorf("unknown CodingProblem field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *CodingProblemMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *CodingProblemMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *CodingProblemMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown CodingProblem numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *CodingProblemMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *CodingProblemMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *CodingProblemMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown CodingProblem nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *CodingProblemMutation) ResetField(name string) error {
+	switch name {
+	case codingproblem.FieldName:
+		m.ResetName()
+		return nil
+	case codingproblem.FieldStatement:
+		m.ResetStatement()
+		return nil
+	case codingproblem.FieldReleased:
+		m.ResetReleased()
+		return nil
+	}
+	return fmt.Errorf("unknown CodingProblem field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *CodingProblemMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *CodingProblemMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *CodingProblemMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *CodingProblemMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *CodingProblemMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *CodingProblemMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *CodingProblemMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown CodingProblem unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *CodingProblemMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown CodingProblem edge %s", name)
+}
 
 // UserMutation represents an operation that mutates the User nodes in the graph.
 type UserMutation struct {
@@ -32,6 +434,7 @@ type UserMutation struct {
 	id            *int
 	email         *string
 	name          *string
+	is_staff      *bool
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*User, error)
@@ -202,6 +605,42 @@ func (m *UserMutation) ResetName() {
 	delete(m.clearedFields, user.FieldName)
 }
 
+// SetIsStaff sets the "is_staff" field.
+func (m *UserMutation) SetIsStaff(b bool) {
+	m.is_staff = &b
+}
+
+// IsStaff returns the value of the "is_staff" field in the mutation.
+func (m *UserMutation) IsStaff() (r bool, exists bool) {
+	v := m.is_staff
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsStaff returns the old "is_staff" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldIsStaff(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldIsStaff is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldIsStaff requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsStaff: %w", err)
+	}
+	return oldValue.IsStaff, nil
+}
+
+// ResetIsStaff resets all changes to the "is_staff" field.
+func (m *UserMutation) ResetIsStaff() {
+	m.is_staff = nil
+}
+
 // Where appends a list predicates to the UserMutation builder.
 func (m *UserMutation) Where(ps ...predicate.User) {
 	m.predicates = append(m.predicates, ps...)
@@ -221,12 +660,15 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 2)
+	fields := make([]string, 0, 3)
 	if m.email != nil {
 		fields = append(fields, user.FieldEmail)
 	}
 	if m.name != nil {
 		fields = append(fields, user.FieldName)
+	}
+	if m.is_staff != nil {
+		fields = append(fields, user.FieldIsStaff)
 	}
 	return fields
 }
@@ -240,6 +682,8 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.Email()
 	case user.FieldName:
 		return m.Name()
+	case user.FieldIsStaff:
+		return m.IsStaff()
 	}
 	return nil, false
 }
@@ -253,6 +697,8 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldEmail(ctx)
 	case user.FieldName:
 		return m.OldName(ctx)
+	case user.FieldIsStaff:
+		return m.OldIsStaff(ctx)
 	}
 	return nil, fmt.Errorf("unknown User field %s", name)
 }
@@ -275,6 +721,13 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetName(v)
+		return nil
+	case user.FieldIsStaff:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsStaff(v)
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)
@@ -339,6 +792,9 @@ func (m *UserMutation) ResetField(name string) error {
 		return nil
 	case user.FieldName:
 		m.ResetName()
+		return nil
+	case user.FieldIsStaff:
+		m.ResetIsStaff()
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)

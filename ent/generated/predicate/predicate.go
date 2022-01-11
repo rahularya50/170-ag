@@ -6,5 +6,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// CodingProblem is the predicate function for codingproblem builders.
+type CodingProblem func(*sql.Selector)
+
 // User is the predicate function for user builders.
 type User func(*sql.Selector)

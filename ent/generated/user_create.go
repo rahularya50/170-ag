@@ -41,6 +41,20 @@ func (uc *UserCreate) SetNillableName(s *string) *UserCreate {
 	return uc
 }
 
+// SetIsStaff sets the "is_staff" field.
+func (uc *UserCreate) SetIsStaff(b bool) *UserCreate {
+	uc.mutation.SetIsStaff(b)
+	return uc
+}
+
+// SetNillableIsStaff sets the "is_staff" field if the given value is not nil.
+func (uc *UserCreate) SetNillableIsStaff(b *bool) *UserCreate {
+	if b != nil {
+		uc.SetIsStaff(*b)
+	}
+	return uc
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uc *UserCreate) Mutation() *UserMutation {
 	return uc.mutation
@@ -52,6 +66,9 @@ func (uc *UserCreate) Save(ctx context.Context) (*User, error) {
 		err  error
 		node *User
 	)
+	if err := uc.defaults(); err != nil {
+		return nil, err
+	}
 	if len(uc.hooks) == 0 {
 		if err = uc.check(); err != nil {
 			return nil, err
@@ -109,6 +126,15 @@ func (uc *UserCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (uc *UserCreate) defaults() error {
+	if _, ok := uc.mutation.IsStaff(); !ok {
+		v := user.DefaultIsStaff
+		uc.mutation.SetIsStaff(v)
+	}
+	return nil
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (uc *UserCreate) check() error {
 	if _, ok := uc.mutation.Email(); !ok {
@@ -123,6 +149,9 @@ func (uc *UserCreate) check() error {
 		if err := user.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`generated: validator failed for field "name": %w`, err)}
 		}
+	}
+	if _, ok := uc.mutation.IsStaff(); !ok {
+		return &ValidationError{Name: "is_staff", err: errors.New(`generated: missing required field "is_staff"`)}
 	}
 	return nil
 }
@@ -167,6 +196,14 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Column: user.FieldName,
 		})
 		_node.Name = value
+	}
+	if value, ok := uc.mutation.IsStaff(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: user.FieldIsStaff,
+		})
+		_node.IsStaff = value
 	}
 	return _node, _spec
 }
@@ -252,6 +289,18 @@ func (u *UserUpsert) ClearName() *UserUpsert {
 	return u
 }
 
+// SetIsStaff sets the "is_staff" field.
+func (u *UserUpsert) SetIsStaff(v bool) *UserUpsert {
+	u.Set(user.FieldIsStaff, v)
+	return u
+}
+
+// UpdateIsStaff sets the "is_staff" field to the value that was provided on create.
+func (u *UserUpsert) UpdateIsStaff() *UserUpsert {
+	u.SetExcluded(user.FieldIsStaff)
+	return u
+}
+
 // UpdateNewValues updates the fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
@@ -329,6 +378,20 @@ func (u *UserUpsertOne) ClearName() *UserUpsertOne {
 	})
 }
 
+// SetIsStaff sets the "is_staff" field.
+func (u *UserUpsertOne) SetIsStaff(v bool) *UserUpsertOne {
+	return u.Update(func(s *UserUpsert) {
+		s.SetIsStaff(v)
+	})
+}
+
+// UpdateIsStaff sets the "is_staff" field to the value that was provided on create.
+func (u *UserUpsertOne) UpdateIsStaff() *UserUpsertOne {
+	return u.Update(func(s *UserUpsert) {
+		s.UpdateIsStaff()
+	})
+}
+
 // Exec executes the query.
 func (u *UserUpsertOne) Exec(ctx context.Context) error {
 	if len(u.create.conflict) == 0 {
@@ -377,6 +440,7 @@ func (ucb *UserCreateBulk) Save(ctx context.Context) ([]*User, error) {
 	for i := range ucb.builders {
 		func(i int, root context.Context) {
 			builder := ucb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*UserMutation)
 				if !ok {
@@ -564,6 +628,20 @@ func (u *UserUpsertBulk) UpdateName() *UserUpsertBulk {
 func (u *UserUpsertBulk) ClearName() *UserUpsertBulk {
 	return u.Update(func(s *UserUpsert) {
 		s.ClearName()
+	})
+}
+
+// SetIsStaff sets the "is_staff" field.
+func (u *UserUpsertBulk) SetIsStaff(v bool) *UserUpsertBulk {
+	return u.Update(func(s *UserUpsert) {
+		s.SetIsStaff(v)
+	})
+}
+
+// UpdateIsStaff sets the "is_staff" field to the value that was provided on create.
+func (u *UserUpsertBulk) UpdateIsStaff() *UserUpsertBulk {
+	return u.Update(func(s *UserUpsert) {
+		s.UpdateIsStaff()
 	})
 }
 

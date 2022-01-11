@@ -9,6 +9,7 @@ import (
 
 	"170-ag/ent/generated/migrate"
 
+	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/user"
 
 	"entgo.io/ent/dialect"
@@ -20,6 +21,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// CodingProblem is the client for interacting with the CodingProblem builders.
+	CodingProblem *CodingProblemClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 	// additional fields for node api
@@ -37,6 +40,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.CodingProblem = NewCodingProblemClient(c.config)
 	c.User = NewUserClient(c.config)
 }
 
@@ -69,9 +73,10 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		User:   NewUserClient(cfg),
+		ctx:           ctx,
+		config:        cfg,
+		CodingProblem: NewCodingProblemClient(cfg),
+		User:          NewUserClient(cfg),
 	}, nil
 }
 
@@ -89,15 +94,16 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		config: cfg,
-		User:   NewUserClient(cfg),
+		config:        cfg,
+		CodingProblem: NewCodingProblemClient(cfg),
+		User:          NewUserClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		User.
+//		CodingProblem.
 //		Query().
 //		Count(ctx)
 //
@@ -120,7 +126,99 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
+	c.CodingProblem.Use(hooks...)
 	c.User.Use(hooks...)
+}
+
+// CodingProblemClient is a client for the CodingProblem schema.
+type CodingProblemClient struct {
+	config
+}
+
+// NewCodingProblemClient returns a client for the CodingProblem from the given config.
+func NewCodingProblemClient(c config) *CodingProblemClient {
+	return &CodingProblemClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `codingproblem.Hooks(f(g(h())))`.
+func (c *CodingProblemClient) Use(hooks ...Hook) {
+	c.hooks.CodingProblem = append(c.hooks.CodingProblem, hooks...)
+}
+
+// Create returns a create builder for CodingProblem.
+func (c *CodingProblemClient) Create() *CodingProblemCreate {
+	mutation := newCodingProblemMutation(c.config, OpCreate)
+	return &CodingProblemCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of CodingProblem entities.
+func (c *CodingProblemClient) CreateBulk(builders ...*CodingProblemCreate) *CodingProblemCreateBulk {
+	return &CodingProblemCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for CodingProblem.
+func (c *CodingProblemClient) Update() *CodingProblemUpdate {
+	mutation := newCodingProblemMutation(c.config, OpUpdate)
+	return &CodingProblemUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CodingProblemClient) UpdateOne(cp *CodingProblem) *CodingProblemUpdateOne {
+	mutation := newCodingProblemMutation(c.config, OpUpdateOne, withCodingProblem(cp))
+	return &CodingProblemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CodingProblemClient) UpdateOneID(id int) *CodingProblemUpdateOne {
+	mutation := newCodingProblemMutation(c.config, OpUpdateOne, withCodingProblemID(id))
+	return &CodingProblemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for CodingProblem.
+func (c *CodingProblemClient) Delete() *CodingProblemDelete {
+	mutation := newCodingProblemMutation(c.config, OpDelete)
+	return &CodingProblemDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *CodingProblemClient) DeleteOne(cp *CodingProblem) *CodingProblemDeleteOne {
+	return c.DeleteOneID(cp.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *CodingProblemClient) DeleteOneID(id int) *CodingProblemDeleteOne {
+	builder := c.Delete().Where(codingproblem.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CodingProblemDeleteOne{builder}
+}
+
+// Query returns a query builder for CodingProblem.
+func (c *CodingProblemClient) Query() *CodingProblemQuery {
+	return &CodingProblemQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a CodingProblem entity by its id.
+func (c *CodingProblemClient) Get(ctx context.Context, id int) (*CodingProblem, error) {
+	return c.Query().Where(codingproblem.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CodingProblemClient) GetX(ctx context.Context, id int) *CodingProblem {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *CodingProblemClient) Hooks() []Hook {
+	hooks := c.hooks.CodingProblem
+	return append(hooks[:len(hooks):len(hooks)], codingproblem.Hooks[:]...)
 }
 
 // UserClient is a client for the User schema.

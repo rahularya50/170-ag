@@ -19,6 +19,8 @@ type User struct {
 	Email string `json:"email,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
+	// IsStaff holds the value of the "is_staff" field.
+	IsStaff bool `json:"is_staff,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -26,6 +28,8 @@ func (*User) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case user.FieldIsStaff:
+			values[i] = new(sql.NullBool)
 		case user.FieldID:
 			values[i] = new(sql.NullInt64)
 		case user.FieldEmail, user.FieldName:
@@ -63,6 +67,12 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				u.Name = value.String
 			}
+		case user.FieldIsStaff:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_staff", values[i])
+			} else if value.Valid {
+				u.IsStaff = value.Bool
+			}
 		}
 	}
 	return nil
@@ -95,6 +105,8 @@ func (u *User) String() string {
 	builder.WriteString(u.Email)
 	builder.WriteString(", name=")
 	builder.WriteString(u.Name)
+	builder.WriteString(", is_staff=")
+	builder.WriteString(fmt.Sprintf("%v", u.IsStaff))
 	builder.WriteByte(')')
 	return builder.String()
 }

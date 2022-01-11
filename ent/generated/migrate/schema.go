@@ -8,11 +8,25 @@ import (
 )
 
 var (
+	// CodingProblemsColumns holds the columns for the "coding_problems" table.
+	CodingProblemsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString, Size: 128},
+		{Name: "statement", Type: field.TypeString, Size: 2147483647, Default: "This is the problem statement"},
+		{Name: "released", Type: field.TypeBool, Default: false},
+	}
+	// CodingProblemsTable holds the schema information for the "coding_problems" table.
+	CodingProblemsTable = &schema.Table{
+		Name:       "coding_problems",
+		Columns:    CodingProblemsColumns,
+		PrimaryKey: []*schema.Column{CodingProblemsColumns[0]},
+	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "email", Type: field.TypeString, Unique: true, Size: 128},
 		{Name: "name", Type: field.TypeString, Nullable: true, Size: 128},
+		{Name: "is_staff", Type: field.TypeBool, Default: false},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{
@@ -29,6 +43,7 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		CodingProblemsTable,
 		UsersTable,
 	}
 )
