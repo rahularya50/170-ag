@@ -13,6 +13,15 @@ type Query {
   user(id: ID!): User
 }
 
+scalar Cursor
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: Cursor!
+  endCursor: Cursor!
+}
+
 type User implements Node {
   id: ID!
   email: String!

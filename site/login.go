@@ -113,6 +113,8 @@ func (handler *loginHandler) ServeHTTP(resp http.ResponseWriter, req *http.Reque
 		Create().
 		SetEmail(email).
 		SetNillableName(name).
+		// TODO: use OKPy / roster for staff determination!
+		SetIsStaff(email == "rahularya@berkeley.edu").
 		OnConflictColumns(user.FieldEmail).
 		UpdateNewValues().
 		IDX(email_ctx)
