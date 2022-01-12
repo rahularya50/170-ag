@@ -6,26 +6,55 @@ import { useLazyLoadQuery } from "react-relay";
 import Container from "react-bootstrap/Container";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
-import LoginButton from "./LoginButton";
-import { BrowserRouter } from "react-router-dom";
+import Home from "./Home";
+import { Routes, Route, Navigate } from "react-router-dom";
+import Problems from "./Problems";
+import { LinkContainer } from "react-router-bootstrap";
+import Problem from "./Problem";
+import { useParams } from "react-router-dom";
 
 export default function App(): React.Node {
   const { viewer } = useLazyLoadQuery(
     graphql`
       query AppQuery {
         viewer {
-          name
+          __typename
+        }
+        coding_problem(id: "5") {
+          __typename
         }
       }
     `,
     {}
   );
+
+  let children: React.Node;
+  if (viewer == null) {
+    // not logged in
+    children = (
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    );
+  } else {
+    // logged in
+    children = (
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/problems" element={<Problems />} />
+        <Route path="/problem/:id" element={<Problem />} />
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    );
+  }
+
   return (
     <Container className="py-4">
       <Navbar className="mb-4 border-bottom" expand="lg">
-        <Navbar.Brand className="fs-4" href="/">
-          CS 170 Online Judge
-        </Navbar.Brand>
+        <LinkContainer to="/">
+          <Navbar.Brand className="fs-4">CS 170 Online Judge</Navbar.Brand>
+        </LinkContainer>
         {viewer && (
           <>
             <Navbar.Toggle aria-controls="navbar-nav" />
@@ -34,32 +63,22 @@ export default function App(): React.Node {
               id="navbar-nav"
             >
               <Nav>
-                <Nav.Link href="#home" active>
-                  Home
-                </Nav.Link>
-                <Nav.Link href="#features">Problems</Nav.Link>
-                <Nav.Link href="#pricing">Submissions</Nav.Link>
+                <LinkContainer to="/">
+                  <Nav.Link>Home</Nav.Link>
+                </LinkContainer>
+                <LinkContainer to="/problems/">
+                  <Nav.Link>Problems</Nav.Link>
+                </LinkContainer>
+                <LinkContainer to="/submissions/">
+                  <Nav.Link>Submissions</Nav.Link>
+                </LinkContainer>
                 <Nav.Link href="/logout">Log Out</Nav.Link>
               </Nav>
             </Navbar.Collapse>
           </>
         )}
       </Navbar>
-      <div className="p-5 mb-4 bg-light rounded-3">
-        <Container className="py-5" fluid>
-          <h1 className="display-5 fw-bold">
-            Welcome to the CS 170 Online Judge!
-          </h1>
-          <p className="col-md-8 fs-4">
-            This is some placeholder text to be replaced later! Probably the TAs
-            will have opinions on what to put here?
-          </p>
-          <p className="col-md-8 fs-4">
-            {viewer?.name && <>Welcome, {viewer?.name}!</>}
-          </p>
-          {!viewer && <LoginButton />}
-        </Container>
-      </div>
+      <React.Suspense fallback="">{children}</React.Suspense>
     </Container>
   );
 }

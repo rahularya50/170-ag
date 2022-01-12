@@ -2,15 +2,9 @@
 #
 # https://gqlgen.com/getting-started/
 
+# Boilerplate
 interface Node {
   id: ID!
-}
-
-type Query {
-  viewer: User
-  node(id: ID!): Node
-  nodes(ids: [ID!]!): [Node!]!
-  user(id: ID!): User
 }
 
 scalar Cursor
@@ -22,6 +16,26 @@ type PageInfo {
   endCursor: Cursor!
 }
 
+type Query {
+  viewer: User
+  node(id: ID!): Node
+  nodes(ids: [ID!]!): [Node!]!
+  user(id: ID!): User
+  coding_problem(id: ID!): CodingProblem
+  coding_problems(
+    after: Cursor
+    first: Int
+    before: Cursor
+    last: Int
+    include_unreleased: Boolean! = false
+  ): CodingProblemConnection!
+}
+
+type Mutation {
+  new_user(name: String): User
+  new_problem(input: CodingProblemInput): CodingProblem
+}
+
 type User implements Node {
   id: ID!
   email: String!
@@ -29,10 +43,25 @@ type User implements Node {
   is_staff: Boolean!
 }
 
-type Placeholder {
+type CodingProblem implements Node {
   id: ID!
+  name: String!
+  statement: String!
+  released: Boolean!
+}
+type CodingProblemConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [CodingProblemEdge!]!
 }
 
-type Mutation {
-  new_user(name: String): User
+type CodingProblemEdge {
+  node: CodingProblem!
+  cursor: Cursor!
+}
+
+input CodingProblemInput {
+  name: String!
+  statement: String!
+  released: Boolean!
 }

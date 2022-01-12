@@ -5,13 +5,24 @@ package resolvers
 
 import (
 	ent "170-ag/ent/generated"
+	"170-ag/ent/generated/codingproblem"
 	resolvers "170-ag/resolvers/generated"
+	model "170-ag/schema/generated"
 	"170-ag/site"
 	"context"
 )
 
 func (r *mutationResolver) NewUser(ctx context.Context, name *string) (*ent.User, error) {
 	return r.client.User.Create().SetName(*name).Save(ctx)
+}
+
+func (r *mutationResolver) NewProblem(ctx context.Context, input *model.CodingProblemInput) (*ent.CodingProblem, error) {
+	return r.client.CodingProblem.
+		Create().
+		SetName(input.Name).
+		SetStatement(input.Statement).
+		SetReleased(input.Released).
+		Save(ctx)
 }
 
 func (r *queryResolver) Viewer(ctx context.Context) (*ent.User, error) {
@@ -33,6 +44,20 @@ func (r *queryResolver) Nodes(ctx context.Context, ids []int) ([]ent.Noder, erro
 
 func (r *queryResolver) User(ctx context.Context, id int) (*ent.User, error) {
 	return r.client.User.Get(ctx, id)
+}
+
+func (r *queryResolver) CodingProblem(ctx context.Context, id int) (*ent.CodingProblem, error) {
+	return r.client.CodingProblem.Get(ctx, id)
+}
+
+func (r *queryResolver) CodingProblems(ctx context.Context, after *ent.Cursor, first *int, before *ent.Cursor, last *int, includeUnreleased bool) (*ent.CodingProblemConnection, error) {
+	query := r.client.CodingProblem.Query()
+
+	if !includeUnreleased {
+		query = query.Where(codingproblem.Released(true))
+	}
+
+	return query.Paginate(ctx, after, first, before, last)
 }
 
 // Mutation returns resolvers.MutationResolver implementation.
