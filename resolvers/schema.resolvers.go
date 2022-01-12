@@ -10,6 +10,7 @@ import (
 	model "170-ag/schema/generated"
 	"170-ag/site"
 	"context"
+	"fmt"
 )
 
 func (r *mutationResolver) NewUser(ctx context.Context, name *string) (*ent.User, error) {
@@ -23,6 +24,10 @@ func (r *mutationResolver) NewProblem(ctx context.Context, input *model.CodingPr
 		SetStatement(input.Statement).
 		SetReleased(input.Released).
 		Save(ctx)
+}
+
+func (r *mutationResolver) SaveDraft(ctx context.Context, input *model.CodingDraftInput) (*model.CodingDraft, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *queryResolver) Viewer(ctx context.Context) (*ent.User, error) {

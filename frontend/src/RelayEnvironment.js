@@ -3,6 +3,8 @@
 import { Environment, Network, RecordSource, Store } from "relay-runtime";
 
 function fetchQuery(operation, variables) {
+  const controller = new AbortController();
+  setTimeout(() => controller.abort(), 5000);
   return fetch("/query", {
     method: "POST",
     headers: {
@@ -12,6 +14,7 @@ function fetchQuery(operation, variables) {
       query: operation.text,
       variables,
     }),
+    signal: controller.signal,
   }).then((response) => {
     return response.json();
   });
