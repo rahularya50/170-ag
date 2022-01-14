@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -26,7 +27,9 @@ func (CodingProblem) Fields() []ent.Field {
 
 // Edges of the CodingProblem.
 func (CodingProblem) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.From("drafts", CodingDraft.Type).Ref("coding_problem"),
+	}
 }
 
 func allowCodingProblemQueryIfReleased() privacy.CodingProblemQueryRuleFunc {

@@ -9,6 +9,18 @@ import (
 )
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (cd *CodingDraftQuery) CollectFields(ctx context.Context, satisfies ...string) *CodingDraftQuery {
+	if fc := graphql.GetFieldContext(ctx); fc != nil {
+		cd = cd.collectField(graphql.GetOperationContext(ctx), fc.Field, satisfies...)
+	}
+	return cd
+}
+
+func (cd *CodingDraftQuery) collectField(ctx *graphql.OperationContext, field graphql.CollectedField, satisfies ...string) *CodingDraftQuery {
+	return cd
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
 func (cp *CodingProblemQuery) CollectFields(ctx context.Context, satisfies ...string) *CodingProblemQuery {
 	if fc := graphql.GetFieldContext(ctx); fc != nil {
 		cp = cp.collectField(graphql.GetOperationContext(ctx), fc.Field, satisfies...)

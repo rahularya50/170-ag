@@ -3,6 +3,7 @@
 package generated
 
 import (
+	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/user"
 	"context"
@@ -232,6 +233,233 @@ const (
 	pageInfoField   = "pageInfo"
 	totalCountField = "totalCount"
 )
+
+// CodingDraftEdge is the edge representation of CodingDraft.
+type CodingDraftEdge struct {
+	Node   *CodingDraft `json:"node"`
+	Cursor Cursor       `json:"cursor"`
+}
+
+// CodingDraftConnection is the connection containing edges to CodingDraft.
+type CodingDraftConnection struct {
+	Edges      []*CodingDraftEdge `json:"edges"`
+	PageInfo   PageInfo           `json:"pageInfo"`
+	TotalCount int                `json:"totalCount"`
+}
+
+// CodingDraftPaginateOption enables pagination customization.
+type CodingDraftPaginateOption func(*codingDraftPager) error
+
+// WithCodingDraftOrder configures pagination ordering.
+func WithCodingDraftOrder(order *CodingDraftOrder) CodingDraftPaginateOption {
+	if order == nil {
+		order = DefaultCodingDraftOrder
+	}
+	o := *order
+	return func(pager *codingDraftPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultCodingDraftOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithCodingDraftFilter configures pagination filter.
+func WithCodingDraftFilter(filter func(*CodingDraftQuery) (*CodingDraftQuery, error)) CodingDraftPaginateOption {
+	return func(pager *codingDraftPager) error {
+		if filter == nil {
+			return errors.New("CodingDraftQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type codingDraftPager struct {
+	order  *CodingDraftOrder
+	filter func(*CodingDraftQuery) (*CodingDraftQuery, error)
+}
+
+func newCodingDraftPager(opts []CodingDraftPaginateOption) (*codingDraftPager, error) {
+	pager := &codingDraftPager{}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultCodingDraftOrder
+	}
+	return pager, nil
+}
+
+func (p *codingDraftPager) applyFilter(query *CodingDraftQuery) (*CodingDraftQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *codingDraftPager) toCursor(cd *CodingDraft) Cursor {
+	return p.order.Field.toCursor(cd)
+}
+
+func (p *codingDraftPager) applyCursors(query *CodingDraftQuery, after, before *Cursor) *CodingDraftQuery {
+	for _, predicate := range cursorsToPredicates(
+		p.order.Direction, after, before,
+		p.order.Field.field, DefaultCodingDraftOrder.Field.field,
+	) {
+		query = query.Where(predicate)
+	}
+	return query
+}
+
+func (p *codingDraftPager) applyOrder(query *CodingDraftQuery, reverse bool) *CodingDraftQuery {
+	direction := p.order.Direction
+	if reverse {
+		direction = direction.reverse()
+	}
+	query = query.Order(direction.orderFunc(p.order.Field.field))
+	if p.order.Field != DefaultCodingDraftOrder.Field {
+		query = query.Order(direction.orderFunc(DefaultCodingDraftOrder.Field.field))
+	}
+	return query
+}
+
+// Paginate executes the query and returns a relay based cursor connection to CodingDraft.
+func (cd *CodingDraftQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...CodingDraftPaginateOption,
+) (*CodingDraftConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newCodingDraftPager(opts)
+	if err != nil {
+		return nil, err
+	}
+
+	if cd, err = pager.applyFilter(cd); err != nil {
+		return nil, err
+	}
+
+	conn := &CodingDraftConnection{Edges: []*CodingDraftEdge{}}
+	if !hasCollectedField(ctx, edgesField) || first != nil && *first == 0 || last != nil && *last == 0 {
+		if hasCollectedField(ctx, totalCountField) ||
+			hasCollectedField(ctx, pageInfoField) {
+			count, err := cd.Count(ctx)
+			if err != nil {
+				return nil, err
+			}
+			conn.TotalCount = count
+			conn.PageInfo.HasNextPage = first != nil && count > 0
+			conn.PageInfo.HasPreviousPage = last != nil && count > 0
+		}
+		return conn, nil
+	}
+
+	if (after != nil || first != nil || before != nil || last != nil) && hasCollectedField(ctx, totalCountField) {
+		count, err := cd.Clone().Count(ctx)
+		if err != nil {
+			return nil, err
+		}
+		conn.TotalCount = count
+	}
+
+	cd = pager.applyCursors(cd, after, before)
+	cd = pager.applyOrder(cd, last != nil)
+	var limit int
+	if first != nil {
+		limit = *first + 1
+	} else if last != nil {
+		limit = *last + 1
+	}
+	if limit > 0 {
+		cd = cd.Limit(limit)
+	}
+
+	if field := getCollectedField(ctx, edgesField, nodeField); field != nil {
+		cd = cd.collectField(graphql.GetOperationContext(ctx), *field)
+	}
+
+	nodes, err := cd.All(ctx)
+	if err != nil || len(nodes) == 0 {
+		return conn, err
+	}
+
+	if len(nodes) == limit {
+		conn.PageInfo.HasNextPage = first != nil
+		conn.PageInfo.HasPreviousPage = last != nil
+		nodes = nodes[:len(nodes)-1]
+	}
+
+	var nodeAt func(int) *CodingDraft
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *CodingDraft {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *CodingDraft {
+			return nodes[i]
+		}
+	}
+
+	conn.Edges = make([]*CodingDraftEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		conn.Edges[i] = &CodingDraftEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+
+	conn.PageInfo.StartCursor = &conn.Edges[0].Cursor
+	conn.PageInfo.EndCursor = &conn.Edges[len(conn.Edges)-1].Cursor
+	if conn.TotalCount == 0 {
+		conn.TotalCount = len(nodes)
+	}
+
+	return conn, nil
+}
+
+// CodingDraftOrderField defines the ordering field of CodingDraft.
+type CodingDraftOrderField struct {
+	field    string
+	toCursor func(*CodingDraft) Cursor
+}
+
+// CodingDraftOrder defines the ordering of CodingDraft.
+type CodingDraftOrder struct {
+	Direction OrderDirection         `json:"direction"`
+	Field     *CodingDraftOrderField `json:"field"`
+}
+
+// DefaultCodingDraftOrder is the default ordering of CodingDraft.
+var DefaultCodingDraftOrder = &CodingDraftOrder{
+	Direction: OrderDirectionAsc,
+	Field: &CodingDraftOrderField{
+		field: codingdraft.FieldID,
+		toCursor: func(cd *CodingDraft) Cursor {
+			return Cursor{ID: cd.ID}
+		},
+	},
+}
+
+// ToEdge converts CodingDraft into CodingDraftEdge.
+func (cd *CodingDraft) ToEdge(order *CodingDraftOrder) *CodingDraftEdge {
+	if order == nil {
+		order = DefaultCodingDraftOrder
+	}
+	return &CodingDraftEdge{
+		Node:   cd,
+		Cursor: order.Field.toCursor(cd),
+	}
+}
 
 // CodingProblemEdge is the edge representation of CodingProblem.
 type CodingProblemEdge struct {

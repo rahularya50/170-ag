@@ -3,6 +3,7 @@
 package generated
 
 import (
+	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/user"
 	"context"
 	"errors"
@@ -53,6 +54,21 @@ func (uc *UserCreate) SetNillableIsStaff(b *bool) *UserCreate {
 		uc.SetIsStaff(*b)
 	}
 	return uc
+}
+
+// AddDraftIDs adds the "drafts" edge to the CodingDraft entity by IDs.
+func (uc *UserCreate) AddDraftIDs(ids ...int) *UserCreate {
+	uc.mutation.AddDraftIDs(ids...)
+	return uc
+}
+
+// AddDrafts adds the "drafts" edges to the CodingDraft entity.
+func (uc *UserCreate) AddDrafts(c ...*CodingDraft) *UserCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uc.AddDraftIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -204,6 +220,25 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Column: user.FieldIsStaff,
 		})
 		_node.IsStaff = value
+	}
+	if nodes := uc.mutation.DraftsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.DraftsTable,
+			Columns: []string{user.DraftsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingdraft.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

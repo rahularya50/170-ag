@@ -6,6 +6,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// CodingDraft is the predicate function for codingdraft builders.
+type CodingDraft func(*sql.Selector)
+
 // CodingProblem is the predicate function for codingproblem builders.
 type CodingProblem func(*sql.Selector)
 

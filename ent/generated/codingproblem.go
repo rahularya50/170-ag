@@ -21,6 +21,27 @@ type CodingProblem struct {
 	Statement string `json:"statement,omitempty"`
 	// Released holds the value of the "released" field.
 	Released bool `json:"released,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the CodingProblemQuery when eager-loading is set.
+	Edges CodingProblemEdges `json:"edges"`
+}
+
+// CodingProblemEdges holds the relations/edges for other nodes in the graph.
+type CodingProblemEdges struct {
+	// Drafts holds the value of the drafts edge.
+	Drafts []*CodingDraft `json:"drafts,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// DraftsOrErr returns the Drafts value or an error if the edge
+// was not loaded in eager-loading.
+func (e CodingProblemEdges) DraftsOrErr() ([]*CodingDraft, error) {
+	if e.loadedTypes[0] {
+		return e.Drafts, nil
+	}
+	return nil, &NotLoadedError{edge: "drafts"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -76,6 +97,11 @@ func (cp *CodingProblem) assignValues(columns []string, values []interface{}) er
 		}
 	}
 	return nil
+}
+
+// QueryDrafts queries the "drafts" edge of the CodingProblem entity.
+func (cp *CodingProblem) QueryDrafts() *CodingDraftQuery {
+	return (&CodingProblemClient{config: cp.config}).QueryDrafts(cp)
 }
 
 // Update returns a builder for updating this CodingProblem.

@@ -5,13 +5,23 @@ package resolvers
 
 import (
 	ent "170-ag/ent/generated"
+	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/codingproblem"
+	"170-ag/ent/generated/user"
 	resolvers "170-ag/resolvers/generated"
 	model "170-ag/schema/generated"
 	"170-ag/site"
 	"context"
 	"fmt"
 )
+
+func (r *codingProblemResolver) MyDraft(ctx context.Context, obj *ent.CodingProblem) (*ent.CodingDraft, error) {
+	viewer, ok := site.ViewerFromContext(ctx)
+	if !ok {
+		return nil, fmt.Errorf("viewer not found")
+	}
+	return obj.QueryDrafts().Where(codingdraft.HasAuthorWith(user.ID(viewer.ID))).Only(ctx)
+}
 
 func (r *mutationResolver) NewUser(ctx context.Context, name *string) (*ent.User, error) {
 	return r.client.User.Create().SetName(*name).Save(ctx)
@@ -26,8 +36,22 @@ func (r *mutationResolver) NewProblem(ctx context.Context, input *model.CodingPr
 		Save(ctx)
 }
 
-func (r *mutationResolver) SaveDraft(ctx context.Context, input *model.CodingDraftInput) (*model.CodingDraft, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *mutationResolver) SaveDraft(ctx context.Context, input *model.CodingDraftInput) (*ent.CodingDraft, error) {
+	viewer, ok := site.ViewerFromContext(ctx)
+	if !ok {
+		return nil, fmt.Errorf("viewer not found")
+	}
+	coding_draft_id, err := r.client.CodingDraft.Create().
+		SetAuthor(viewer).
+		SetCode(input.Code).
+		SetCodingProblemID(input.ProblemID).
+		OnConflictColumns(codingdraft.CodingProblemColumn, codingdraft.AuthorColumn).
+		UpdateNewValues().
+		ID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return r.client.CodingDraft.Get(ctx, coding_draft_id)
 }
 
 func (r *queryResolver) Viewer(ctx context.Context) (*ent.User, error) {
@@ -65,11 +89,15 @@ func (r *queryResolver) CodingProblems(ctx context.Context, after *ent.Cursor, f
 	return query.Paginate(ctx, after, first, before, last)
 }
 
+// CodingProblem returns resolvers.CodingProblemResolver implementation.
+func (r *Resolver) CodingProblem() resolvers.CodingProblemResolver { return &codingProblemResolver{r} }
+
 // Mutation returns resolvers.MutationResolver implementation.
 func (r *Resolver) Mutation() resolvers.MutationResolver { return &mutationResolver{r} }
 
 // Query returns resolvers.QueryResolver implementation.
 func (r *Resolver) Query() resolvers.QueryResolver { return &queryResolver{r} }
 
+type codingProblemResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

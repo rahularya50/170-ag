@@ -17,8 +17,17 @@ const (
 	FieldName = "name"
 	// FieldIsStaff holds the string denoting the is_staff field in the database.
 	FieldIsStaff = "is_staff"
+	// EdgeDrafts holds the string denoting the drafts edge name in mutations.
+	EdgeDrafts = "drafts"
 	// Table holds the table name of the user in the database.
 	Table = "users"
+	// DraftsTable is the table that holds the drafts relation/edge.
+	DraftsTable = "coding_drafts"
+	// DraftsInverseTable is the table name for the CodingDraft entity.
+	// It exists in this package in order to avoid circular dependency with the "codingdraft" package.
+	DraftsInverseTable = "coding_drafts"
+	// DraftsColumn is the table column denoting the drafts relation/edge.
+	DraftsColumn = "coding_draft_author"
 )
 
 // Columns holds all SQL columns for user fields.

@@ -3,6 +3,7 @@
 package generated
 
 import (
+	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/codingproblem"
 	"context"
 	"errors"
@@ -53,6 +54,21 @@ func (cpc *CodingProblemCreate) SetNillableReleased(b *bool) *CodingProblemCreat
 		cpc.SetReleased(*b)
 	}
 	return cpc
+}
+
+// AddDraftIDs adds the "drafts" edge to the CodingDraft entity by IDs.
+func (cpc *CodingProblemCreate) AddDraftIDs(ids ...int) *CodingProblemCreate {
+	cpc.mutation.AddDraftIDs(ids...)
+	return cpc
+}
+
+// AddDrafts adds the "drafts" edges to the CodingDraft entity.
+func (cpc *CodingProblemCreate) AddDrafts(c ...*CodingDraft) *CodingProblemCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cpc.AddDraftIDs(ids...)
 }
 
 // Mutation returns the CodingProblemMutation object of the builder.
@@ -211,6 +227,25 @@ func (cpc *CodingProblemCreate) createSpec() (*CodingProblem, *sqlgraph.CreateSp
 			Column: codingproblem.FieldReleased,
 		})
 		_node.Released = value
+	}
+	if nodes := cpc.mutation.DraftsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   codingproblem.DraftsTable,
+			Columns: []string{codingproblem.DraftsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingdraft.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

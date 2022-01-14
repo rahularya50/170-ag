@@ -3,6 +3,7 @@
 package generated
 
 import (
+	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/user"
 	"context"
@@ -47,12 +48,51 @@ type Edge struct {
 	IDs  []int  `json:"ids,omitempty"`  // node ids (where this edge point to).
 }
 
+func (cd *CodingDraft) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     cd.ID,
+		Type:   "CodingDraft",
+		Fields: make([]*Field, 1),
+		Edges:  make([]*Edge, 2),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(cd.Code); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "string",
+		Name:  "code",
+		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "User",
+		Name: "author",
+	}
+	err = cd.QueryAuthor().
+		Select(user.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[1] = &Edge{
+		Type: "CodingProblem",
+		Name: "coding_problem",
+	}
+	err = cd.QueryCodingProblem().
+		Select(codingproblem.FieldID).
+		Scan(ctx, &node.Edges[1].IDs)
+	if err != nil {
+		return nil, err
+	}
+	return node, nil
+}
+
 func (cp *CodingProblem) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     cp.ID,
 		Type:   "CodingProblem",
 		Fields: make([]*Field, 3),
-		Edges:  make([]*Edge, 0),
+		Edges:  make([]*Edge, 1),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(cp.Name); err != nil {
@@ -79,6 +119,16 @@ func (cp *CodingProblem) Node(ctx context.Context) (node *Node, err error) {
 		Name:  "released",
 		Value: string(buf),
 	}
+	node.Edges[0] = &Edge{
+		Type: "CodingDraft",
+		Name: "drafts",
+	}
+	err = cp.QueryDrafts().
+		Select(codingdraft.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
 	return node, nil
 }
 
@@ -87,7 +137,7 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 		ID:     u.ID,
 		Type:   "User",
 		Fields: make([]*Field, 3),
-		Edges:  make([]*Edge, 0),
+		Edges:  make([]*Edge, 1),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(u.Email); err != nil {
@@ -113,6 +163,16 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 		Type:  "bool",
 		Name:  "is_staff",
 		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "CodingDraft",
+		Name: "drafts",
+	}
+	err = u.QueryDrafts().
+		Select(codingdraft.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
 	}
 	return node, nil
 }
@@ -184,6 +244,15 @@ func (c *Client) Noder(ctx context.Context, id int, opts ...NodeOption) (_ Noder
 
 func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error) {
 	switch table {
+	case codingdraft.Table:
+		n, err := c.CodingDraft.Query().
+			Where(codingdraft.ID(id)).
+			CollectFields(ctx, "CodingDraft").
+			Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
 	case codingproblem.Table:
 		n, err := c.CodingProblem.Query().
 			Where(codingproblem.ID(id)).
@@ -275,6 +344,19 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		idmap[id] = append(idmap[id], &noders[i])
 	}
 	switch table {
+	case codingdraft.Table:
+		nodes, err := c.CodingDraft.Query().
+			Where(codingdraft.IDIn(ids...)).
+			CollectFields(ctx, "CodingDraft").
+			All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
 	case codingproblem.Table:
 		nodes, err := c.CodingProblem.Query().
 			Where(codingproblem.IDIn(ids...)).

@@ -8,6 +8,40 @@ import (
 )
 
 var (
+	// CodingDraftsColumns holds the columns for the "coding_drafts" table.
+	CodingDraftsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "code", Type: field.TypeString, Size: 2147483647},
+		{Name: "coding_draft_author", Type: field.TypeInt, Nullable: true},
+		{Name: "coding_draft_coding_problem", Type: field.TypeInt, Nullable: true},
+	}
+	// CodingDraftsTable holds the schema information for the "coding_drafts" table.
+	CodingDraftsTable = &schema.Table{
+		Name:       "coding_drafts",
+		Columns:    CodingDraftsColumns,
+		PrimaryKey: []*schema.Column{CodingDraftsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "coding_drafts_users_author",
+				Columns:    []*schema.Column{CodingDraftsColumns[2]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "coding_drafts_coding_problems_coding_problem",
+				Columns:    []*schema.Column{CodingDraftsColumns[3]},
+				RefColumns: []*schema.Column{CodingProblemsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "codingdraft_coding_draft_author_coding_draft_coding_problem",
+				Unique:  true,
+				Columns: []*schema.Column{CodingDraftsColumns[2], CodingDraftsColumns[3]},
+			},
+		},
+	}
 	// CodingProblemsColumns holds the columns for the "coding_problems" table.
 	CodingProblemsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -43,10 +77,13 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		CodingDraftsTable,
 		CodingProblemsTable,
 		UsersTable,
 	}
 )
 
 func init() {
+	CodingDraftsTable.ForeignKeys[0].RefTable = UsersTable
+	CodingDraftsTable.ForeignKeys[1].RefTable = CodingProblemsTable
 }

@@ -21,6 +21,27 @@ type User struct {
 	Name string `json:"name,omitempty"`
 	// IsStaff holds the value of the "is_staff" field.
 	IsStaff bool `json:"is_staff,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the UserQuery when eager-loading is set.
+	Edges UserEdges `json:"edges"`
+}
+
+// UserEdges holds the relations/edges for other nodes in the graph.
+type UserEdges struct {
+	// Drafts holds the value of the drafts edge.
+	Drafts []*CodingDraft `json:"drafts,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// DraftsOrErr returns the Drafts value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) DraftsOrErr() ([]*CodingDraft, error) {
+	if e.loadedTypes[0] {
+		return e.Drafts, nil
+	}
+	return nil, &NotLoadedError{edge: "drafts"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -76,6 +97,11 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 		}
 	}
 	return nil
+}
+
+// QueryDrafts queries the "drafts" edge of the User entity.
+func (u *User) QueryDrafts() *CodingDraftQuery {
+	return (&UserClient{config: u.config}).QueryDrafts(u)
 }
 
 // Update returns a builder for updating this User.

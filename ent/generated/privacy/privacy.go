@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 
+	"entgo.io/ent/entql"
 	"entgo.io/ent/privacy"
 )
 
@@ -163,6 +164,30 @@ func DenyMutationOperationRule(op generated.Op) MutationRule {
 	return OnMutationOperation(rule, op)
 }
 
+// The CodingDraftQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type CodingDraftQueryRuleFunc func(context.Context, *generated.CodingDraftQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f CodingDraftQueryRuleFunc) EvalQuery(ctx context.Context, q generated.Query) error {
+	if q, ok := q.(*generated.CodingDraftQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("generated/privacy: unexpected query type %T, expect *generated.CodingDraftQuery", q)
+}
+
+// The CodingDraftMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type CodingDraftMutationRuleFunc func(context.Context, *generated.CodingDraftMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f CodingDraftMutationRuleFunc) EvalMutation(ctx context.Context, m generated.Mutation) error {
+	if m, ok := m.(*generated.CodingDraftMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("generated/privacy: unexpected mutation type %T, expect *generated.CodingDraftMutation", m)
+}
+
 // The CodingProblemQueryRuleFunc type is an adapter to allow the use of ordinary
 // functions as a query rule.
 type CodingProblemQueryRuleFunc func(context.Context, *generated.CodingProblemQuery) error
@@ -209,4 +234,63 @@ func (f UserMutationRuleFunc) EvalMutation(ctx context.Context, m generated.Muta
 		return f(ctx, m)
 	}
 	return Denyf("generated/privacy: unexpected mutation type %T, expect *generated.UserMutation", m)
+}
+
+type (
+	// Filter is the interface that wraps the Where function
+	// for filtering nodes in queries and mutations.
+	Filter interface {
+		// Where applies a filter on the executed query/mutation.
+		Where(entql.P)
+	}
+
+	// The FilterFunc type is an adapter that allows the use of ordinary
+	// functions as filters for query and mutation types.
+	FilterFunc func(context.Context, Filter) error
+)
+
+// EvalQuery calls f(ctx, q) if the query implements the Filter interface, otherwise it is denied.
+func (f FilterFunc) EvalQuery(ctx context.Context, q generated.Query) error {
+	fr, err := queryFilter(q)
+	if err != nil {
+		return err
+	}
+	return f(ctx, fr)
+}
+
+// EvalMutation calls f(ctx, q) if the mutation implements the Filter interface, otherwise it is denied.
+func (f FilterFunc) EvalMutation(ctx context.Context, m generated.Mutation) error {
+	fr, err := mutationFilter(m)
+	if err != nil {
+		return err
+	}
+	return f(ctx, fr)
+}
+
+var _ QueryMutationRule = FilterFunc(nil)
+
+func queryFilter(q generated.Query) (Filter, error) {
+	switch q := q.(type) {
+	case *generated.CodingDraftQuery:
+		return q.Filter(), nil
+	case *generated.CodingProblemQuery:
+		return q.Filter(), nil
+	case *generated.UserQuery:
+		return q.Filter(), nil
+	default:
+		return nil, Denyf("generated/privacy: unexpected query type %T for query filter", q)
+	}
+}
+
+func mutationFilter(m generated.Mutation) (Filter, error) {
+	switch m := m.(type) {
+	case *generated.CodingDraftMutation:
+		return m.Filter(), nil
+	case *generated.CodingProblemMutation:
+		return m.Filter(), nil
+	case *generated.UserMutation:
+		return m.Filter(), nil
+	default:
+		return nil, Denyf("generated/privacy: unexpected mutation type %T for mutation filter", m)
+	}
 }

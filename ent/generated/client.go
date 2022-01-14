@@ -9,11 +9,13 @@ import (
 
 	"170-ag/ent/generated/migrate"
 
+	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/user"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // Client is the client that holds all ent builders.
@@ -21,6 +23,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// CodingDraft is the client for interacting with the CodingDraft builders.
+	CodingDraft *CodingDraftClient
 	// CodingProblem is the client for interacting with the CodingProblem builders.
 	CodingProblem *CodingProblemClient
 	// User is the client for interacting with the User builders.
@@ -40,6 +44,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.CodingDraft = NewCodingDraftClient(c.config)
 	c.CodingProblem = NewCodingProblemClient(c.config)
 	c.User = NewUserClient(c.config)
 }
@@ -75,6 +80,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	return &Tx{
 		ctx:           ctx,
 		config:        cfg,
+		CodingDraft:   NewCodingDraftClient(cfg),
 		CodingProblem: NewCodingProblemClient(cfg),
 		User:          NewUserClient(cfg),
 	}, nil
@@ -95,6 +101,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
 		config:        cfg,
+		CodingDraft:   NewCodingDraftClient(cfg),
 		CodingProblem: NewCodingProblemClient(cfg),
 		User:          NewUserClient(cfg),
 	}, nil
@@ -103,7 +110,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		CodingProblem.
+//		CodingDraft.
 //		Query().
 //		Count(ctx)
 //
@@ -126,8 +133,132 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
+	c.CodingDraft.Use(hooks...)
 	c.CodingProblem.Use(hooks...)
 	c.User.Use(hooks...)
+}
+
+// CodingDraftClient is a client for the CodingDraft schema.
+type CodingDraftClient struct {
+	config
+}
+
+// NewCodingDraftClient returns a client for the CodingDraft from the given config.
+func NewCodingDraftClient(c config) *CodingDraftClient {
+	return &CodingDraftClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `codingdraft.Hooks(f(g(h())))`.
+func (c *CodingDraftClient) Use(hooks ...Hook) {
+	c.hooks.CodingDraft = append(c.hooks.CodingDraft, hooks...)
+}
+
+// Create returns a create builder for CodingDraft.
+func (c *CodingDraftClient) Create() *CodingDraftCreate {
+	mutation := newCodingDraftMutation(c.config, OpCreate)
+	return &CodingDraftCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of CodingDraft entities.
+func (c *CodingDraftClient) CreateBulk(builders ...*CodingDraftCreate) *CodingDraftCreateBulk {
+	return &CodingDraftCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for CodingDraft.
+func (c *CodingDraftClient) Update() *CodingDraftUpdate {
+	mutation := newCodingDraftMutation(c.config, OpUpdate)
+	return &CodingDraftUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CodingDraftClient) UpdateOne(cd *CodingDraft) *CodingDraftUpdateOne {
+	mutation := newCodingDraftMutation(c.config, OpUpdateOne, withCodingDraft(cd))
+	return &CodingDraftUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CodingDraftClient) UpdateOneID(id int) *CodingDraftUpdateOne {
+	mutation := newCodingDraftMutation(c.config, OpUpdateOne, withCodingDraftID(id))
+	return &CodingDraftUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for CodingDraft.
+func (c *CodingDraftClient) Delete() *CodingDraftDelete {
+	mutation := newCodingDraftMutation(c.config, OpDelete)
+	return &CodingDraftDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *CodingDraftClient) DeleteOne(cd *CodingDraft) *CodingDraftDeleteOne {
+	return c.DeleteOneID(cd.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *CodingDraftClient) DeleteOneID(id int) *CodingDraftDeleteOne {
+	builder := c.Delete().Where(codingdraft.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CodingDraftDeleteOne{builder}
+}
+
+// Query returns a query builder for CodingDraft.
+func (c *CodingDraftClient) Query() *CodingDraftQuery {
+	return &CodingDraftQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a CodingDraft entity by its id.
+func (c *CodingDraftClient) Get(ctx context.Context, id int) (*CodingDraft, error) {
+	return c.Query().Where(codingdraft.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CodingDraftClient) GetX(ctx context.Context, id int) *CodingDraft {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryAuthor queries the author edge of a CodingDraft.
+func (c *CodingDraftClient) QueryAuthor(cd *CodingDraft) *UserQuery {
+	query := &UserQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := cd.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(codingdraft.Table, codingdraft.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, codingdraft.AuthorTable, codingdraft.AuthorColumn),
+		)
+		fromV = sqlgraph.Neighbors(cd.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCodingProblem queries the coding_problem edge of a CodingDraft.
+func (c *CodingDraftClient) QueryCodingProblem(cd *CodingDraft) *CodingProblemQuery {
+	query := &CodingProblemQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := cd.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(codingdraft.Table, codingdraft.FieldID, id),
+			sqlgraph.To(codingproblem.Table, codingproblem.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, codingdraft.CodingProblemTable, codingdraft.CodingProblemColumn),
+		)
+		fromV = sqlgraph.Neighbors(cd.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *CodingDraftClient) Hooks() []Hook {
+	hooks := c.hooks.CodingDraft
+	return append(hooks[:len(hooks):len(hooks)], codingdraft.Hooks[:]...)
 }
 
 // CodingProblemClient is a client for the CodingProblem schema.
@@ -213,6 +344,22 @@ func (c *CodingProblemClient) GetX(ctx context.Context, id int) *CodingProblem {
 		panic(err)
 	}
 	return obj
+}
+
+// QueryDrafts queries the drafts edge of a CodingProblem.
+func (c *CodingProblemClient) QueryDrafts(cp *CodingProblem) *CodingDraftQuery {
+	query := &CodingDraftQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := cp.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(codingproblem.Table, codingproblem.FieldID, id),
+			sqlgraph.To(codingdraft.Table, codingdraft.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, codingproblem.DraftsTable, codingproblem.DraftsColumn),
+		)
+		fromV = sqlgraph.Neighbors(cp.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.
@@ -304,6 +451,22 @@ func (c *UserClient) GetX(ctx context.Context, id int) *User {
 		panic(err)
 	}
 	return obj
+}
+
+// QueryDrafts queries the drafts edge of a User.
+func (c *UserClient) QueryDrafts(u *User) *CodingDraftQuery {
+	query := &CodingDraftQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(codingdraft.Table, codingdraft.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, user.DraftsTable, user.DraftsColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.

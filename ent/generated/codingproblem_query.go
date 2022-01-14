@@ -3,9 +3,11 @@
 package generated
 
 import (
+	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/predicate"
 	"context"
+	"database/sql/driver"
 	"errors"
 	"fmt"
 	"math"
@@ -24,6 +26,8 @@ type CodingProblemQuery struct {
 	order      []OrderFunc
 	fields     []string
 	predicates []predicate.CodingProblem
+	// eager-loading edges.
+	withDrafts *CodingDraftQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -58,6 +62,28 @@ func (cpq *CodingProblemQuery) Unique(unique bool) *CodingProblemQuery {
 func (cpq *CodingProblemQuery) Order(o ...OrderFunc) *CodingProblemQuery {
 	cpq.order = append(cpq.order, o...)
 	return cpq
+}
+
+// QueryDrafts chains the current query on the "drafts" edge.
+func (cpq *CodingProblemQuery) QueryDrafts() *CodingDraftQuery {
+	query := &CodingDraftQuery{config: cpq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cpq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cpq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(codingproblem.Table, codingproblem.FieldID, selector),
+			sqlgraph.To(codingdraft.Table, codingdraft.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, codingproblem.DraftsTable, codingproblem.DraftsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cpq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first CodingProblem entity from the query.
@@ -241,10 +267,22 @@ func (cpq *CodingProblemQuery) Clone() *CodingProblemQuery {
 		offset:     cpq.offset,
 		order:      append([]OrderFunc{}, cpq.order...),
 		predicates: append([]predicate.CodingProblem{}, cpq.predicates...),
+		withDrafts: cpq.withDrafts.Clone(),
 		// clone intermediate query.
 		sql:  cpq.sql.Clone(),
 		path: cpq.path,
 	}
+}
+
+// WithDrafts tells the query-builder to eager-load the nodes that are connected to
+// the "drafts" edge. The optional arguments are used to configure the query builder of the edge.
+func (cpq *CodingProblemQuery) WithDrafts(opts ...func(*CodingDraftQuery)) *CodingProblemQuery {
+	query := &CodingDraftQuery{config: cpq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	cpq.withDrafts = query
+	return cpq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -316,8 +354,11 @@ func (cpq *CodingProblemQuery) prepareQuery(ctx context.Context) error {
 
 func (cpq *CodingProblemQuery) sqlAll(ctx context.Context) ([]*CodingProblem, error) {
 	var (
-		nodes = []*CodingProblem{}
-		_spec = cpq.querySpec()
+		nodes       = []*CodingProblem{}
+		_spec       = cpq.querySpec()
+		loadedTypes = [1]bool{
+			cpq.withDrafts != nil,
+		}
 	)
 	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
 		node := &CodingProblem{config: cpq.config}
@@ -329,6 +370,7 @@ func (cpq *CodingProblemQuery) sqlAll(ctx context.Context) ([]*CodingProblem, er
 			return fmt.Errorf("generated: Assign called without calling ScanValues")
 		}
 		node := nodes[len(nodes)-1]
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	if err := sqlgraph.QueryNodes(ctx, cpq.driver, _spec); err != nil {
@@ -337,6 +379,36 @@ func (cpq *CodingProblemQuery) sqlAll(ctx context.Context) ([]*CodingProblem, er
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+
+	if query := cpq.withDrafts; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		nodeids := make(map[int]*CodingProblem)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+			nodes[i].Edges.Drafts = []*CodingDraft{}
+		}
+		query.withFKs = true
+		query.Where(predicate.CodingDraft(func(s *sql.Selector) {
+			s.Where(sql.InValues(codingproblem.DraftsColumn, fks...))
+		}))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			fk := n.coding_draft_coding_problem
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "coding_draft_coding_problem" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "coding_draft_coding_problem" returned %v for node %v`, *fk, n.ID)
+			}
+			node.Edges.Drafts = append(node.Edges.Drafts, n)
+		}
+	}
+
 	return nodes, nil
 }
 

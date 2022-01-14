@@ -17,25 +17,31 @@ func DenyIfNoViewer() privacy.QueryMutationRule {
 	})
 }
 
-type clonableEntQuery interface {
-	ent.Query
-	Clone() ent.Query
-}
-
-func AllowIfIDMatchesViewer(get_id func(context.Context, *ent.Query) (int, error)) privacy.QueryRule {
+func AllowQueryIfIDsMatchViewer(get_ids func(context.Context, ent.Query) ([]int, error)) privacy.QueryRule {
 	return privacy.QueryRuleFunc(func(c context.Context, q ent.Query) error {
 		viewer, ok := site.ViewerFromContext(c)
 		if !ok {
 			return privacy.Skip
 		}
-		cloned := q.(clonableEntQuery).Clone()
-		id, err := get_id(c, &cloned)
+		ids, err := get_ids(c, q)
 		if err != nil {
 			return privacy.Skip
 		}
-		if viewer.ID != id {
-			return privacy.Skip
+		for _, id := range ids {
+			if viewer.ID != id {
+				return privacy.Skip
+			}
 		}
 		return privacy.Allow
+	})
+}
+
+func FilterToViewerID(filter_id func(context.Context, privacy.Filter, int) error) privacy.MutationRule {
+	return privacy.FilterFunc(func(c context.Context, f privacy.Filter) error {
+		viewer, ok := site.ViewerFromContext(c)
+		if !ok {
+			return privacy.Deny
+		}
+		return filter_id(c, f, viewer.ID)
 	})
 }

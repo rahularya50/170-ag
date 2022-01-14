@@ -49,6 +49,7 @@ type CodingProblem implements Node {
   name: String!
   statement: String!
   released: Boolean!
+  my_draft: CodingDraft
 }
 type CodingProblemConnection {
   totalCount: Int!
@@ -67,12 +68,14 @@ input CodingProblemInput {
   released: Boolean!
 }
 
+type CodingDraft implements Node {
+  id: ID!
+  author: User!
+  code: String!
+  coding_problem: CodingProblem!
+}
+
 input CodingDraftInput {
   problem_id: ID!
   code: String!
-}
-
-type CodingDraft {
-  code: String!
-  problem: CodingProblem!
 }

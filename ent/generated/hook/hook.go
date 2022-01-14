@@ -8,6 +8,19 @@ import (
 	"fmt"
 )
 
+// The CodingDraftFunc type is an adapter to allow the use of ordinary
+// function as CodingDraft mutator.
+type CodingDraftFunc func(context.Context, *generated.CodingDraftMutation) (generated.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CodingDraftFunc) Mutate(ctx context.Context, m generated.Mutation) (generated.Value, error) {
+	mv, ok := m.(*generated.CodingDraftMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *generated.CodingDraftMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The CodingProblemFunc type is an adapter to allow the use of ordinary
 // function as CodingProblem mutator.
 type CodingProblemFunc func(context.Context, *generated.CodingProblemMutation) (generated.Value, error)

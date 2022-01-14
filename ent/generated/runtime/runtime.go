@@ -3,6 +3,7 @@
 package runtime
 
 import (
+	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/user"
 	"170-ag/ent/schema"
@@ -16,6 +17,15 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	codingdraft.Policy = privacy.NewPolicies(schema.CodingDraft{})
+	codingdraft.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := codingdraft.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
 	codingproblem.Policy = privacy.NewPolicies(schema.CodingProblem{})
 	codingproblem.Hooks[0] = func(next ent.Mutator) ent.Mutator {
 		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {

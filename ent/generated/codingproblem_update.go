@@ -3,6 +3,7 @@
 package generated
 
 import (
+	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/predicate"
 	"context"
@@ -60,9 +61,45 @@ func (cpu *CodingProblemUpdate) SetNillableReleased(b *bool) *CodingProblemUpdat
 	return cpu
 }
 
+// AddDraftIDs adds the "drafts" edge to the CodingDraft entity by IDs.
+func (cpu *CodingProblemUpdate) AddDraftIDs(ids ...int) *CodingProblemUpdate {
+	cpu.mutation.AddDraftIDs(ids...)
+	return cpu
+}
+
+// AddDrafts adds the "drafts" edges to the CodingDraft entity.
+func (cpu *CodingProblemUpdate) AddDrafts(c ...*CodingDraft) *CodingProblemUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cpu.AddDraftIDs(ids...)
+}
+
 // Mutation returns the CodingProblemMutation object of the builder.
 func (cpu *CodingProblemUpdate) Mutation() *CodingProblemMutation {
 	return cpu.mutation
+}
+
+// ClearDrafts clears all "drafts" edges to the CodingDraft entity.
+func (cpu *CodingProblemUpdate) ClearDrafts() *CodingProblemUpdate {
+	cpu.mutation.ClearDrafts()
+	return cpu
+}
+
+// RemoveDraftIDs removes the "drafts" edge to CodingDraft entities by IDs.
+func (cpu *CodingProblemUpdate) RemoveDraftIDs(ids ...int) *CodingProblemUpdate {
+	cpu.mutation.RemoveDraftIDs(ids...)
+	return cpu
+}
+
+// RemoveDrafts removes "drafts" edges to CodingDraft entities.
+func (cpu *CodingProblemUpdate) RemoveDrafts(c ...*CodingDraft) *CodingProblemUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cpu.RemoveDraftIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -179,6 +216,60 @@ func (cpu *CodingProblemUpdate) sqlSave(ctx context.Context) (n int, err error) 
 			Column: codingproblem.FieldReleased,
 		})
 	}
+	if cpu.mutation.DraftsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   codingproblem.DraftsTable,
+			Columns: []string{codingproblem.DraftsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingdraft.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cpu.mutation.RemovedDraftsIDs(); len(nodes) > 0 && !cpu.mutation.DraftsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   codingproblem.DraftsTable,
+			Columns: []string{codingproblem.DraftsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingdraft.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cpu.mutation.DraftsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   codingproblem.DraftsTable,
+			Columns: []string{codingproblem.DraftsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingdraft.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, cpu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{codingproblem.Label}
@@ -232,9 +323,45 @@ func (cpuo *CodingProblemUpdateOne) SetNillableReleased(b *bool) *CodingProblemU
 	return cpuo
 }
 
+// AddDraftIDs adds the "drafts" edge to the CodingDraft entity by IDs.
+func (cpuo *CodingProblemUpdateOne) AddDraftIDs(ids ...int) *CodingProblemUpdateOne {
+	cpuo.mutation.AddDraftIDs(ids...)
+	return cpuo
+}
+
+// AddDrafts adds the "drafts" edges to the CodingDraft entity.
+func (cpuo *CodingProblemUpdateOne) AddDrafts(c ...*CodingDraft) *CodingProblemUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cpuo.AddDraftIDs(ids...)
+}
+
 // Mutation returns the CodingProblemMutation object of the builder.
 func (cpuo *CodingProblemUpdateOne) Mutation() *CodingProblemMutation {
 	return cpuo.mutation
+}
+
+// ClearDrafts clears all "drafts" edges to the CodingDraft entity.
+func (cpuo *CodingProblemUpdateOne) ClearDrafts() *CodingProblemUpdateOne {
+	cpuo.mutation.ClearDrafts()
+	return cpuo
+}
+
+// RemoveDraftIDs removes the "drafts" edge to CodingDraft entities by IDs.
+func (cpuo *CodingProblemUpdateOne) RemoveDraftIDs(ids ...int) *CodingProblemUpdateOne {
+	cpuo.mutation.RemoveDraftIDs(ids...)
+	return cpuo
+}
+
+// RemoveDrafts removes "drafts" edges to CodingDraft entities.
+func (cpuo *CodingProblemUpdateOne) RemoveDrafts(c ...*CodingDraft) *CodingProblemUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cpuo.RemoveDraftIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -374,6 +501,60 @@ func (cpuo *CodingProblemUpdateOne) sqlSave(ctx context.Context) (_node *CodingP
 			Value:  value,
 			Column: codingproblem.FieldReleased,
 		})
+	}
+	if cpuo.mutation.DraftsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   codingproblem.DraftsTable,
+			Columns: []string{codingproblem.DraftsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingdraft.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cpuo.mutation.RemovedDraftsIDs(); len(nodes) > 0 && !cpuo.mutation.DraftsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   codingproblem.DraftsTable,
+			Columns: []string{codingproblem.DraftsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingdraft.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cpuo.mutation.DraftsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   codingproblem.DraftsTable,
+			Columns: []string{codingproblem.DraftsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingdraft.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &CodingProblem{config: cpuo.config}
 	_spec.Assign = _node.assignValues

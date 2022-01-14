@@ -3,6 +3,7 @@
 package generated
 
 import (
+	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/predicate"
 	"170-ag/ent/generated/user"
 	"context"
@@ -60,9 +61,45 @@ func (uu *UserUpdate) SetNillableIsStaff(b *bool) *UserUpdate {
 	return uu
 }
 
+// AddDraftIDs adds the "drafts" edge to the CodingDraft entity by IDs.
+func (uu *UserUpdate) AddDraftIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddDraftIDs(ids...)
+	return uu
+}
+
+// AddDrafts adds the "drafts" edges to the CodingDraft entity.
+func (uu *UserUpdate) AddDrafts(c ...*CodingDraft) *UserUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uu.AddDraftIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
+}
+
+// ClearDrafts clears all "drafts" edges to the CodingDraft entity.
+func (uu *UserUpdate) ClearDrafts() *UserUpdate {
+	uu.mutation.ClearDrafts()
+	return uu
+}
+
+// RemoveDraftIDs removes the "drafts" edge to CodingDraft entities by IDs.
+func (uu *UserUpdate) RemoveDraftIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveDraftIDs(ids...)
+	return uu
+}
+
+// RemoveDrafts removes "drafts" edges to CodingDraft entities.
+func (uu *UserUpdate) RemoveDrafts(c ...*CodingDraft) *UserUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uu.RemoveDraftIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -173,6 +210,60 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: user.FieldIsStaff,
 		})
 	}
+	if uu.mutation.DraftsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.DraftsTable,
+			Columns: []string{user.DraftsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingdraft.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedDraftsIDs(); len(nodes) > 0 && !uu.mutation.DraftsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.DraftsTable,
+			Columns: []string{user.DraftsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingdraft.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.DraftsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.DraftsTable,
+			Columns: []string{user.DraftsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingdraft.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
@@ -226,9 +317,45 @@ func (uuo *UserUpdateOne) SetNillableIsStaff(b *bool) *UserUpdateOne {
 	return uuo
 }
 
+// AddDraftIDs adds the "drafts" edge to the CodingDraft entity by IDs.
+func (uuo *UserUpdateOne) AddDraftIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddDraftIDs(ids...)
+	return uuo
+}
+
+// AddDrafts adds the "drafts" edges to the CodingDraft entity.
+func (uuo *UserUpdateOne) AddDrafts(c ...*CodingDraft) *UserUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uuo.AddDraftIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
+}
+
+// ClearDrafts clears all "drafts" edges to the CodingDraft entity.
+func (uuo *UserUpdateOne) ClearDrafts() *UserUpdateOne {
+	uuo.mutation.ClearDrafts()
+	return uuo
+}
+
+// RemoveDraftIDs removes the "drafts" edge to CodingDraft entities by IDs.
+func (uuo *UserUpdateOne) RemoveDraftIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveDraftIDs(ids...)
+	return uuo
+}
+
+// RemoveDrafts removes "drafts" edges to CodingDraft entities.
+func (uuo *UserUpdateOne) RemoveDrafts(c ...*CodingDraft) *UserUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uuo.RemoveDraftIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -362,6 +489,60 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Value:  value,
 			Column: user.FieldIsStaff,
 		})
+	}
+	if uuo.mutation.DraftsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.DraftsTable,
+			Columns: []string{user.DraftsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingdraft.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedDraftsIDs(); len(nodes) > 0 && !uuo.mutation.DraftsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.DraftsTable,
+			Columns: []string{user.DraftsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingdraft.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.DraftsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.DraftsTable,
+			Columns: []string{user.DraftsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingdraft.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &User{config: uuo.config}
 	_spec.Assign = _node.assignValues
