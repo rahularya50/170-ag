@@ -54,6 +54,12 @@ func main() {
 
 	log.Printf("connect to http://localhost:%s/playground for GraphQL playground", port)
 
+	http.Handle("/static/", http.FileServer(http.Dir("frontend/build/")))
+
+	http.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
+		http.ServeFile(rw, r, "frontend/build/index.html")
+	})
+
 	httpSrv := &http.Server{
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,

@@ -9,7 +9,7 @@ import { useFragment, useMutation } from "react-relay/hooks";
 import { useParams } from "react-router-dom";
 import AceEditor from "react-ace";
 import { Button, Stack } from "react-bootstrap";
-import { useDebounced } from "./useDebounced";
+import { useDebounced, useDebouncedCallback } from "./useDebounced";
 
 import "ace-builds/src-noconflict/mode-javascript";
 import "ace-builds/src-noconflict/mode-java";
@@ -75,32 +75,35 @@ export default function ProblemEditor(props: Props): React.Node {
   const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
   const [studentCode, setStudentCode] = useState(myDraft?.code ?? "");
   const [savedStudentCode, setSavedStudentCode] = useState("");
-  const debouncedStudentCode = useDebounced(studentCode, 1500);
 
   const isSaved = !isSaving && studentCode === savedStudentCode;
 
-  const forceSave = useCallback(() => {
-    if (!isSaving) {
-      saveDraft({
-        variables: {
-          input: { problem_id: id, code: studentCode },
-        },
-        onCompleted: ({ save_draft }) => {
-          setSavedStudentCode(save_draft.code);
-          setAutoSaveEnabled(true);
-        },
-        onError: () => {
-          setAutoSaveEnabled(false);
-        },
-      });
-    }
-  }, [id, isSaving, saveDraft, studentCode]);
+  const forceSave = useDebouncedCallback(
+    useCallback(
+      (code: string) => {
+        saveDraft({
+          variables: {
+            input: { problem_id: id, code },
+          },
+          onCompleted: ({ save_draft }) => {
+            setSavedStudentCode(save_draft.code);
+            setAutoSaveEnabled(true);
+          },
+          onError: () => {
+            setAutoSaveEnabled(false);
+          },
+        });
+      },
+      [id, saveDraft]
+    ),
+    1500
+  );
 
   useEffect(() => {
-    if (autoSaveEnabled && debouncedStudentCode !== savedStudentCode) {
-      forceSave();
+    if (autoSaveEnabled && studentCode !== savedStudentCode) {
+      forceSave(studentCode);
     }
-  }, [autoSaveEnabled, debouncedStudentCode, savedStudentCode, forceSave]);
+  }, [autoSaveEnabled, studentCode, savedStudentCode, forceSave]);
 
   return (
     <Stack gap={2}>
@@ -114,7 +117,7 @@ export default function ProblemEditor(props: Props): React.Node {
         <Button
           size="sm"
           variant="secondary"
-          onClick={forceSave}
+          onClick={() => forceSave(studentCode)}
           disabled={isSaved}
         >
           {isSaved ? "Draft Saved" : isSaving ? "Saving..." : "Save Draft"}
