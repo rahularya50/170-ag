@@ -34,15 +34,13 @@ export default function Problems(): React.Node {
         </thead>
         <tbody>
           {coding_problems.edges.map(({ node }) => (
-            <LinkContainer to="/" key={node.id}>
-              <tr>
-                <td>
-                  <Link to={generatePath("/problem/:id", { id: node.id })}>
-                    {node.name}
-                  </Link>
-                </td>
-              </tr>
-            </LinkContainer>
+            <tr>
+              <td>
+                <Link to={generatePath("/problem/:id", { id: node.id })}>
+                  {node.name}
+                </Link>
+              </td>
+            </tr>
           ))}
         </tbody>
       </Table>

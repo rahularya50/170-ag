@@ -23,7 +23,8 @@ func AllowQueryIfIDsMatchViewer(get_ids func(context.Context, ent.Query) ([]int,
 		if !ok {
 			return privacy.Skip
 		}
-		ids, err := get_ids(c, q)
+		allow_ctx := privacy.DecisionContext(c, privacy.Allow)
+		ids, err := get_ids(allow_ctx, q)
 		if err != nil {
 			return privacy.Skip
 		}

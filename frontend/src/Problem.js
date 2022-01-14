@@ -16,6 +16,7 @@ import "ace-builds/src-noconflict/mode-python";
 import "ace-builds/src-noconflict/mode-golang";
 import "ace-builds/src-noconflict/mode-c_cpp";
 import "ace-builds/src-noconflict/theme-github";
+import { useDebounced } from "./useDebounced";
 
 export default function Problems(): React.Node {
   const { id } = useParams();
@@ -45,6 +46,7 @@ export default function Problems(): React.Node {
   const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
   const [studentCode, setStudentCode] = useState("");
   const [savedStudentCode, setSavedStudentCode] = useState("");
+  const debouncedStudentCode = useDebounced(studentCode, 1500);
 
   const isSaved = !isSaving && studentCode === savedStudentCode;
 
@@ -66,10 +68,10 @@ export default function Problems(): React.Node {
   }, [id, isSaving, saveDraft, studentCode]);
 
   useEffect(() => {
-    if (autoSaveEnabled && !isSaved) {
+    if (autoSaveEnabled && debouncedStudentCode !== savedStudentCode) {
       forceSave();
     }
-  }, [autoSaveEnabled, isSaved, forceSave]);
+  }, [autoSaveEnabled, debouncedStudentCode, savedStudentCode, forceSave]);
 
   if (!coding_problem) {
     return <Navigate to="404" />;
@@ -92,7 +94,12 @@ export default function Problems(): React.Node {
               value={studentCode}
             />
             <Stack direction="horizontal" gap={1}>
-              <Button size="sm" variant="secondary" onClick={forceSave}>
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={forceSave}
+                disabled={isSaved}
+              >
                 {isSaved
                   ? "Draft Saved"
                   : isSaving

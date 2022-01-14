@@ -54,9 +54,7 @@ func (CodingDraft) Policy() ent.Policy {
 			privacyrules.DenyIfNoViewer(),
 			privacyrules.AllowIfViewerIsStaff(),
 			privacyrules.AllowQueryIfIDsMatchViewer(func(c context.Context, q ent.Query) ([]int, error) {
-				cq := q.(generated.CodingDraftQuery)
-				cq.Filter().WhereHasAuthorWith()
-				return cq.QueryAuthor().IDs(c)
+				return q.(*generated.CodingDraftQuery).Clone().QueryAuthor().IDs(c)
 			}),
 			privacy.AlwaysDenyRule(),
 		},
