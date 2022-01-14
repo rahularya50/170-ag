@@ -11,6 +11,7 @@ import (
 
 	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/codingproblem"
+	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/user"
 
 	"entgo.io/ent/dialect"
@@ -27,6 +28,8 @@ type Client struct {
 	CodingDraft *CodingDraftClient
 	// CodingProblem is the client for interacting with the CodingProblem builders.
 	CodingProblem *CodingProblemClient
+	// CodingSubmission is the client for interacting with the CodingSubmission builders.
+	CodingSubmission *CodingSubmissionClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 	// additional fields for node api
@@ -46,6 +49,7 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.CodingDraft = NewCodingDraftClient(c.config)
 	c.CodingProblem = NewCodingProblemClient(c.config)
+	c.CodingSubmission = NewCodingSubmissionClient(c.config)
 	c.User = NewUserClient(c.config)
 }
 
@@ -78,11 +82,12 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:           ctx,
-		config:        cfg,
-		CodingDraft:   NewCodingDraftClient(cfg),
-		CodingProblem: NewCodingProblemClient(cfg),
-		User:          NewUserClient(cfg),
+		ctx:              ctx,
+		config:           cfg,
+		CodingDraft:      NewCodingDraftClient(cfg),
+		CodingProblem:    NewCodingProblemClient(cfg),
+		CodingSubmission: NewCodingSubmissionClient(cfg),
+		User:             NewUserClient(cfg),
 	}, nil
 }
 
@@ -100,10 +105,11 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		config:        cfg,
-		CodingDraft:   NewCodingDraftClient(cfg),
-		CodingProblem: NewCodingProblemClient(cfg),
-		User:          NewUserClient(cfg),
+		config:           cfg,
+		CodingDraft:      NewCodingDraftClient(cfg),
+		CodingProblem:    NewCodingProblemClient(cfg),
+		CodingSubmission: NewCodingSubmissionClient(cfg),
+		User:             NewUserClient(cfg),
 	}, nil
 }
 
@@ -135,6 +141,7 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	c.CodingDraft.Use(hooks...)
 	c.CodingProblem.Use(hooks...)
+	c.CodingSubmission.Use(hooks...)
 	c.User.Use(hooks...)
 }
 
@@ -366,6 +373,129 @@ func (c *CodingProblemClient) QueryDrafts(cp *CodingProblem) *CodingDraftQuery {
 func (c *CodingProblemClient) Hooks() []Hook {
 	hooks := c.hooks.CodingProblem
 	return append(hooks[:len(hooks):len(hooks)], codingproblem.Hooks[:]...)
+}
+
+// CodingSubmissionClient is a client for the CodingSubmission schema.
+type CodingSubmissionClient struct {
+	config
+}
+
+// NewCodingSubmissionClient returns a client for the CodingSubmission from the given config.
+func NewCodingSubmissionClient(c config) *CodingSubmissionClient {
+	return &CodingSubmissionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `codingsubmission.Hooks(f(g(h())))`.
+func (c *CodingSubmissionClient) Use(hooks ...Hook) {
+	c.hooks.CodingSubmission = append(c.hooks.CodingSubmission, hooks...)
+}
+
+// Create returns a create builder for CodingSubmission.
+func (c *CodingSubmissionClient) Create() *CodingSubmissionCreate {
+	mutation := newCodingSubmissionMutation(c.config, OpCreate)
+	return &CodingSubmissionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of CodingSubmission entities.
+func (c *CodingSubmissionClient) CreateBulk(builders ...*CodingSubmissionCreate) *CodingSubmissionCreateBulk {
+	return &CodingSubmissionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for CodingSubmission.
+func (c *CodingSubmissionClient) Update() *CodingSubmissionUpdate {
+	mutation := newCodingSubmissionMutation(c.config, OpUpdate)
+	return &CodingSubmissionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CodingSubmissionClient) UpdateOne(cs *CodingSubmission) *CodingSubmissionUpdateOne {
+	mutation := newCodingSubmissionMutation(c.config, OpUpdateOne, withCodingSubmission(cs))
+	return &CodingSubmissionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CodingSubmissionClient) UpdateOneID(id int) *CodingSubmissionUpdateOne {
+	mutation := newCodingSubmissionMutation(c.config, OpUpdateOne, withCodingSubmissionID(id))
+	return &CodingSubmissionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for CodingSubmission.
+func (c *CodingSubmissionClient) Delete() *CodingSubmissionDelete {
+	mutation := newCodingSubmissionMutation(c.config, OpDelete)
+	return &CodingSubmissionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *CodingSubmissionClient) DeleteOne(cs *CodingSubmission) *CodingSubmissionDeleteOne {
+	return c.DeleteOneID(cs.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *CodingSubmissionClient) DeleteOneID(id int) *CodingSubmissionDeleteOne {
+	builder := c.Delete().Where(codingsubmission.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CodingSubmissionDeleteOne{builder}
+}
+
+// Query returns a query builder for CodingSubmission.
+func (c *CodingSubmissionClient) Query() *CodingSubmissionQuery {
+	return &CodingSubmissionQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a CodingSubmission entity by its id.
+func (c *CodingSubmissionClient) Get(ctx context.Context, id int) (*CodingSubmission, error) {
+	return c.Query().Where(codingsubmission.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CodingSubmissionClient) GetX(ctx context.Context, id int) *CodingSubmission {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryAuthor queries the author edge of a CodingSubmission.
+func (c *CodingSubmissionClient) QueryAuthor(cs *CodingSubmission) *UserQuery {
+	query := &UserQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := cs.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(codingsubmission.Table, codingsubmission.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, codingsubmission.AuthorTable, codingsubmission.AuthorColumn),
+		)
+		fromV = sqlgraph.Neighbors(cs.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCodingProblem queries the coding_problem edge of a CodingSubmission.
+func (c *CodingSubmissionClient) QueryCodingProblem(cs *CodingSubmission) *CodingProblemQuery {
+	query := &CodingProblemQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := cs.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(codingsubmission.Table, codingsubmission.FieldID, id),
+			sqlgraph.To(codingproblem.Table, codingproblem.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, codingsubmission.CodingProblemTable, codingsubmission.CodingProblemColumn),
+		)
+		fromV = sqlgraph.Neighbors(cs.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *CodingSubmissionClient) Hooks() []Hook {
+	hooks := c.hooks.CodingSubmission
+	return append(hooks[:len(hooks):len(hooks)], codingsubmission.Hooks[:]...)
 }
 
 // UserClient is a client for the User schema.

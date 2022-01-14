@@ -5,6 +5,7 @@ package generated
 import (
 	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/codingproblem"
+	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/predicate"
 	"170-ag/ent/generated/user"
 	"context"
@@ -23,9 +24,10 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeCodingDraft   = "CodingDraft"
-	TypeCodingProblem = "CodingProblem"
-	TypeUser          = "User"
+	TypeCodingDraft      = "CodingDraft"
+	TypeCodingProblem    = "CodingProblem"
+	TypeCodingSubmission = "CodingSubmission"
+	TypeUser             = "User"
 )
 
 // CodingDraftMutation represents an operation that mutates the CodingDraft nodes in the graph.
@@ -939,6 +941,480 @@ func (m *CodingProblemMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown CodingProblem edge %s", name)
+}
+
+// CodingSubmissionMutation represents an operation that mutates the CodingSubmission nodes in the graph.
+type CodingSubmissionMutation struct {
+	config
+	op                    Op
+	typ                   string
+	id                    *int
+	code                  *string
+	status                *codingsubmission.Status
+	clearedFields         map[string]struct{}
+	author                *int
+	clearedauthor         bool
+	coding_problem        *int
+	clearedcoding_problem bool
+	done                  bool
+	oldValue              func(context.Context) (*CodingSubmission, error)
+	predicates            []predicate.CodingSubmission
+}
+
+var _ ent.Mutation = (*CodingSubmissionMutation)(nil)
+
+// codingsubmissionOption allows management of the mutation configuration using functional options.
+type codingsubmissionOption func(*CodingSubmissionMutation)
+
+// newCodingSubmissionMutation creates new mutation for the CodingSubmission entity.
+func newCodingSubmissionMutation(c config, op Op, opts ...codingsubmissionOption) *CodingSubmissionMutation {
+	m := &CodingSubmissionMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeCodingSubmission,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withCodingSubmissionID sets the ID field of the mutation.
+func withCodingSubmissionID(id int) codingsubmissionOption {
+	return func(m *CodingSubmissionMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *CodingSubmission
+		)
+		m.oldValue = func(ctx context.Context) (*CodingSubmission, error) {
+			once.Do(func() {
+				if m.done {
+					err = fmt.Errorf("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().CodingSubmission.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withCodingSubmission sets the old CodingSubmission of the mutation.
+func withCodingSubmission(node *CodingSubmission) codingsubmissionOption {
+	return func(m *CodingSubmissionMutation) {
+		m.oldValue = func(context.Context) (*CodingSubmission, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m CodingSubmissionMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m CodingSubmissionMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, fmt.Errorf("generated: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *CodingSubmissionMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// SetCode sets the "code" field.
+func (m *CodingSubmissionMutation) SetCode(s string) {
+	m.code = &s
+}
+
+// Code returns the value of the "code" field in the mutation.
+func (m *CodingSubmissionMutation) Code() (r string, exists bool) {
+	v := m.code
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCode returns the old "code" field's value of the CodingSubmission entity.
+// If the CodingSubmission object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CodingSubmissionMutation) OldCode(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldCode is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldCode requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCode: %w", err)
+	}
+	return oldValue.Code, nil
+}
+
+// ResetCode resets all changes to the "code" field.
+func (m *CodingSubmissionMutation) ResetCode() {
+	m.code = nil
+}
+
+// SetStatus sets the "status" field.
+func (m *CodingSubmissionMutation) SetStatus(c codingsubmission.Status) {
+	m.status = &c
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *CodingSubmissionMutation) Status() (r codingsubmission.Status, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the CodingSubmission entity.
+// If the CodingSubmission object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CodingSubmissionMutation) OldStatus(ctx context.Context) (v codingsubmission.Status, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *CodingSubmissionMutation) ResetStatus() {
+	m.status = nil
+}
+
+// SetAuthorID sets the "author" edge to the User entity by id.
+func (m *CodingSubmissionMutation) SetAuthorID(id int) {
+	m.author = &id
+}
+
+// ClearAuthor clears the "author" edge to the User entity.
+func (m *CodingSubmissionMutation) ClearAuthor() {
+	m.clearedauthor = true
+}
+
+// AuthorCleared reports if the "author" edge to the User entity was cleared.
+func (m *CodingSubmissionMutation) AuthorCleared() bool {
+	return m.clearedauthor
+}
+
+// AuthorID returns the "author" edge ID in the mutation.
+func (m *CodingSubmissionMutation) AuthorID() (id int, exists bool) {
+	if m.author != nil {
+		return *m.author, true
+	}
+	return
+}
+
+// AuthorIDs returns the "author" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// AuthorID instead. It exists only for internal usage by the builders.
+func (m *CodingSubmissionMutation) AuthorIDs() (ids []int) {
+	if id := m.author; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAuthor resets all changes to the "author" edge.
+func (m *CodingSubmissionMutation) ResetAuthor() {
+	m.author = nil
+	m.clearedauthor = false
+}
+
+// SetCodingProblemID sets the "coding_problem" edge to the CodingProblem entity by id.
+func (m *CodingSubmissionMutation) SetCodingProblemID(id int) {
+	m.coding_problem = &id
+}
+
+// ClearCodingProblem clears the "coding_problem" edge to the CodingProblem entity.
+func (m *CodingSubmissionMutation) ClearCodingProblem() {
+	m.clearedcoding_problem = true
+}
+
+// CodingProblemCleared reports if the "coding_problem" edge to the CodingProblem entity was cleared.
+func (m *CodingSubmissionMutation) CodingProblemCleared() bool {
+	return m.clearedcoding_problem
+}
+
+// CodingProblemID returns the "coding_problem" edge ID in the mutation.
+func (m *CodingSubmissionMutation) CodingProblemID() (id int, exists bool) {
+	if m.coding_problem != nil {
+		return *m.coding_problem, true
+	}
+	return
+}
+
+// CodingProblemIDs returns the "coding_problem" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CodingProblemID instead. It exists only for internal usage by the builders.
+func (m *CodingSubmissionMutation) CodingProblemIDs() (ids []int) {
+	if id := m.coding_problem; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCodingProblem resets all changes to the "coding_problem" edge.
+func (m *CodingSubmissionMutation) ResetCodingProblem() {
+	m.coding_problem = nil
+	m.clearedcoding_problem = false
+}
+
+// Where appends a list predicates to the CodingSubmissionMutation builder.
+func (m *CodingSubmissionMutation) Where(ps ...predicate.CodingSubmission) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *CodingSubmissionMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (CodingSubmission).
+func (m *CodingSubmissionMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *CodingSubmissionMutation) Fields() []string {
+	fields := make([]string, 0, 2)
+	if m.code != nil {
+		fields = append(fields, codingsubmission.FieldCode)
+	}
+	if m.status != nil {
+		fields = append(fields, codingsubmission.FieldStatus)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *CodingSubmissionMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case codingsubmission.FieldCode:
+		return m.Code()
+	case codingsubmission.FieldStatus:
+		return m.Status()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *CodingSubmissionMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case codingsubmission.FieldCode:
+		return m.OldCode(ctx)
+	case codingsubmission.FieldStatus:
+		return m.OldStatus(ctx)
+	}
+	return nil, fmt.Errorf("unknown CodingSubmission field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *CodingSubmissionMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case codingsubmission.FieldCode:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCode(v)
+		return nil
+	case codingsubmission.FieldStatus:
+		v, ok := value.(codingsubmission.Status)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	}
+	return fmt.Errorf("unknown CodingSubmission field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *CodingSubmissionMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *CodingSubmissionMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *CodingSubmissionMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown CodingSubmission numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *CodingSubmissionMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *CodingSubmissionMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *CodingSubmissionMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown CodingSubmission nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *CodingSubmissionMutation) ResetField(name string) error {
+	switch name {
+	case codingsubmission.FieldCode:
+		m.ResetCode()
+		return nil
+	case codingsubmission.FieldStatus:
+		m.ResetStatus()
+		return nil
+	}
+	return fmt.Errorf("unknown CodingSubmission field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *CodingSubmissionMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.author != nil {
+		edges = append(edges, codingsubmission.EdgeAuthor)
+	}
+	if m.coding_problem != nil {
+		edges = append(edges, codingsubmission.EdgeCodingProblem)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *CodingSubmissionMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case codingsubmission.EdgeAuthor:
+		if id := m.author; id != nil {
+			return []ent.Value{*id}
+		}
+	case codingsubmission.EdgeCodingProblem:
+		if id := m.coding_problem; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *CodingSubmissionMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *CodingSubmissionMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *CodingSubmissionMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedauthor {
+		edges = append(edges, codingsubmission.EdgeAuthor)
+	}
+	if m.clearedcoding_problem {
+		edges = append(edges, codingsubmission.EdgeCodingProblem)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *CodingSubmissionMutation) EdgeCleared(name string) bool {
+	switch name {
+	case codingsubmission.EdgeAuthor:
+		return m.clearedauthor
+	case codingsubmission.EdgeCodingProblem:
+		return m.clearedcoding_problem
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *CodingSubmissionMutation) ClearEdge(name string) error {
+	switch name {
+	case codingsubmission.EdgeAuthor:
+		m.ClearAuthor()
+		return nil
+	case codingsubmission.EdgeCodingProblem:
+		m.ClearCodingProblem()
+		return nil
+	}
+	return fmt.Errorf("unknown CodingSubmission unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *CodingSubmissionMutation) ResetEdge(name string) error {
+	switch name {
+	case codingsubmission.EdgeAuthor:
+		m.ResetAuthor()
+		return nil
+	case codingsubmission.EdgeCodingProblem:
+		m.ResetCodingProblem()
+		return nil
+	}
+	return fmt.Errorf("unknown CodingSubmission edge %s", name)
 }
 
 // UserMutation represents an operation that mutates the User nodes in the graph.

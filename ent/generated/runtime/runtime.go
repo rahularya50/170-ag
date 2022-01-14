@@ -5,6 +5,7 @@ package runtime
 import (
 	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/codingproblem"
+	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/user"
 	"170-ag/ent/schema"
 	"context"
@@ -65,6 +66,17 @@ func init() {
 	codingproblemDescReleased := codingproblemFields[2].Descriptor()
 	// codingproblem.DefaultReleased holds the default value on creation for the released field.
 	codingproblem.DefaultReleased = codingproblemDescReleased.Default.(bool)
+	codingsubmission.Policy = privacy.NewPolicies(schema.CodingSubmission{})
+	codingsubmission.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := codingsubmission.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	codingsubmissionFields := schema.CodingSubmission{}.Fields()
+	_ = codingsubmissionFields
 	user.Policy = privacy.NewPolicies(schema.User{})
 	user.Hooks[0] = func(next ent.Mutator) ent.Mutator {
 		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {

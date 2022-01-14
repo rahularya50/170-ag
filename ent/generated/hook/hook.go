@@ -34,6 +34,19 @@ func (f CodingProblemFunc) Mutate(ctx context.Context, m generated.Mutation) (ge
 	return f(ctx, mv)
 }
 
+// The CodingSubmissionFunc type is an adapter to allow the use of ordinary
+// function as CodingSubmission mutator.
+type CodingSubmissionFunc func(context.Context, *generated.CodingSubmissionMutation) (generated.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CodingSubmissionFunc) Mutate(ctx context.Context, m generated.Mutation) (generated.Value, error) {
+	mv, ok := m.(*generated.CodingSubmissionMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *generated.CodingSubmissionMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The UserFunc type is an adapter to allow the use of ordinary
 // function as User mutator.
 type UserFunc func(context.Context, *generated.UserMutation) (generated.Value, error)

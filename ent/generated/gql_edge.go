@@ -28,6 +28,22 @@ func (cp *CodingProblem) Drafts(ctx context.Context) ([]*CodingDraft, error) {
 	return result, err
 }
 
+func (cs *CodingSubmission) Author(ctx context.Context) (*User, error) {
+	result, err := cs.Edges.AuthorOrErr()
+	if IsNotLoaded(err) {
+		result, err = cs.QueryAuthor().Only(ctx)
+	}
+	return result, err
+}
+
+func (cs *CodingSubmission) CodingProblem(ctx context.Context) (*CodingProblem, error) {
+	result, err := cs.Edges.CodingProblemOrErr()
+	if IsNotLoaded(err) {
+		result, err = cs.QueryCodingProblem().Only(ctx)
+	}
+	return result, err
+}
+
 func (u *User) Drafts(ctx context.Context) ([]*CodingDraft, error) {
 	result, err := u.Edges.DraftsOrErr()
 	if IsNotLoaded(err) {

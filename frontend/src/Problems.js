@@ -4,7 +4,6 @@ import * as React from "react";
 import graphql from "babel-plugin-relay/macro";
 import { useLazyLoadQuery } from "react-relay/hooks";
 import { Table } from "react-bootstrap";
-import { LinkContainer } from "react-router-bootstrap";
 import { generatePath, Link } from "react-router-dom";
 
 export default function Problems(): React.Node {

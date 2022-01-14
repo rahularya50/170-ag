@@ -5,6 +5,7 @@ package generated
 import (
 	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/codingproblem"
+	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/user"
 	"context"
 	"encoding/base64"
@@ -685,6 +686,233 @@ func (cp *CodingProblem) ToEdge(order *CodingProblemOrder) *CodingProblemEdge {
 	return &CodingProblemEdge{
 		Node:   cp,
 		Cursor: order.Field.toCursor(cp),
+	}
+}
+
+// CodingSubmissionEdge is the edge representation of CodingSubmission.
+type CodingSubmissionEdge struct {
+	Node   *CodingSubmission `json:"node"`
+	Cursor Cursor            `json:"cursor"`
+}
+
+// CodingSubmissionConnection is the connection containing edges to CodingSubmission.
+type CodingSubmissionConnection struct {
+	Edges      []*CodingSubmissionEdge `json:"edges"`
+	PageInfo   PageInfo                `json:"pageInfo"`
+	TotalCount int                     `json:"totalCount"`
+}
+
+// CodingSubmissionPaginateOption enables pagination customization.
+type CodingSubmissionPaginateOption func(*codingSubmissionPager) error
+
+// WithCodingSubmissionOrder configures pagination ordering.
+func WithCodingSubmissionOrder(order *CodingSubmissionOrder) CodingSubmissionPaginateOption {
+	if order == nil {
+		order = DefaultCodingSubmissionOrder
+	}
+	o := *order
+	return func(pager *codingSubmissionPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultCodingSubmissionOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithCodingSubmissionFilter configures pagination filter.
+func WithCodingSubmissionFilter(filter func(*CodingSubmissionQuery) (*CodingSubmissionQuery, error)) CodingSubmissionPaginateOption {
+	return func(pager *codingSubmissionPager) error {
+		if filter == nil {
+			return errors.New("CodingSubmissionQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type codingSubmissionPager struct {
+	order  *CodingSubmissionOrder
+	filter func(*CodingSubmissionQuery) (*CodingSubmissionQuery, error)
+}
+
+func newCodingSubmissionPager(opts []CodingSubmissionPaginateOption) (*codingSubmissionPager, error) {
+	pager := &codingSubmissionPager{}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultCodingSubmissionOrder
+	}
+	return pager, nil
+}
+
+func (p *codingSubmissionPager) applyFilter(query *CodingSubmissionQuery) (*CodingSubmissionQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *codingSubmissionPager) toCursor(cs *CodingSubmission) Cursor {
+	return p.order.Field.toCursor(cs)
+}
+
+func (p *codingSubmissionPager) applyCursors(query *CodingSubmissionQuery, after, before *Cursor) *CodingSubmissionQuery {
+	for _, predicate := range cursorsToPredicates(
+		p.order.Direction, after, before,
+		p.order.Field.field, DefaultCodingSubmissionOrder.Field.field,
+	) {
+		query = query.Where(predicate)
+	}
+	return query
+}
+
+func (p *codingSubmissionPager) applyOrder(query *CodingSubmissionQuery, reverse bool) *CodingSubmissionQuery {
+	direction := p.order.Direction
+	if reverse {
+		direction = direction.reverse()
+	}
+	query = query.Order(direction.orderFunc(p.order.Field.field))
+	if p.order.Field != DefaultCodingSubmissionOrder.Field {
+		query = query.Order(direction.orderFunc(DefaultCodingSubmissionOrder.Field.field))
+	}
+	return query
+}
+
+// Paginate executes the query and returns a relay based cursor connection to CodingSubmission.
+func (cs *CodingSubmissionQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...CodingSubmissionPaginateOption,
+) (*CodingSubmissionConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newCodingSubmissionPager(opts)
+	if err != nil {
+		return nil, err
+	}
+
+	if cs, err = pager.applyFilter(cs); err != nil {
+		return nil, err
+	}
+
+	conn := &CodingSubmissionConnection{Edges: []*CodingSubmissionEdge{}}
+	if !hasCollectedField(ctx, edgesField) || first != nil && *first == 0 || last != nil && *last == 0 {
+		if hasCollectedField(ctx, totalCountField) ||
+			hasCollectedField(ctx, pageInfoField) {
+			count, err := cs.Count(ctx)
+			if err != nil {
+				return nil, err
+			}
+			conn.TotalCount = count
+			conn.PageInfo.HasNextPage = first != nil && count > 0
+			conn.PageInfo.HasPreviousPage = last != nil && count > 0
+		}
+		return conn, nil
+	}
+
+	if (after != nil || first != nil || before != nil || last != nil) && hasCollectedField(ctx, totalCountField) {
+		count, err := cs.Clone().Count(ctx)
+		if err != nil {
+			return nil, err
+		}
+		conn.TotalCount = count
+	}
+
+	cs = pager.applyCursors(cs, after, before)
+	cs = pager.applyOrder(cs, last != nil)
+	var limit int
+	if first != nil {
+		limit = *first + 1
+	} else if last != nil {
+		limit = *last + 1
+	}
+	if limit > 0 {
+		cs = cs.Limit(limit)
+	}
+
+	if field := getCollectedField(ctx, edgesField, nodeField); field != nil {
+		cs = cs.collectField(graphql.GetOperationContext(ctx), *field)
+	}
+
+	nodes, err := cs.All(ctx)
+	if err != nil || len(nodes) == 0 {
+		return conn, err
+	}
+
+	if len(nodes) == limit {
+		conn.PageInfo.HasNextPage = first != nil
+		conn.PageInfo.HasPreviousPage = last != nil
+		nodes = nodes[:len(nodes)-1]
+	}
+
+	var nodeAt func(int) *CodingSubmission
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *CodingSubmission {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *CodingSubmission {
+			return nodes[i]
+		}
+	}
+
+	conn.Edges = make([]*CodingSubmissionEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		conn.Edges[i] = &CodingSubmissionEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+
+	conn.PageInfo.StartCursor = &conn.Edges[0].Cursor
+	conn.PageInfo.EndCursor = &conn.Edges[len(conn.Edges)-1].Cursor
+	if conn.TotalCount == 0 {
+		conn.TotalCount = len(nodes)
+	}
+
+	return conn, nil
+}
+
+// CodingSubmissionOrderField defines the ordering field of CodingSubmission.
+type CodingSubmissionOrderField struct {
+	field    string
+	toCursor func(*CodingSubmission) Cursor
+}
+
+// CodingSubmissionOrder defines the ordering of CodingSubmission.
+type CodingSubmissionOrder struct {
+	Direction OrderDirection              `json:"direction"`
+	Field     *CodingSubmissionOrderField `json:"field"`
+}
+
+// DefaultCodingSubmissionOrder is the default ordering of CodingSubmission.
+var DefaultCodingSubmissionOrder = &CodingSubmissionOrder{
+	Direction: OrderDirectionAsc,
+	Field: &CodingSubmissionOrderField{
+		field: codingsubmission.FieldID,
+		toCursor: func(cs *CodingSubmission) Cursor {
+			return Cursor{ID: cs.ID}
+		},
+	},
+}
+
+// ToEdge converts CodingSubmission into CodingSubmissionEdge.
+func (cs *CodingSubmission) ToEdge(order *CodingSubmissionOrder) *CodingSubmissionEdge {
+	if order == nil {
+		order = DefaultCodingSubmissionOrder
+	}
+	return &CodingSubmissionEdge{
+		Node:   cs,
+		Cursor: order.Field.toCursor(cs),
 	}
 }
 

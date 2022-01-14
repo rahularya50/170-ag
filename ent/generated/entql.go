@@ -5,6 +5,7 @@ package generated
 import (
 	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/codingproblem"
+	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/predicate"
 	"170-ag/ent/generated/user"
 
@@ -16,7 +17,7 @@ import (
 
 // schemaGraph holds a representation of ent/schema at runtime.
 var schemaGraph = func() *sqlgraph.Schema {
-	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 3)}
+	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 4)}
 	graph.Nodes[0] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   codingdraft.Table,
@@ -48,6 +49,21 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 	}
 	graph.Nodes[2] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   codingsubmission.Table,
+			Columns: codingsubmission.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: codingsubmission.FieldID,
+			},
+		},
+		Type: "CodingSubmission",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			codingsubmission.FieldCode:   {Type: field.TypeString, Column: codingsubmission.FieldCode},
+			codingsubmission.FieldStatus: {Type: field.TypeEnum, Column: codingsubmission.FieldStatus},
+		},
+	}
+	graph.Nodes[3] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   user.Table,
 			Columns: user.Columns,
@@ -98,6 +114,30 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		"CodingProblem",
 		"CodingDraft",
+	)
+	graph.MustAddE(
+		"author",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   codingsubmission.AuthorTable,
+			Columns: []string{codingsubmission.AuthorColumn},
+			Bidi:    false,
+		},
+		"CodingSubmission",
+		"User",
+	)
+	graph.MustAddE(
+		"coding_problem",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   codingsubmission.CodingProblemTable,
+			Columns: []string{codingsubmission.CodingProblemColumn},
+			Bidi:    false,
+		},
+		"CodingSubmission",
+		"CodingProblem",
 	)
 	graph.MustAddE(
 		"drafts",
@@ -261,6 +301,83 @@ func (f *CodingProblemFilter) WhereHasDraftsWith(preds ...predicate.CodingDraft)
 }
 
 // addPredicate implements the predicateAdder interface.
+func (csq *CodingSubmissionQuery) addPredicate(pred func(s *sql.Selector)) {
+	csq.predicates = append(csq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the CodingSubmissionQuery builder.
+func (csq *CodingSubmissionQuery) Filter() *CodingSubmissionFilter {
+	return &CodingSubmissionFilter{csq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *CodingSubmissionMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the CodingSubmissionMutation builder.
+func (m *CodingSubmissionMutation) Filter() *CodingSubmissionFilter {
+	return &CodingSubmissionFilter{m}
+}
+
+// CodingSubmissionFilter provides a generic filtering capability at runtime for CodingSubmissionQuery.
+type CodingSubmissionFilter struct {
+	predicateAdder
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *CodingSubmissionFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[2].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int predicate on the id field.
+func (f *CodingSubmissionFilter) WhereID(p entql.IntP) {
+	f.Where(p.Field(codingsubmission.FieldID))
+}
+
+// WhereCode applies the entql string predicate on the code field.
+func (f *CodingSubmissionFilter) WhereCode(p entql.StringP) {
+	f.Where(p.Field(codingsubmission.FieldCode))
+}
+
+// WhereStatus applies the entql string predicate on the status field.
+func (f *CodingSubmissionFilter) WhereStatus(p entql.StringP) {
+	f.Where(p.Field(codingsubmission.FieldStatus))
+}
+
+// WhereHasAuthor applies a predicate to check if query has an edge author.
+func (f *CodingSubmissionFilter) WhereHasAuthor() {
+	f.Where(entql.HasEdge("author"))
+}
+
+// WhereHasAuthorWith applies a predicate to check if query has an edge author with a given conditions (other predicates).
+func (f *CodingSubmissionFilter) WhereHasAuthorWith(preds ...predicate.User) {
+	f.Where(entql.HasEdgeWith("author", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasCodingProblem applies a predicate to check if query has an edge coding_problem.
+func (f *CodingSubmissionFilter) WhereHasCodingProblem() {
+	f.Where(entql.HasEdge("coding_problem"))
+}
+
+// WhereHasCodingProblemWith applies a predicate to check if query has an edge coding_problem with a given conditions (other predicates).
+func (f *CodingSubmissionFilter) WhereHasCodingProblemWith(preds ...predicate.CodingProblem) {
+	f.Where(entql.HasEdgeWith("coding_problem", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
 func (uq *UserQuery) addPredicate(pred func(s *sql.Selector)) {
 	uq.predicates = append(uq.predicates, pred)
 }
@@ -288,7 +405,7 @@ type UserFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *UserFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[2].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[3].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})

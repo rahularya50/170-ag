@@ -16,6 +16,8 @@ type Tx struct {
 	CodingDraft *CodingDraftClient
 	// CodingProblem is the client for interacting with the CodingProblem builders.
 	CodingProblem *CodingProblemClient
+	// CodingSubmission is the client for interacting with the CodingSubmission builders.
+	CodingSubmission *CodingSubmissionClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 
@@ -155,6 +157,7 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.CodingDraft = NewCodingDraftClient(tx.config)
 	tx.CodingProblem = NewCodingProblemClient(tx.config)
+	tx.CodingSubmission = NewCodingSubmissionClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }
 

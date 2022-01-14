@@ -14,39 +14,54 @@ import (
 	"entgo.io/ent/schema/index"
 )
 
-// CodingDraft holds the schema definition for the CodingDraft entity.
-type CodingDraft struct {
+// CodingSubmission holds the schema definition for the CodingSubmission entity.
+type CodingSubmission struct {
 	ent.Schema
 }
 
-// Fields of the CodingDraft.
-func (CodingDraft) Fields() []ent.Field {
+// Fields of the CodingSubmission.
+func (CodingSubmission) Fields() []ent.Field {
 	return []ent.Field{
 		field.Text("code"),
+		field.Enum("status").
+			NamedValues(
+				"Queued", "QUEUED",
+				"Running", "RUNNING",
+				"Completed", "COMPLETED",
+			).
+			Default("QUEUED"),
 	}
 }
 
-// Edges of the CodingDraft.
-func (CodingDraft) Edges() []ent.Edge {
+// Edges of the CodingSubmission.
+func (CodingSubmission) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("author", User.Type).Required().Unique().Annotations(entgql.Bind()),
 		edge.To("coding_problem", CodingProblem.Type).Required().Unique().Annotations(entgql.Bind()),
 	}
 }
 
-func (CodingDraft) Indexes() []ent.Index {
+func (CodingSubmission) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Edges("author", "coding_problem").Unique(),
+		index.Edges("author", "coding_problem"),
+		index.Edges("coding_problem"),
 	}
 }
 
-func (CodingDraft) Policy() ent.Policy {
+func (CodingSubmission) Policy() ent.Policy {
 	return privacy.Policy{
 		Mutation: privacy.MutationPolicy{
 			privacyrules.DenyIfNoViewer(),
+			privacy.CodingSubmissionMutationRuleFunc(func(c context.Context, csm *generated.CodingSubmissionMutation) error {
+				_, statusSet := csm.Status()
+				if statusSet {
+					return privacy.Deny
+				}
+				return privacy.Skip
+			}),
 			privacyrules.AllowIfViewerIsStaff(),
 			privacyrules.FilterToViewerID(func(c context.Context, f privacy.Filter, user_id int) error {
-				f.(*generated.CodingDraftFilter).WhereHasAuthorWith(user.ID(user_id))
+				f.(*generated.CodingSubmissionFilter).WhereHasAuthorWith(user.ID(user_id))
 				return privacy.Allow
 			}),
 			privacy.AlwaysDenyRule(),
@@ -55,7 +70,7 @@ func (CodingDraft) Policy() ent.Policy {
 			privacyrules.DenyIfNoViewer(),
 			privacyrules.AllowIfViewerIsStaff(),
 			privacyrules.AllowQueryIfIDsMatchViewer(func(c context.Context, q ent.Query) ([]int, error) {
-				return q.(*generated.CodingDraftQuery).Clone().QueryAuthor().IDs(c)
+				return q.(*generated.CodingSubmissionQuery).Clone().QueryAuthor().IDs(c)
 			}),
 			privacy.AlwaysDenyRule(),
 		},

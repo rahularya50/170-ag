@@ -5,6 +5,7 @@ package generated
 import (
 	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/codingproblem"
+	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/user"
 	"context"
 	"encoding/json"
@@ -126,6 +127,53 @@ func (cp *CodingProblem) Node(ctx context.Context) (node *Node, err error) {
 	err = cp.QueryDrafts().
 		Select(codingdraft.FieldID).
 		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	return node, nil
+}
+
+func (cs *CodingSubmission) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     cs.ID,
+		Type:   "CodingSubmission",
+		Fields: make([]*Field, 2),
+		Edges:  make([]*Edge, 2),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(cs.Code); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "string",
+		Name:  "code",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(cs.Status); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "codingsubmission.Status",
+		Name:  "status",
+		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "User",
+		Name: "author",
+	}
+	err = cs.QueryAuthor().
+		Select(user.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[1] = &Edge{
+		Type: "CodingProblem",
+		Name: "coding_problem",
+	}
+	err = cs.QueryCodingProblem().
+		Select(codingproblem.FieldID).
+		Scan(ctx, &node.Edges[1].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -262,6 +310,15 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 			return nil, err
 		}
 		return n, nil
+	case codingsubmission.Table:
+		n, err := c.CodingSubmission.Query().
+			Where(codingsubmission.ID(id)).
+			CollectFields(ctx, "CodingSubmission").
+			Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
 	case user.Table:
 		n, err := c.User.Query().
 			Where(user.ID(id)).
@@ -361,6 +418,19 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		nodes, err := c.CodingProblem.Query().
 			Where(codingproblem.IDIn(ids...)).
 			CollectFields(ctx, "CodingProblem").
+			All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case codingsubmission.Table:
+		nodes, err := c.CodingSubmission.Query().
+			Where(codingsubmission.IDIn(ids...)).
+			CollectFields(ctx, "CodingSubmission").
 			All(ctx)
 		if err != nil {
 			return nil, err

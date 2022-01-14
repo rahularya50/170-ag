@@ -27,6 +27,9 @@ export default function Problems(): React.Node {
         coding_problem(id: $id) {
           name
           statement
+          my_draft {
+            code
+          }
         }
       }
     `,
@@ -44,7 +47,9 @@ export default function Problems(): React.Node {
   );
 
   const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
-  const [studentCode, setStudentCode] = useState("");
+  const [studentCode, setStudentCode] = useState(
+    coding_problem?.my_draft?.code ?? ""
+  );
   const [savedStudentCode, setSavedStudentCode] = useState("");
   const debouncedStudentCode = useDebounced(studentCode, 1500);
 

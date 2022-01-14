@@ -23,6 +23,10 @@ func (r *codingProblemResolver) MyDraft(ctx context.Context, obj *ent.CodingProb
 	return obj.QueryDrafts().Where(codingdraft.HasAuthorWith(user.ID(viewer.ID))).Only(ctx)
 }
 
+func (r *codingProblemResolver) MySubmissions(ctx context.Context, obj *ent.CodingProblem, after *ent.Cursor, first *int, before *ent.Cursor, last *int) (*ent.CodingSubmissionConnection, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *mutationResolver) NewUser(ctx context.Context, name *string) (*ent.User, error) {
 	return r.client.User.Create().SetName(*name).Save(ctx)
 }
@@ -52,6 +56,18 @@ func (r *mutationResolver) SaveDraft(ctx context.Context, input *model.CodingDra
 		return nil, err
 	}
 	return r.client.CodingDraft.Get(ctx, coding_draft_id)
+}
+
+func (r *mutationResolver) CreateSubmission(ctx context.Context, input *model.CodingSubmissionInput) (*ent.CodingSubmission, error) {
+	viewer, ok := site.ViewerFromContext(ctx)
+	if !ok {
+		return nil, fmt.Errorf("viewer not found")
+	}
+	return r.client.CodingSubmission.Create().
+		SetAuthor(viewer).
+		SetCode(input.Code).
+		SetCodingProblemID(input.ProblemID).
+		Save(ctx)
 }
 
 func (r *queryResolver) Viewer(ctx context.Context) (*ent.User, error) {

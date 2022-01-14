@@ -40,19 +40,6 @@ func (User) Indexes() []ent.Index {
 	}
 }
 
-func allowUserQueryIfIdMatchesViewer() privacy.UserQueryRuleFunc {
-	return privacy.UserQueryRuleFunc(func(c context.Context, uq *generated.UserQuery) error {
-		viewer, _ := site.ViewerFromContext(c)
-		// check what the query resolves to
-		allow_ctx := privacy.DecisionContext(c, privacy.Allow)
-		id, err := uq.Clone().OnlyID(allow_ctx)
-		if err == nil && id == viewer.ID {
-			return privacy.Allow
-		}
-		return privacy.Skip
-	})
-}
-
 func allowUserMutateIfEmailMatchesContext() privacy.UserMutationRuleFunc {
 	return privacy.UserMutationRuleFunc(func(ctx context.Context, m *generated.UserMutation) error {
 		if !m.Op().Is(ent.OpCreate) {
@@ -81,7 +68,9 @@ func (User) Policy() ent.Policy {
 		},
 		Query: privacy.QueryPolicy{
 			privacyrules.DenyIfNoViewer(),
-			allowUserQueryIfIdMatchesViewer(),
+			privacyrules.AllowQueryIfIDsMatchViewer(func(c context.Context, q generated.Query) ([]int, error) {
+				return q.(*generated.UserQuery).Clone().IDs(c)
+			}),
 			privacy.AlwaysDenyRule(),
 		},
 	}

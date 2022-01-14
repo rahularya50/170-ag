@@ -17,6 +17,18 @@ func (cd *CodingDraftQuery) CollectFields(ctx context.Context, satisfies ...stri
 }
 
 func (cd *CodingDraftQuery) collectField(ctx *graphql.OperationContext, field graphql.CollectedField, satisfies ...string) *CodingDraftQuery {
+	for _, field := range graphql.CollectFields(ctx, field.Selections, satisfies) {
+		switch field.Name {
+		case "author":
+			cd = cd.WithAuthor(func(query *UserQuery) {
+				query.collectField(ctx, field)
+			})
+		case "coding_problem":
+			cd = cd.WithCodingProblem(func(query *CodingProblemQuery) {
+				query.collectField(ctx, field)
+			})
+		}
+	}
 	return cd
 }
 
@@ -29,7 +41,39 @@ func (cp *CodingProblemQuery) CollectFields(ctx context.Context, satisfies ...st
 }
 
 func (cp *CodingProblemQuery) collectField(ctx *graphql.OperationContext, field graphql.CollectedField, satisfies ...string) *CodingProblemQuery {
+	for _, field := range graphql.CollectFields(ctx, field.Selections, satisfies) {
+		switch field.Name {
+		case "drafts":
+			cp = cp.WithDrafts(func(query *CodingDraftQuery) {
+				query.collectField(ctx, field)
+			})
+		}
+	}
 	return cp
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (cs *CodingSubmissionQuery) CollectFields(ctx context.Context, satisfies ...string) *CodingSubmissionQuery {
+	if fc := graphql.GetFieldContext(ctx); fc != nil {
+		cs = cs.collectField(graphql.GetOperationContext(ctx), fc.Field, satisfies...)
+	}
+	return cs
+}
+
+func (cs *CodingSubmissionQuery) collectField(ctx *graphql.OperationContext, field graphql.CollectedField, satisfies ...string) *CodingSubmissionQuery {
+	for _, field := range graphql.CollectFields(ctx, field.Selections, satisfies) {
+		switch field.Name {
+		case "author":
+			cs = cs.WithAuthor(func(query *UserQuery) {
+				query.collectField(ctx, field)
+			})
+		case "coding_problem":
+			cs = cs.WithCodingProblem(func(query *CodingProblemQuery) {
+				query.collectField(ctx, field)
+			})
+		}
+	}
+	return cs
 }
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.

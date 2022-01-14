@@ -55,6 +55,46 @@ var (
 		Columns:    CodingProblemsColumns,
 		PrimaryKey: []*schema.Column{CodingProblemsColumns[0]},
 	}
+	// CodingSubmissionsColumns holds the columns for the "coding_submissions" table.
+	CodingSubmissionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "code", Type: field.TypeString, Size: 2147483647},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"QUEUED", "RUNNING", "COMPLETED"}, Default: "QUEUED"},
+		{Name: "coding_submission_author", Type: field.TypeInt, Nullable: true},
+		{Name: "coding_submission_coding_problem", Type: field.TypeInt, Nullable: true},
+	}
+	// CodingSubmissionsTable holds the schema information for the "coding_submissions" table.
+	CodingSubmissionsTable = &schema.Table{
+		Name:       "coding_submissions",
+		Columns:    CodingSubmissionsColumns,
+		PrimaryKey: []*schema.Column{CodingSubmissionsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "coding_submissions_users_author",
+				Columns:    []*schema.Column{CodingSubmissionsColumns[3]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "coding_submissions_coding_problems_coding_problem",
+				Columns:    []*schema.Column{CodingSubmissionsColumns[4]},
+				RefColumns: []*schema.Column{CodingProblemsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "codingsubmission_coding_submission_author_coding_submission_coding_problem",
+				Unique:  false,
+				Columns: []*schema.Column{CodingSubmissionsColumns[3], CodingSubmissionsColumns[4]},
+			},
+			{
+				Name:    "codingsubmission_coding_submission_coding_problem",
+				Unique:  false,
+				Columns: []*schema.Column{CodingSubmissionsColumns[4]},
+			},
+		},
+	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -79,6 +119,7 @@ var (
 	Tables = []*schema.Table{
 		CodingDraftsTable,
 		CodingProblemsTable,
+		CodingSubmissionsTable,
 		UsersTable,
 	}
 )
@@ -86,4 +127,6 @@ var (
 func init() {
 	CodingDraftsTable.ForeignKeys[0].RefTable = UsersTable
 	CodingDraftsTable.ForeignKeys[1].RefTable = CodingProblemsTable
+	CodingSubmissionsTable.ForeignKeys[0].RefTable = UsersTable
+	CodingSubmissionsTable.ForeignKeys[1].RefTable = CodingProblemsTable
 }

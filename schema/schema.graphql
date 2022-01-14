@@ -3,6 +3,17 @@
 # https://gqlgen.com/getting-started/
 
 # Boilerplate
+
+directive @goModel(
+  model: String
+  models: [String!]
+) on OBJECT | INPUT_OBJECT | SCALAR | ENUM | INTERFACE | UNION
+
+directive @goField(
+  forceResolver: Boolean
+  name: String
+) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+
 interface Node {
   id: ID!
 }
@@ -35,6 +46,7 @@ type Mutation {
   new_user(name: String): User
   new_problem(input: CodingProblemInput): CodingProblem!
   save_draft(input: CodingDraftInput): CodingDraft!
+  create_submission(input: CodingSubmissionInput): CodingSubmission!
 }
 
 type User implements Node {
@@ -50,7 +62,14 @@ type CodingProblem implements Node {
   statement: String!
   released: Boolean!
   my_draft: CodingDraft
+  my_submissions(
+    after: Cursor
+    first: Int
+    before: Cursor
+    last: Int
+  ): CodingSubmissionConnection
 }
+
 type CodingProblemConnection {
   totalCount: Int!
   pageInfo: PageInfo!
@@ -78,4 +97,35 @@ type CodingDraft implements Node {
 input CodingDraftInput {
   problem_id: ID!
   code: String!
+}
+
+enum CodingSubmissionStatus
+  @goModel(model: "170-ag/ent/generated/codingsubmission.Status") {
+  QUEUED
+  RUNNING
+  COMPLETED
+}
+
+type CodingSubmission implements Node {
+  id: ID!
+  author: User!
+  code: String!
+  coding_problem: CodingProblem!
+  status: CodingSubmissionStatus!
+}
+
+input CodingSubmissionInput {
+  problem_id: ID!
+  code: String!
+}
+
+type CodingSubmissionConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [CodingSubmissionEdge!]!
+}
+
+type CodingSubmissionEdge {
+  node: CodingSubmission!
+  cursor: Cursor!
 }
