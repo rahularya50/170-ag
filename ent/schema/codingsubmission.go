@@ -2,6 +2,7 @@ package schema
 
 import (
 	"170-ag/ent/generated"
+	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/privacy"
 	"170-ag/ent/generated/user"
 	"170-ag/privacyrules"
@@ -52,14 +53,17 @@ func (CodingSubmission) Policy() ent.Policy {
 	return privacy.Policy{
 		Mutation: privacy.MutationPolicy{
 			privacyrules.DenyIfNoViewer(),
+			privacyrules.AllowIfViewerIsStaff(),
 			privacy.CodingSubmissionMutationRuleFunc(func(c context.Context, csm *generated.CodingSubmissionMutation) error {
-				_, statusSet := csm.Status()
-				if statusSet {
-					return privacy.Deny
+				status, statusSet := csm.Status()
+
+				if csm.Op().Is(ent.OpCreate) && status == codingsubmission.DefaultStatus {
+					// this is OK
+				} else if statusSet {
+					return privacy.Denyf("Cannot explicitly set status of submission, except to initialize to default")
 				}
 				return privacy.Skip
 			}),
-			privacyrules.AllowIfViewerIsStaff(),
 			privacyrules.FilterToViewerID(func(c context.Context, f privacy.Filter, user_id int) error {
 				f.(*generated.CodingSubmissionFilter).WhereHasAuthorWith(user.ID(user_id))
 				return privacy.Allow
