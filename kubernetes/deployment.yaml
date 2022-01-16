@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: autograder-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: autograder-web
+  template:
+    metadata:
+      labels:
+        app: autograder-web
+    spec:
+      containers:
+        - name: autograder-gke-web
+          image: gcr.io/formidable-gate-337712/autograder-web:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ENV
+              value: prod
+            - name: PORT
+              value: "8080"
+          envFrom:
+            - secretRef:
+                name: web-secrets
+        - name: cloud-sql-proxy
+          image: gcr.io/cloudsql-docker/gce-proxy:1.28.0
+          command:
+            - "/cloud_sql_proxy"
+            - "-instances=formidable-gate-337712:us-west2:cs170-db=tcp:5432"
+            - "-enable_iam_login"
+          securityContext:
+            runAsNonRoot: true
+      serviceAccountName: autograder-web
