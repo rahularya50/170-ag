@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+option go_package = "proto/schemas";
+
+message JudgingRequest {
+  string code = 1;
+  string input = 2;
+  fixed64 id_nonce = 3;
+}

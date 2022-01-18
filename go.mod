@@ -15,10 +15,15 @@ require (
 	google.golang.org/api v0.64.0
 )
 
-require github.com/gorilla/securecookie v1.1.1 // indirect
+require (
+	github.com/google/go-cmp v0.5.6 // indirect
+	github.com/googleapis/gax-go/v2 v2.1.1 // indirect
+	github.com/gorilla/securecookie v1.1.1 // indirect
+)
 
 require (
 	cloud.google.com/go v0.99.0 // indirect
+	cloud.google.com/go/pubsub v1.17.1
 	github.com/agnivade/levenshtein v1.1.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/go-openapi/inflect v0.19.0 // indirect

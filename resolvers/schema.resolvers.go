@@ -63,11 +63,19 @@ func (r *mutationResolver) CreateSubmission(ctx context.Context, input *model.Co
 	if !ok {
 		return nil, fmt.Errorf("viewer not found")
 	}
-	return r.client.CodingSubmission.Create().
+	submission, err := r.client.CodingSubmission.Create().
 		SetAuthor(viewer).
 		SetCode(input.Code).
 		SetCodingProblemID(input.ProblemID).
 		Save(ctx)
+	if err != nil {
+		return nil, err
+	}
+	err = site.EnqueueSubmission(ctx, submission)
+	if err != nil {
+		return nil, err
+	}
+	return submission, nil
 }
 
 func (r *queryResolver) Viewer(ctx context.Context) (*ent.User, error) {

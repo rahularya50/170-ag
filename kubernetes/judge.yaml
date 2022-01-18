@@ -1,0 +1,77 @@
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: scaled-judge-trigger-credentials
+spec:
+  secretTargetRef:
+  - parameter: GoogleApplicationCredentials
+    name: judge-secrets
+    key: "credentials.json"
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledJob
+metadata:
+  name: scaled-judge
+spec:
+  jobTargetRef:
+    parallelism: 1
+    completions: 1
+    activeDeadlineSeconds: 60
+    backoffLimit: 0
+    template:
+      spec:
+        runtimeClassName: gvisor
+        initContainers:
+          - name: judge-subscriber
+            image: gcr.io/formidable-gate-337712/autograder-judge:latest
+            volumeMounts:
+              - name: workdir
+                mountPath: /workdir
+              - name: secrets
+                mountPath: /secrets
+            env:
+              - name: MODE
+                value: SUBSCRIBE
+              - name: GOOGLE_APPLICATION_CREDENTIALS
+                value: /secrets/credentials.json
+          - name: judge-executor
+            image: gcr.io/formidable-gate-337712/autograder-judge:latest
+            volumeMounts:
+              - name: workdir
+                mountPath: /workdir
+            env:
+              - name: MODE
+                value: JUDGE
+        containers:
+          - name: judge-publisher
+            image: gcr.io/formidable-gate-337712/autograder-judge:latest
+            volumeMounts:
+              - name: workdir
+                mountPath: /workdir
+              - name: secrets
+                mountPath: /secrets
+            env:
+              - name: MODE
+                value: PUBLISH
+              - name: GOOGLE_APPLICATION_CREDENTIALS
+                value: /secrets/credentials.json
+        restartPolicy: Never
+        volumes:
+          - name: workdir
+            emptyDir: {}
+          - name: secrets
+            secret:
+              secretName: judge-secrets
+  pollingInterval: 5
+  maxReplicaCount: 10
+  rolloutStrategy: gradual
+  successfulJobsHistoryLimit: 5
+  successfulJobsHistoryLimit: 5
+  triggers:
+  - type: gcp-pubsub
+    metadata:
+      mode: SubscriptionSize
+      value: "1"
+      subscriptionName: judge
+    authenticationRef:
+      name: scaled-judge-trigger-credentials

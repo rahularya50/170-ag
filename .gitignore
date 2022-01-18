@@ -5,4 +5,4 @@ __generated__/
 *.db
 oauth_secret.json
 node_modules/
-
+proto/**/*.go
