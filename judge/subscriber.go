@@ -3,12 +3,10 @@ package judge
 import (
 	"170-ag/proto/schemas"
 	"context"
-
-	"google.golang.org/grpc"
 )
 
 func PopFromJudgingQueue(ctx context.Context) error {
-	conn, err := grpc.Dial("judge-scaler.default.svc.cluster.local:6000")
+	conn, err := NewConn()
 	if err != nil {
 		return err
 	}

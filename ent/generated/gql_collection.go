@@ -47,9 +47,37 @@ func (cp *CodingProblemQuery) collectField(ctx *graphql.OperationContext, field 
 			cp = cp.WithDrafts(func(query *CodingDraftQuery) {
 				query.collectField(ctx, field)
 			})
+		case "staff_data":
+			cp = cp.WithStaffData(func(query *CodingProblemStaffDataQuery) {
+				query.collectField(ctx, field)
+			})
+		case "submissions":
+			cp = cp.WithSubmissions(func(query *CodingSubmissionQuery) {
+				query.collectField(ctx, field)
+			})
 		}
 	}
 	return cp
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (cpsd *CodingProblemStaffDataQuery) CollectFields(ctx context.Context, satisfies ...string) *CodingProblemStaffDataQuery {
+	if fc := graphql.GetFieldContext(ctx); fc != nil {
+		cpsd = cpsd.collectField(graphql.GetOperationContext(ctx), fc.Field, satisfies...)
+	}
+	return cpsd
+}
+
+func (cpsd *CodingProblemStaffDataQuery) collectField(ctx *graphql.OperationContext, field graphql.CollectedField, satisfies ...string) *CodingProblemStaffDataQuery {
+	for _, field := range graphql.CollectFields(ctx, field.Selections, satisfies) {
+		switch field.Name {
+		case "coding_problem":
+			cpsd = cpsd.WithCodingProblem(func(query *CodingProblemQuery) {
+				query.collectField(ctx, field)
+			})
+		}
+	}
+	return cpsd
 }
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
@@ -71,9 +99,33 @@ func (cs *CodingSubmissionQuery) collectField(ctx *graphql.OperationContext, fie
 			cs = cs.WithCodingProblem(func(query *CodingProblemQuery) {
 				query.collectField(ctx, field)
 			})
+		case "staff_data":
+			cs = cs.WithStaffData(func(query *CodingSubmissionStaffDataQuery) {
+				query.collectField(ctx, field)
+			})
 		}
 	}
 	return cs
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (cssd *CodingSubmissionStaffDataQuery) CollectFields(ctx context.Context, satisfies ...string) *CodingSubmissionStaffDataQuery {
+	if fc := graphql.GetFieldContext(ctx); fc != nil {
+		cssd = cssd.collectField(graphql.GetOperationContext(ctx), fc.Field, satisfies...)
+	}
+	return cssd
+}
+
+func (cssd *CodingSubmissionStaffDataQuery) collectField(ctx *graphql.OperationContext, field graphql.CollectedField, satisfies ...string) *CodingSubmissionStaffDataQuery {
+	for _, field := range graphql.CollectFields(ctx, field.Selections, satisfies) {
+		switch field.Name {
+		case "coding_submission":
+			cssd = cssd.WithCodingSubmission(func(query *CodingSubmissionQuery) {
+				query.collectField(ctx, field)
+			})
+		}
+	}
+	return cssd
 }
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.

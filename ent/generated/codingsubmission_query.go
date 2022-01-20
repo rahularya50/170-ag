@@ -5,6 +5,7 @@ package generated
 import (
 	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/codingsubmission"
+	"170-ag/ent/generated/codingsubmissionstaffdata"
 	"170-ag/ent/generated/predicate"
 	"170-ag/ent/generated/user"
 	"context"
@@ -29,6 +30,7 @@ type CodingSubmissionQuery struct {
 	// eager-loading edges.
 	withAuthor        *UserQuery
 	withCodingProblem *CodingProblemQuery
+	withStaffData     *CodingSubmissionStaffDataQuery
 	withFKs           bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -103,6 +105,28 @@ func (csq *CodingSubmissionQuery) QueryCodingProblem() *CodingProblemQuery {
 			sqlgraph.From(codingsubmission.Table, codingsubmission.FieldID, selector),
 			sqlgraph.To(codingproblem.Table, codingproblem.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, codingsubmission.CodingProblemTable, codingsubmission.CodingProblemColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(csq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryStaffData chains the current query on the "staff_data" edge.
+func (csq *CodingSubmissionQuery) QueryStaffData() *CodingSubmissionStaffDataQuery {
+	query := &CodingSubmissionStaffDataQuery{config: csq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := csq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := csq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(codingsubmission.Table, codingsubmission.FieldID, selector),
+			sqlgraph.To(codingsubmissionstaffdata.Table, codingsubmissionstaffdata.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, codingsubmission.StaffDataTable, codingsubmission.StaffDataColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(csq.driver.Dialect(), step)
 		return fromU, nil
@@ -293,6 +317,7 @@ func (csq *CodingSubmissionQuery) Clone() *CodingSubmissionQuery {
 		predicates:        append([]predicate.CodingSubmission{}, csq.predicates...),
 		withAuthor:        csq.withAuthor.Clone(),
 		withCodingProblem: csq.withCodingProblem.Clone(),
+		withStaffData:     csq.withStaffData.Clone(),
 		// clone intermediate query.
 		sql:  csq.sql.Clone(),
 		path: csq.path,
@@ -318,6 +343,17 @@ func (csq *CodingSubmissionQuery) WithCodingProblem(opts ...func(*CodingProblemQ
 		opt(query)
 	}
 	csq.withCodingProblem = query
+	return csq
+}
+
+// WithStaffData tells the query-builder to eager-load the nodes that are connected to
+// the "staff_data" edge. The optional arguments are used to configure the query builder of the edge.
+func (csq *CodingSubmissionQuery) WithStaffData(opts ...func(*CodingSubmissionStaffDataQuery)) *CodingSubmissionQuery {
+	query := &CodingSubmissionStaffDataQuery{config: csq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	csq.withStaffData = query
 	return csq
 }
 
@@ -393,12 +429,13 @@ func (csq *CodingSubmissionQuery) sqlAll(ctx context.Context) ([]*CodingSubmissi
 		nodes       = []*CodingSubmission{}
 		withFKs     = csq.withFKs
 		_spec       = csq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			csq.withAuthor != nil,
 			csq.withCodingProblem != nil,
+			csq.withStaffData != nil,
 		}
 	)
-	if csq.withAuthor != nil || csq.withCodingProblem != nil {
+	if csq.withAuthor != nil || csq.withCodingProblem != nil || csq.withStaffData != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -478,6 +515,35 @@ func (csq *CodingSubmissionQuery) sqlAll(ctx context.Context) ([]*CodingSubmissi
 			}
 			for i := range nodes {
 				nodes[i].Edges.CodingProblem = n
+			}
+		}
+	}
+
+	if query := csq.withStaffData; query != nil {
+		ids := make([]int, 0, len(nodes))
+		nodeids := make(map[int][]*CodingSubmission)
+		for i := range nodes {
+			if nodes[i].coding_submission_staff_data_coding_submission == nil {
+				continue
+			}
+			fk := *nodes[i].coding_submission_staff_data_coding_submission
+			if _, ok := nodeids[fk]; !ok {
+				ids = append(ids, fk)
+			}
+			nodeids[fk] = append(nodeids[fk], nodes[i])
+		}
+		query.Where(codingsubmissionstaffdata.IDIn(ids...))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			nodes, ok := nodeids[n.ID]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "coding_submission_staff_data_coding_submission" returned %v`, n.ID)
+			}
+			for i := range nodes {
+				nodes[i].Edges.StaffData = n
 			}
 		}
 	}

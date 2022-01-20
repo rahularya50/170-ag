@@ -7,7 +7,9 @@ import (
 	ent "170-ag/ent/generated"
 	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/codingproblem"
+	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/user"
+	"170-ag/privacyrules"
 	resolvers "170-ag/resolvers/generated"
 	model "170-ag/schema/generated"
 	"170-ag/site"
@@ -24,7 +26,23 @@ func (r *codingProblemResolver) MyDraft(ctx context.Context, obj *ent.CodingProb
 }
 
 func (r *codingProblemResolver) MySubmissions(ctx context.Context, obj *ent.CodingProblem, after *ent.Cursor, first *int, before *ent.Cursor, last *int) (*ent.CodingSubmissionConnection, error) {
-	panic(fmt.Errorf("not implemented"))
+	viewer, ok := site.ViewerFromContext(ctx)
+	if !ok {
+		return nil, fmt.Errorf("viewer not found")
+	}
+	return obj.QuerySubmissions().Where(codingsubmission.HasAuthorWith(user.ID(viewer.ID))).Paginate(ctx, after, first, before, last)
+}
+
+func (r *codingProblemResolver) AllSubmissions(ctx context.Context, obj *ent.CodingProblem, after *ent.Cursor, first *int, before *ent.Cursor, last *int) (*ent.CodingSubmissionConnection, error) {
+	return obj.QuerySubmissions().Paginate(ctx, after, first, before, last)
+}
+
+func (r *codingSubmissionStaffDataResolver) ExecutionID(ctx context.Context, obj *ent.CodingSubmissionStaffData) (*string, error) {
+	if obj.ExecutionID == nil {
+		return nil, nil
+	}
+	s := string(*obj.ExecutionID)
+	return &s, nil
 }
 
 func (r *mutationResolver) NewUser(ctx context.Context, name *string) (*ent.User, error) {
@@ -32,12 +50,35 @@ func (r *mutationResolver) NewUser(ctx context.Context, name *string) (*ent.User
 }
 
 func (r *mutationResolver) NewProblem(ctx context.Context, input *model.CodingProblemInput) (*ent.CodingProblem, error) {
-	return r.client.CodingProblem.
+	tx, err := r.client.Tx(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback()
+
+	problem, err := tx.CodingProblem.
 		Create().
 		SetName(input.Name).
 		SetStatement(input.Statement).
 		SetReleased(input.Released).
 		Save(ctx)
+	if err != nil {
+		return nil, err
+	}
+	err = tx.CodingProblemStaffData.Create().
+		SetCodingProblem(problem).
+		SetInput("").
+		Exec(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, err
+	}
+
+	return problem.Unwrap(), nil
 }
 
 func (r *mutationResolver) SaveDraft(ctx context.Context, input *model.CodingDraftInput) (*ent.CodingDraft, error) {
@@ -63,7 +104,14 @@ func (r *mutationResolver) CreateSubmission(ctx context.Context, input *model.Co
 	if !ok {
 		return nil, fmt.Errorf("viewer not found")
 	}
-	submission, err := r.client.CodingSubmission.Create().
+
+	tx, err := r.client.Tx(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback()
+
+	submission, err := tx.CodingSubmission.Create().
 		SetAuthor(viewer).
 		SetCode(input.Code).
 		SetCodingProblemID(input.ProblemID).
@@ -71,11 +119,31 @@ func (r *mutationResolver) CreateSubmission(ctx context.Context, input *model.Co
 	if err != nil {
 		return nil, err
 	}
-	err = site.EnqueueSubmission(ctx, submission)
+
+	submission_ctx := privacyrules.NewContextWithAccessToken(ctx, privacyrules.SubmissionEnqueuingAccessToken)
+
+	problem_data, err := tx.CodingProblem.Query().
+		Where(codingproblem.ID(input.ProblemID)).
+		QueryStaffData().
+		Only(submission_ctx)
 	if err != nil {
 		return nil, err
 	}
-	return submission, nil
+
+	err = tx.CodingSubmissionStaffData.Create().
+		SetCodingSubmission(submission).
+		SetInput(problem_data.Input).
+		Exec(submission_ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, err
+	}
+
+	return submission.Unwrap(), nil
 }
 
 func (r *queryResolver) Viewer(ctx context.Context) (*ent.User, error) {
@@ -116,6 +184,11 @@ func (r *queryResolver) CodingProblems(ctx context.Context, after *ent.Cursor, f
 // CodingProblem returns resolvers.CodingProblemResolver implementation.
 func (r *Resolver) CodingProblem() resolvers.CodingProblemResolver { return &codingProblemResolver{r} }
 
+// CodingSubmissionStaffData returns resolvers.CodingSubmissionStaffDataResolver implementation.
+func (r *Resolver) CodingSubmissionStaffData() resolvers.CodingSubmissionStaffDataResolver {
+	return &codingSubmissionStaffDataResolver{r}
+}
+
 // Mutation returns resolvers.MutationResolver implementation.
 func (r *Resolver) Mutation() resolvers.MutationResolver { return &mutationResolver{r} }
 
@@ -123,5 +196,6 @@ func (r *Resolver) Mutation() resolvers.MutationResolver { return &mutationResol
 func (r *Resolver) Query() resolvers.QueryResolver { return &queryResolver{r} }
 
 type codingProblemResolver struct{ *Resolver }
+type codingSubmissionStaffDataResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

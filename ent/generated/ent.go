@@ -5,7 +5,9 @@ package generated
 import (
 	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/codingproblem"
+	"170-ag/ent/generated/codingproblemstaffdata"
 	"170-ag/ent/generated/codingsubmission"
+	"170-ag/ent/generated/codingsubmissionstaffdata"
 	"170-ag/ent/generated/user"
 	"errors"
 	"fmt"
@@ -32,10 +34,12 @@ type OrderFunc func(*sql.Selector)
 // columnChecker returns a function indicates if the column exists in the given column.
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
-		codingdraft.Table:      codingdraft.ValidColumn,
-		codingproblem.Table:    codingproblem.ValidColumn,
-		codingsubmission.Table: codingsubmission.ValidColumn,
-		user.Table:             user.ValidColumn,
+		codingdraft.Table:               codingdraft.ValidColumn,
+		codingproblem.Table:             codingproblem.ValidColumn,
+		codingproblemstaffdata.Table:    codingproblemstaffdata.ValidColumn,
+		codingsubmission.Table:          codingsubmission.ValidColumn,
+		codingsubmissionstaffdata.Table: codingsubmissionstaffdata.ValidColumn,
+		user.Table:                      user.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

@@ -5,6 +5,7 @@ package generated
 import (
 	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/codingsubmission"
+	"170-ag/ent/generated/codingsubmissionstaffdata"
 	"170-ag/ent/generated/user"
 	"context"
 	"errors"
@@ -63,6 +64,25 @@ func (csc *CodingSubmissionCreate) SetCodingProblemID(id int) *CodingSubmissionC
 // SetCodingProblem sets the "coding_problem" edge to the CodingProblem entity.
 func (csc *CodingSubmissionCreate) SetCodingProblem(c *CodingProblem) *CodingSubmissionCreate {
 	return csc.SetCodingProblemID(c.ID)
+}
+
+// SetStaffDataID sets the "staff_data" edge to the CodingSubmissionStaffData entity by ID.
+func (csc *CodingSubmissionCreate) SetStaffDataID(id int) *CodingSubmissionCreate {
+	csc.mutation.SetStaffDataID(id)
+	return csc
+}
+
+// SetNillableStaffDataID sets the "staff_data" edge to the CodingSubmissionStaffData entity by ID if the given value is not nil.
+func (csc *CodingSubmissionCreate) SetNillableStaffDataID(id *int) *CodingSubmissionCreate {
+	if id != nil {
+		csc = csc.SetStaffDataID(*id)
+	}
+	return csc
+}
+
+// SetStaffData sets the "staff_data" edge to the CodingSubmissionStaffData entity.
+func (csc *CodingSubmissionCreate) SetStaffData(c *CodingSubmissionStaffData) *CodingSubmissionCreate {
+	return csc.SetStaffDataID(c.ID)
 }
 
 // Mutation returns the CodingSubmissionMutation object of the builder.
@@ -246,6 +266,26 @@ func (csc *CodingSubmissionCreate) createSpec() (*CodingSubmission, *sqlgraph.Cr
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.coding_submission_coding_problem = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := csc.mutation.StaffDataIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   codingsubmission.StaffDataTable,
+			Columns: []string{codingsubmission.StaffDataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingsubmissionstaffdata.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.coding_submission_staff_data_coding_submission = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

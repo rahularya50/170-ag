@@ -5,7 +5,9 @@ package generated
 import (
 	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/codingproblem"
+	"170-ag/ent/generated/codingproblemstaffdata"
 	"170-ag/ent/generated/codingsubmission"
+	"170-ag/ent/generated/codingsubmissionstaffdata"
 	"170-ag/ent/generated/predicate"
 	"170-ag/ent/generated/user"
 	"context"
@@ -24,10 +26,12 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeCodingDraft      = "CodingDraft"
-	TypeCodingProblem    = "CodingProblem"
-	TypeCodingSubmission = "CodingSubmission"
-	TypeUser             = "User"
+	TypeCodingDraft               = "CodingDraft"
+	TypeCodingProblem             = "CodingProblem"
+	TypeCodingProblemStaffData    = "CodingProblemStaffData"
+	TypeCodingSubmission          = "CodingSubmission"
+	TypeCodingSubmissionStaffData = "CodingSubmissionStaffData"
+	TypeUser                      = "User"
 )
 
 // CodingDraftMutation represents an operation that mutates the CodingDraft nodes in the graph.
@@ -453,19 +457,24 @@ func (m *CodingDraftMutation) ResetEdge(name string) error {
 // CodingProblemMutation represents an operation that mutates the CodingProblem nodes in the graph.
 type CodingProblemMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int
-	name          *string
-	statement     *string
-	released      *bool
-	clearedFields map[string]struct{}
-	drafts        map[int]struct{}
-	removeddrafts map[int]struct{}
-	cleareddrafts bool
-	done          bool
-	oldValue      func(context.Context) (*CodingProblem, error)
-	predicates    []predicate.CodingProblem
+	op                 Op
+	typ                string
+	id                 *int
+	name               *string
+	statement          *string
+	released           *bool
+	clearedFields      map[string]struct{}
+	drafts             map[int]struct{}
+	removeddrafts      map[int]struct{}
+	cleareddrafts      bool
+	staff_data         *int
+	clearedstaff_data  bool
+	submissions        map[int]struct{}
+	removedsubmissions map[int]struct{}
+	clearedsubmissions bool
+	done               bool
+	oldValue           func(context.Context) (*CodingProblem, error)
+	predicates         []predicate.CodingProblem
 }
 
 var _ ent.Mutation = (*CodingProblemMutation)(nil)
@@ -709,6 +718,99 @@ func (m *CodingProblemMutation) ResetDrafts() {
 	m.removeddrafts = nil
 }
 
+// SetStaffDataID sets the "staff_data" edge to the CodingProblemStaffData entity by id.
+func (m *CodingProblemMutation) SetStaffDataID(id int) {
+	m.staff_data = &id
+}
+
+// ClearStaffData clears the "staff_data" edge to the CodingProblemStaffData entity.
+func (m *CodingProblemMutation) ClearStaffData() {
+	m.clearedstaff_data = true
+}
+
+// StaffDataCleared reports if the "staff_data" edge to the CodingProblemStaffData entity was cleared.
+func (m *CodingProblemMutation) StaffDataCleared() bool {
+	return m.clearedstaff_data
+}
+
+// StaffDataID returns the "staff_data" edge ID in the mutation.
+func (m *CodingProblemMutation) StaffDataID() (id int, exists bool) {
+	if m.staff_data != nil {
+		return *m.staff_data, true
+	}
+	return
+}
+
+// StaffDataIDs returns the "staff_data" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// StaffDataID instead. It exists only for internal usage by the builders.
+func (m *CodingProblemMutation) StaffDataIDs() (ids []int) {
+	if id := m.staff_data; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetStaffData resets all changes to the "staff_data" edge.
+func (m *CodingProblemMutation) ResetStaffData() {
+	m.staff_data = nil
+	m.clearedstaff_data = false
+}
+
+// AddSubmissionIDs adds the "submissions" edge to the CodingSubmission entity by ids.
+func (m *CodingProblemMutation) AddSubmissionIDs(ids ...int) {
+	if m.submissions == nil {
+		m.submissions = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.submissions[ids[i]] = struct{}{}
+	}
+}
+
+// ClearSubmissions clears the "submissions" edge to the CodingSubmission entity.
+func (m *CodingProblemMutation) ClearSubmissions() {
+	m.clearedsubmissions = true
+}
+
+// SubmissionsCleared reports if the "submissions" edge to the CodingSubmission entity was cleared.
+func (m *CodingProblemMutation) SubmissionsCleared() bool {
+	return m.clearedsubmissions
+}
+
+// RemoveSubmissionIDs removes the "submissions" edge to the CodingSubmission entity by IDs.
+func (m *CodingProblemMutation) RemoveSubmissionIDs(ids ...int) {
+	if m.removedsubmissions == nil {
+		m.removedsubmissions = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.submissions, ids[i])
+		m.removedsubmissions[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedSubmissions returns the removed IDs of the "submissions" edge to the CodingSubmission entity.
+func (m *CodingProblemMutation) RemovedSubmissionsIDs() (ids []int) {
+	for id := range m.removedsubmissions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// SubmissionsIDs returns the "submissions" edge IDs in the mutation.
+func (m *CodingProblemMutation) SubmissionsIDs() (ids []int) {
+	for id := range m.submissions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetSubmissions resets all changes to the "submissions" edge.
+func (m *CodingProblemMutation) ResetSubmissions() {
+	m.submissions = nil
+	m.clearedsubmissions = false
+	m.removedsubmissions = nil
+}
+
 // Where appends a list predicates to the CodingProblemMutation builder.
 func (m *CodingProblemMutation) Where(ps ...predicate.CodingProblem) {
 	m.predicates = append(m.predicates, ps...)
@@ -861,9 +963,15 @@ func (m *CodingProblemMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *CodingProblemMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 3)
 	if m.drafts != nil {
 		edges = append(edges, codingproblem.EdgeDrafts)
+	}
+	if m.staff_data != nil {
+		edges = append(edges, codingproblem.EdgeStaffData)
+	}
+	if m.submissions != nil {
+		edges = append(edges, codingproblem.EdgeSubmissions)
 	}
 	return edges
 }
@@ -878,15 +986,28 @@ func (m *CodingProblemMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case codingproblem.EdgeStaffData:
+		if id := m.staff_data; id != nil {
+			return []ent.Value{*id}
+		}
+	case codingproblem.EdgeSubmissions:
+		ids := make([]ent.Value, 0, len(m.submissions))
+		for id := range m.submissions {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *CodingProblemMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 3)
 	if m.removeddrafts != nil {
 		edges = append(edges, codingproblem.EdgeDrafts)
+	}
+	if m.removedsubmissions != nil {
+		edges = append(edges, codingproblem.EdgeSubmissions)
 	}
 	return edges
 }
@@ -901,15 +1022,27 @@ func (m *CodingProblemMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case codingproblem.EdgeSubmissions:
+		ids := make([]ent.Value, 0, len(m.removedsubmissions))
+		for id := range m.removedsubmissions {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *CodingProblemMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 3)
 	if m.cleareddrafts {
 		edges = append(edges, codingproblem.EdgeDrafts)
+	}
+	if m.clearedstaff_data {
+		edges = append(edges, codingproblem.EdgeStaffData)
+	}
+	if m.clearedsubmissions {
+		edges = append(edges, codingproblem.EdgeSubmissions)
 	}
 	return edges
 }
@@ -920,6 +1053,10 @@ func (m *CodingProblemMutation) EdgeCleared(name string) bool {
 	switch name {
 	case codingproblem.EdgeDrafts:
 		return m.cleareddrafts
+	case codingproblem.EdgeStaffData:
+		return m.clearedstaff_data
+	case codingproblem.EdgeSubmissions:
+		return m.clearedsubmissions
 	}
 	return false
 }
@@ -928,6 +1065,9 @@ func (m *CodingProblemMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *CodingProblemMutation) ClearEdge(name string) error {
 	switch name {
+	case codingproblem.EdgeStaffData:
+		m.ClearStaffData()
+		return nil
 	}
 	return fmt.Errorf("unknown CodingProblem unique edge %s", name)
 }
@@ -939,8 +1079,375 @@ func (m *CodingProblemMutation) ResetEdge(name string) error {
 	case codingproblem.EdgeDrafts:
 		m.ResetDrafts()
 		return nil
+	case codingproblem.EdgeStaffData:
+		m.ResetStaffData()
+		return nil
+	case codingproblem.EdgeSubmissions:
+		m.ResetSubmissions()
+		return nil
 	}
 	return fmt.Errorf("unknown CodingProblem edge %s", name)
+}
+
+// CodingProblemStaffDataMutation represents an operation that mutates the CodingProblemStaffData nodes in the graph.
+type CodingProblemStaffDataMutation struct {
+	config
+	op                    Op
+	typ                   string
+	id                    *int
+	input                 *string
+	clearedFields         map[string]struct{}
+	coding_problem        *int
+	clearedcoding_problem bool
+	done                  bool
+	oldValue              func(context.Context) (*CodingProblemStaffData, error)
+	predicates            []predicate.CodingProblemStaffData
+}
+
+var _ ent.Mutation = (*CodingProblemStaffDataMutation)(nil)
+
+// codingproblemstaffdataOption allows management of the mutation configuration using functional options.
+type codingproblemstaffdataOption func(*CodingProblemStaffDataMutation)
+
+// newCodingProblemStaffDataMutation creates new mutation for the CodingProblemStaffData entity.
+func newCodingProblemStaffDataMutation(c config, op Op, opts ...codingproblemstaffdataOption) *CodingProblemStaffDataMutation {
+	m := &CodingProblemStaffDataMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeCodingProblemStaffData,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withCodingProblemStaffDataID sets the ID field of the mutation.
+func withCodingProblemStaffDataID(id int) codingproblemstaffdataOption {
+	return func(m *CodingProblemStaffDataMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *CodingProblemStaffData
+		)
+		m.oldValue = func(ctx context.Context) (*CodingProblemStaffData, error) {
+			once.Do(func() {
+				if m.done {
+					err = fmt.Errorf("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().CodingProblemStaffData.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withCodingProblemStaffData sets the old CodingProblemStaffData of the mutation.
+func withCodingProblemStaffData(node *CodingProblemStaffData) codingproblemstaffdataOption {
+	return func(m *CodingProblemStaffDataMutation) {
+		m.oldValue = func(context.Context) (*CodingProblemStaffData, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m CodingProblemStaffDataMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m CodingProblemStaffDataMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, fmt.Errorf("generated: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *CodingProblemStaffDataMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// SetInput sets the "input" field.
+func (m *CodingProblemStaffDataMutation) SetInput(s string) {
+	m.input = &s
+}
+
+// Input returns the value of the "input" field in the mutation.
+func (m *CodingProblemStaffDataMutation) Input() (r string, exists bool) {
+	v := m.input
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldInput returns the old "input" field's value of the CodingProblemStaffData entity.
+// If the CodingProblemStaffData object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CodingProblemStaffDataMutation) OldInput(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldInput is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldInput requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldInput: %w", err)
+	}
+	return oldValue.Input, nil
+}
+
+// ResetInput resets all changes to the "input" field.
+func (m *CodingProblemStaffDataMutation) ResetInput() {
+	m.input = nil
+}
+
+// SetCodingProblemID sets the "coding_problem" edge to the CodingProblem entity by id.
+func (m *CodingProblemStaffDataMutation) SetCodingProblemID(id int) {
+	m.coding_problem = &id
+}
+
+// ClearCodingProblem clears the "coding_problem" edge to the CodingProblem entity.
+func (m *CodingProblemStaffDataMutation) ClearCodingProblem() {
+	m.clearedcoding_problem = true
+}
+
+// CodingProblemCleared reports if the "coding_problem" edge to the CodingProblem entity was cleared.
+func (m *CodingProblemStaffDataMutation) CodingProblemCleared() bool {
+	return m.clearedcoding_problem
+}
+
+// CodingProblemID returns the "coding_problem" edge ID in the mutation.
+func (m *CodingProblemStaffDataMutation) CodingProblemID() (id int, exists bool) {
+	if m.coding_problem != nil {
+		return *m.coding_problem, true
+	}
+	return
+}
+
+// CodingProblemIDs returns the "coding_problem" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CodingProblemID instead. It exists only for internal usage by the builders.
+func (m *CodingProblemStaffDataMutation) CodingProblemIDs() (ids []int) {
+	if id := m.coding_problem; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCodingProblem resets all changes to the "coding_problem" edge.
+func (m *CodingProblemStaffDataMutation) ResetCodingProblem() {
+	m.coding_problem = nil
+	m.clearedcoding_problem = false
+}
+
+// Where appends a list predicates to the CodingProblemStaffDataMutation builder.
+func (m *CodingProblemStaffDataMutation) Where(ps ...predicate.CodingProblemStaffData) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *CodingProblemStaffDataMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (CodingProblemStaffData).
+func (m *CodingProblemStaffDataMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *CodingProblemStaffDataMutation) Fields() []string {
+	fields := make([]string, 0, 1)
+	if m.input != nil {
+		fields = append(fields, codingproblemstaffdata.FieldInput)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *CodingProblemStaffDataMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case codingproblemstaffdata.FieldInput:
+		return m.Input()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *CodingProblemStaffDataMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case codingproblemstaffdata.FieldInput:
+		return m.OldInput(ctx)
+	}
+	return nil, fmt.Errorf("unknown CodingProblemStaffData field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *CodingProblemStaffDataMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case codingproblemstaffdata.FieldInput:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetInput(v)
+		return nil
+	}
+	return fmt.Errorf("unknown CodingProblemStaffData field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *CodingProblemStaffDataMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *CodingProblemStaffDataMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *CodingProblemStaffDataMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown CodingProblemStaffData numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *CodingProblemStaffDataMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *CodingProblemStaffDataMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *CodingProblemStaffDataMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown CodingProblemStaffData nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *CodingProblemStaffDataMutation) ResetField(name string) error {
+	switch name {
+	case codingproblemstaffdata.FieldInput:
+		m.ResetInput()
+		return nil
+	}
+	return fmt.Errorf("unknown CodingProblemStaffData field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *CodingProblemStaffDataMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.coding_problem != nil {
+		edges = append(edges, codingproblemstaffdata.EdgeCodingProblem)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *CodingProblemStaffDataMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case codingproblemstaffdata.EdgeCodingProblem:
+		if id := m.coding_problem; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *CodingProblemStaffDataMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *CodingProblemStaffDataMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *CodingProblemStaffDataMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedcoding_problem {
+		edges = append(edges, codingproblemstaffdata.EdgeCodingProblem)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *CodingProblemStaffDataMutation) EdgeCleared(name string) bool {
+	switch name {
+	case codingproblemstaffdata.EdgeCodingProblem:
+		return m.clearedcoding_problem
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *CodingProblemStaffDataMutation) ClearEdge(name string) error {
+	switch name {
+	case codingproblemstaffdata.EdgeCodingProblem:
+		m.ClearCodingProblem()
+		return nil
+	}
+	return fmt.Errorf("unknown CodingProblemStaffData unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *CodingProblemStaffDataMutation) ResetEdge(name string) error {
+	switch name {
+	case codingproblemstaffdata.EdgeCodingProblem:
+		m.ResetCodingProblem()
+		return nil
+	}
+	return fmt.Errorf("unknown CodingProblemStaffData edge %s", name)
 }
 
 // CodingSubmissionMutation represents an operation that mutates the CodingSubmission nodes in the graph.
@@ -956,6 +1463,8 @@ type CodingSubmissionMutation struct {
 	clearedauthor         bool
 	coding_problem        *int
 	clearedcoding_problem bool
+	staff_data            *int
+	clearedstaff_data     bool
 	done                  bool
 	oldValue              func(context.Context) (*CodingSubmission, error)
 	predicates            []predicate.CodingSubmission
@@ -1190,6 +1699,45 @@ func (m *CodingSubmissionMutation) ResetCodingProblem() {
 	m.clearedcoding_problem = false
 }
 
+// SetStaffDataID sets the "staff_data" edge to the CodingSubmissionStaffData entity by id.
+func (m *CodingSubmissionMutation) SetStaffDataID(id int) {
+	m.staff_data = &id
+}
+
+// ClearStaffData clears the "staff_data" edge to the CodingSubmissionStaffData entity.
+func (m *CodingSubmissionMutation) ClearStaffData() {
+	m.clearedstaff_data = true
+}
+
+// StaffDataCleared reports if the "staff_data" edge to the CodingSubmissionStaffData entity was cleared.
+func (m *CodingSubmissionMutation) StaffDataCleared() bool {
+	return m.clearedstaff_data
+}
+
+// StaffDataID returns the "staff_data" edge ID in the mutation.
+func (m *CodingSubmissionMutation) StaffDataID() (id int, exists bool) {
+	if m.staff_data != nil {
+		return *m.staff_data, true
+	}
+	return
+}
+
+// StaffDataIDs returns the "staff_data" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// StaffDataID instead. It exists only for internal usage by the builders.
+func (m *CodingSubmissionMutation) StaffDataIDs() (ids []int) {
+	if id := m.staff_data; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetStaffData resets all changes to the "staff_data" edge.
+func (m *CodingSubmissionMutation) ResetStaffData() {
+	m.staff_data = nil
+	m.clearedstaff_data = false
+}
+
 // Where appends a list predicates to the CodingSubmissionMutation builder.
 func (m *CodingSubmissionMutation) Where(ps ...predicate.CodingSubmission) {
 	m.predicates = append(m.predicates, ps...)
@@ -1325,12 +1873,15 @@ func (m *CodingSubmissionMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *CodingSubmissionMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.author != nil {
 		edges = append(edges, codingsubmission.EdgeAuthor)
 	}
 	if m.coding_problem != nil {
 		edges = append(edges, codingsubmission.EdgeCodingProblem)
+	}
+	if m.staff_data != nil {
+		edges = append(edges, codingsubmission.EdgeStaffData)
 	}
 	return edges
 }
@@ -1347,13 +1898,17 @@ func (m *CodingSubmissionMutation) AddedIDs(name string) []ent.Value {
 		if id := m.coding_problem; id != nil {
 			return []ent.Value{*id}
 		}
+	case codingsubmission.EdgeStaffData:
+		if id := m.staff_data; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *CodingSubmissionMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	return edges
 }
 
@@ -1367,12 +1922,15 @@ func (m *CodingSubmissionMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *CodingSubmissionMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.clearedauthor {
 		edges = append(edges, codingsubmission.EdgeAuthor)
 	}
 	if m.clearedcoding_problem {
 		edges = append(edges, codingsubmission.EdgeCodingProblem)
+	}
+	if m.clearedstaff_data {
+		edges = append(edges, codingsubmission.EdgeStaffData)
 	}
 	return edges
 }
@@ -1385,6 +1943,8 @@ func (m *CodingSubmissionMutation) EdgeCleared(name string) bool {
 		return m.clearedauthor
 	case codingsubmission.EdgeCodingProblem:
 		return m.clearedcoding_problem
+	case codingsubmission.EdgeStaffData:
+		return m.clearedstaff_data
 	}
 	return false
 }
@@ -1398,6 +1958,9 @@ func (m *CodingSubmissionMutation) ClearEdge(name string) error {
 		return nil
 	case codingsubmission.EdgeCodingProblem:
 		m.ClearCodingProblem()
+		return nil
+	case codingsubmission.EdgeStaffData:
+		m.ClearStaffData()
 		return nil
 	}
 	return fmt.Errorf("unknown CodingSubmission unique edge %s", name)
@@ -1413,8 +1976,558 @@ func (m *CodingSubmissionMutation) ResetEdge(name string) error {
 	case codingsubmission.EdgeCodingProblem:
 		m.ResetCodingProblem()
 		return nil
+	case codingsubmission.EdgeStaffData:
+		m.ResetStaffData()
+		return nil
 	}
 	return fmt.Errorf("unknown CodingSubmission edge %s", name)
+}
+
+// CodingSubmissionStaffDataMutation represents an operation that mutates the CodingSubmissionStaffData nodes in the graph.
+type CodingSubmissionStaffDataMutation struct {
+	config
+	op                       Op
+	typ                      string
+	id                       *int
+	execution_id             *int64
+	addexecution_id          *int64
+	input                    *string
+	output                   *string
+	clearedFields            map[string]struct{}
+	coding_submission        *int
+	clearedcoding_submission bool
+	done                     bool
+	oldValue                 func(context.Context) (*CodingSubmissionStaffData, error)
+	predicates               []predicate.CodingSubmissionStaffData
+}
+
+var _ ent.Mutation = (*CodingSubmissionStaffDataMutation)(nil)
+
+// codingsubmissionstaffdataOption allows management of the mutation configuration using functional options.
+type codingsubmissionstaffdataOption func(*CodingSubmissionStaffDataMutation)
+
+// newCodingSubmissionStaffDataMutation creates new mutation for the CodingSubmissionStaffData entity.
+func newCodingSubmissionStaffDataMutation(c config, op Op, opts ...codingsubmissionstaffdataOption) *CodingSubmissionStaffDataMutation {
+	m := &CodingSubmissionStaffDataMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeCodingSubmissionStaffData,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withCodingSubmissionStaffDataID sets the ID field of the mutation.
+func withCodingSubmissionStaffDataID(id int) codingsubmissionstaffdataOption {
+	return func(m *CodingSubmissionStaffDataMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *CodingSubmissionStaffData
+		)
+		m.oldValue = func(ctx context.Context) (*CodingSubmissionStaffData, error) {
+			once.Do(func() {
+				if m.done {
+					err = fmt.Errorf("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().CodingSubmissionStaffData.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withCodingSubmissionStaffData sets the old CodingSubmissionStaffData of the mutation.
+func withCodingSubmissionStaffData(node *CodingSubmissionStaffData) codingsubmissionstaffdataOption {
+	return func(m *CodingSubmissionStaffDataMutation) {
+		m.oldValue = func(context.Context) (*CodingSubmissionStaffData, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m CodingSubmissionStaffDataMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m CodingSubmissionStaffDataMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, fmt.Errorf("generated: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *CodingSubmissionStaffDataMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// SetExecutionID sets the "execution_id" field.
+func (m *CodingSubmissionStaffDataMutation) SetExecutionID(i int64) {
+	m.execution_id = &i
+	m.addexecution_id = nil
+}
+
+// ExecutionID returns the value of the "execution_id" field in the mutation.
+func (m *CodingSubmissionStaffDataMutation) ExecutionID() (r int64, exists bool) {
+	v := m.execution_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldExecutionID returns the old "execution_id" field's value of the CodingSubmissionStaffData entity.
+// If the CodingSubmissionStaffData object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CodingSubmissionStaffDataMutation) OldExecutionID(ctx context.Context) (v *int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldExecutionID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldExecutionID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldExecutionID: %w", err)
+	}
+	return oldValue.ExecutionID, nil
+}
+
+// AddExecutionID adds i to the "execution_id" field.
+func (m *CodingSubmissionStaffDataMutation) AddExecutionID(i int64) {
+	if m.addexecution_id != nil {
+		*m.addexecution_id += i
+	} else {
+		m.addexecution_id = &i
+	}
+}
+
+// AddedExecutionID returns the value that was added to the "execution_id" field in this mutation.
+func (m *CodingSubmissionStaffDataMutation) AddedExecutionID() (r int64, exists bool) {
+	v := m.addexecution_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearExecutionID clears the value of the "execution_id" field.
+func (m *CodingSubmissionStaffDataMutation) ClearExecutionID() {
+	m.execution_id = nil
+	m.addexecution_id = nil
+	m.clearedFields[codingsubmissionstaffdata.FieldExecutionID] = struct{}{}
+}
+
+// ExecutionIDCleared returns if the "execution_id" field was cleared in this mutation.
+func (m *CodingSubmissionStaffDataMutation) ExecutionIDCleared() bool {
+	_, ok := m.clearedFields[codingsubmissionstaffdata.FieldExecutionID]
+	return ok
+}
+
+// ResetExecutionID resets all changes to the "execution_id" field.
+func (m *CodingSubmissionStaffDataMutation) ResetExecutionID() {
+	m.execution_id = nil
+	m.addexecution_id = nil
+	delete(m.clearedFields, codingsubmissionstaffdata.FieldExecutionID)
+}
+
+// SetInput sets the "input" field.
+func (m *CodingSubmissionStaffDataMutation) SetInput(s string) {
+	m.input = &s
+}
+
+// Input returns the value of the "input" field in the mutation.
+func (m *CodingSubmissionStaffDataMutation) Input() (r string, exists bool) {
+	v := m.input
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldInput returns the old "input" field's value of the CodingSubmissionStaffData entity.
+// If the CodingSubmissionStaffData object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CodingSubmissionStaffDataMutation) OldInput(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldInput is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldInput requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldInput: %w", err)
+	}
+	return oldValue.Input, nil
+}
+
+// ResetInput resets all changes to the "input" field.
+func (m *CodingSubmissionStaffDataMutation) ResetInput() {
+	m.input = nil
+}
+
+// SetOutput sets the "output" field.
+func (m *CodingSubmissionStaffDataMutation) SetOutput(s string) {
+	m.output = &s
+}
+
+// Output returns the value of the "output" field in the mutation.
+func (m *CodingSubmissionStaffDataMutation) Output() (r string, exists bool) {
+	v := m.output
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOutput returns the old "output" field's value of the CodingSubmissionStaffData entity.
+// If the CodingSubmissionStaffData object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CodingSubmissionStaffDataMutation) OldOutput(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldOutput is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldOutput requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOutput: %w", err)
+	}
+	return oldValue.Output, nil
+}
+
+// ClearOutput clears the value of the "output" field.
+func (m *CodingSubmissionStaffDataMutation) ClearOutput() {
+	m.output = nil
+	m.clearedFields[codingsubmissionstaffdata.FieldOutput] = struct{}{}
+}
+
+// OutputCleared returns if the "output" field was cleared in this mutation.
+func (m *CodingSubmissionStaffDataMutation) OutputCleared() bool {
+	_, ok := m.clearedFields[codingsubmissionstaffdata.FieldOutput]
+	return ok
+}
+
+// ResetOutput resets all changes to the "output" field.
+func (m *CodingSubmissionStaffDataMutation) ResetOutput() {
+	m.output = nil
+	delete(m.clearedFields, codingsubmissionstaffdata.FieldOutput)
+}
+
+// SetCodingSubmissionID sets the "coding_submission" edge to the CodingSubmission entity by id.
+func (m *CodingSubmissionStaffDataMutation) SetCodingSubmissionID(id int) {
+	m.coding_submission = &id
+}
+
+// ClearCodingSubmission clears the "coding_submission" edge to the CodingSubmission entity.
+func (m *CodingSubmissionStaffDataMutation) ClearCodingSubmission() {
+	m.clearedcoding_submission = true
+}
+
+// CodingSubmissionCleared reports if the "coding_submission" edge to the CodingSubmission entity was cleared.
+func (m *CodingSubmissionStaffDataMutation) CodingSubmissionCleared() bool {
+	return m.clearedcoding_submission
+}
+
+// CodingSubmissionID returns the "coding_submission" edge ID in the mutation.
+func (m *CodingSubmissionStaffDataMutation) CodingSubmissionID() (id int, exists bool) {
+	if m.coding_submission != nil {
+		return *m.coding_submission, true
+	}
+	return
+}
+
+// CodingSubmissionIDs returns the "coding_submission" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CodingSubmissionID instead. It exists only for internal usage by the builders.
+func (m *CodingSubmissionStaffDataMutation) CodingSubmissionIDs() (ids []int) {
+	if id := m.coding_submission; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCodingSubmission resets all changes to the "coding_submission" edge.
+func (m *CodingSubmissionStaffDataMutation) ResetCodingSubmission() {
+	m.coding_submission = nil
+	m.clearedcoding_submission = false
+}
+
+// Where appends a list predicates to the CodingSubmissionStaffDataMutation builder.
+func (m *CodingSubmissionStaffDataMutation) Where(ps ...predicate.CodingSubmissionStaffData) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *CodingSubmissionStaffDataMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (CodingSubmissionStaffData).
+func (m *CodingSubmissionStaffDataMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *CodingSubmissionStaffDataMutation) Fields() []string {
+	fields := make([]string, 0, 3)
+	if m.execution_id != nil {
+		fields = append(fields, codingsubmissionstaffdata.FieldExecutionID)
+	}
+	if m.input != nil {
+		fields = append(fields, codingsubmissionstaffdata.FieldInput)
+	}
+	if m.output != nil {
+		fields = append(fields, codingsubmissionstaffdata.FieldOutput)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *CodingSubmissionStaffDataMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case codingsubmissionstaffdata.FieldExecutionID:
+		return m.ExecutionID()
+	case codingsubmissionstaffdata.FieldInput:
+		return m.Input()
+	case codingsubmissionstaffdata.FieldOutput:
+		return m.Output()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *CodingSubmissionStaffDataMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case codingsubmissionstaffdata.FieldExecutionID:
+		return m.OldExecutionID(ctx)
+	case codingsubmissionstaffdata.FieldInput:
+		return m.OldInput(ctx)
+	case codingsubmissionstaffdata.FieldOutput:
+		return m.OldOutput(ctx)
+	}
+	return nil, fmt.Errorf("unknown CodingSubmissionStaffData field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *CodingSubmissionStaffDataMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case codingsubmissionstaffdata.FieldExecutionID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExecutionID(v)
+		return nil
+	case codingsubmissionstaffdata.FieldInput:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetInput(v)
+		return nil
+	case codingsubmissionstaffdata.FieldOutput:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOutput(v)
+		return nil
+	}
+	return fmt.Errorf("unknown CodingSubmissionStaffData field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *CodingSubmissionStaffDataMutation) AddedFields() []string {
+	var fields []string
+	if m.addexecution_id != nil {
+		fields = append(fields, codingsubmissionstaffdata.FieldExecutionID)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *CodingSubmissionStaffDataMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case codingsubmissionstaffdata.FieldExecutionID:
+		return m.AddedExecutionID()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *CodingSubmissionStaffDataMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case codingsubmissionstaffdata.FieldExecutionID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddExecutionID(v)
+		return nil
+	}
+	return fmt.Errorf("unknown CodingSubmissionStaffData numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *CodingSubmissionStaffDataMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(codingsubmissionstaffdata.FieldExecutionID) {
+		fields = append(fields, codingsubmissionstaffdata.FieldExecutionID)
+	}
+	if m.FieldCleared(codingsubmissionstaffdata.FieldOutput) {
+		fields = append(fields, codingsubmissionstaffdata.FieldOutput)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *CodingSubmissionStaffDataMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *CodingSubmissionStaffDataMutation) ClearField(name string) error {
+	switch name {
+	case codingsubmissionstaffdata.FieldExecutionID:
+		m.ClearExecutionID()
+		return nil
+	case codingsubmissionstaffdata.FieldOutput:
+		m.ClearOutput()
+		return nil
+	}
+	return fmt.Errorf("unknown CodingSubmissionStaffData nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *CodingSubmissionStaffDataMutation) ResetField(name string) error {
+	switch name {
+	case codingsubmissionstaffdata.FieldExecutionID:
+		m.ResetExecutionID()
+		return nil
+	case codingsubmissionstaffdata.FieldInput:
+		m.ResetInput()
+		return nil
+	case codingsubmissionstaffdata.FieldOutput:
+		m.ResetOutput()
+		return nil
+	}
+	return fmt.Errorf("unknown CodingSubmissionStaffData field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *CodingSubmissionStaffDataMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.coding_submission != nil {
+		edges = append(edges, codingsubmissionstaffdata.EdgeCodingSubmission)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *CodingSubmissionStaffDataMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case codingsubmissionstaffdata.EdgeCodingSubmission:
+		if id := m.coding_submission; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *CodingSubmissionStaffDataMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *CodingSubmissionStaffDataMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *CodingSubmissionStaffDataMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedcoding_submission {
+		edges = append(edges, codingsubmissionstaffdata.EdgeCodingSubmission)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *CodingSubmissionStaffDataMutation) EdgeCleared(name string) bool {
+	switch name {
+	case codingsubmissionstaffdata.EdgeCodingSubmission:
+		return m.clearedcoding_submission
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *CodingSubmissionStaffDataMutation) ClearEdge(name string) error {
+	switch name {
+	case codingsubmissionstaffdata.EdgeCodingSubmission:
+		m.ClearCodingSubmission()
+		return nil
+	}
+	return fmt.Errorf("unknown CodingSubmissionStaffData unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *CodingSubmissionStaffDataMutation) ResetEdge(name string) error {
+	switch name {
+	case codingsubmissionstaffdata.EdgeCodingSubmission:
+		m.ResetCodingSubmission()
+		return nil
+	}
+	return fmt.Errorf("unknown CodingSubmissionStaffData edge %s", name)
 }
 
 // UserMutation represents an operation that mutates the User nodes in the graph.

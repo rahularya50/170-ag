@@ -5,6 +5,7 @@ package generated
 import (
 	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/codingsubmission"
+	"170-ag/ent/generated/codingsubmissionstaffdata"
 	"170-ag/ent/generated/predicate"
 	"170-ag/ent/generated/user"
 	"context"
@@ -71,6 +72,25 @@ func (csu *CodingSubmissionUpdate) SetCodingProblem(c *CodingProblem) *CodingSub
 	return csu.SetCodingProblemID(c.ID)
 }
 
+// SetStaffDataID sets the "staff_data" edge to the CodingSubmissionStaffData entity by ID.
+func (csu *CodingSubmissionUpdate) SetStaffDataID(id int) *CodingSubmissionUpdate {
+	csu.mutation.SetStaffDataID(id)
+	return csu
+}
+
+// SetNillableStaffDataID sets the "staff_data" edge to the CodingSubmissionStaffData entity by ID if the given value is not nil.
+func (csu *CodingSubmissionUpdate) SetNillableStaffDataID(id *int) *CodingSubmissionUpdate {
+	if id != nil {
+		csu = csu.SetStaffDataID(*id)
+	}
+	return csu
+}
+
+// SetStaffData sets the "staff_data" edge to the CodingSubmissionStaffData entity.
+func (csu *CodingSubmissionUpdate) SetStaffData(c *CodingSubmissionStaffData) *CodingSubmissionUpdate {
+	return csu.SetStaffDataID(c.ID)
+}
+
 // Mutation returns the CodingSubmissionMutation object of the builder.
 func (csu *CodingSubmissionUpdate) Mutation() *CodingSubmissionMutation {
 	return csu.mutation
@@ -85,6 +105,12 @@ func (csu *CodingSubmissionUpdate) ClearAuthor() *CodingSubmissionUpdate {
 // ClearCodingProblem clears the "coding_problem" edge to the CodingProblem entity.
 func (csu *CodingSubmissionUpdate) ClearCodingProblem() *CodingSubmissionUpdate {
 	csu.mutation.ClearCodingProblem()
+	return csu
+}
+
+// ClearStaffData clears the "staff_data" edge to the CodingSubmissionStaffData entity.
+func (csu *CodingSubmissionUpdate) ClearStaffData() *CodingSubmissionUpdate {
+	csu.mutation.ClearStaffData()
 	return csu
 }
 
@@ -266,6 +292,41 @@ func (csu *CodingSubmissionUpdate) sqlSave(ctx context.Context) (n int, err erro
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if csu.mutation.StaffDataCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   codingsubmission.StaffDataTable,
+			Columns: []string{codingsubmission.StaffDataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingsubmissionstaffdata.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := csu.mutation.StaffDataIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   codingsubmission.StaffDataTable,
+			Columns: []string{codingsubmission.StaffDataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingsubmissionstaffdata.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, csu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{codingsubmission.Label}
@@ -327,6 +388,25 @@ func (csuo *CodingSubmissionUpdateOne) SetCodingProblem(c *CodingProblem) *Codin
 	return csuo.SetCodingProblemID(c.ID)
 }
 
+// SetStaffDataID sets the "staff_data" edge to the CodingSubmissionStaffData entity by ID.
+func (csuo *CodingSubmissionUpdateOne) SetStaffDataID(id int) *CodingSubmissionUpdateOne {
+	csuo.mutation.SetStaffDataID(id)
+	return csuo
+}
+
+// SetNillableStaffDataID sets the "staff_data" edge to the CodingSubmissionStaffData entity by ID if the given value is not nil.
+func (csuo *CodingSubmissionUpdateOne) SetNillableStaffDataID(id *int) *CodingSubmissionUpdateOne {
+	if id != nil {
+		csuo = csuo.SetStaffDataID(*id)
+	}
+	return csuo
+}
+
+// SetStaffData sets the "staff_data" edge to the CodingSubmissionStaffData entity.
+func (csuo *CodingSubmissionUpdateOne) SetStaffData(c *CodingSubmissionStaffData) *CodingSubmissionUpdateOne {
+	return csuo.SetStaffDataID(c.ID)
+}
+
 // Mutation returns the CodingSubmissionMutation object of the builder.
 func (csuo *CodingSubmissionUpdateOne) Mutation() *CodingSubmissionMutation {
 	return csuo.mutation
@@ -341,6 +421,12 @@ func (csuo *CodingSubmissionUpdateOne) ClearAuthor() *CodingSubmissionUpdateOne 
 // ClearCodingProblem clears the "coding_problem" edge to the CodingProblem entity.
 func (csuo *CodingSubmissionUpdateOne) ClearCodingProblem() *CodingSubmissionUpdateOne {
 	csuo.mutation.ClearCodingProblem()
+	return csuo
+}
+
+// ClearStaffData clears the "staff_data" edge to the CodingSubmissionStaffData entity.
+func (csuo *CodingSubmissionUpdateOne) ClearStaffData() *CodingSubmissionUpdateOne {
+	csuo.mutation.ClearStaffData()
 	return csuo
 }
 
@@ -538,6 +624,41 @@ func (csuo *CodingSubmissionUpdateOne) sqlSave(ctx context.Context) (_node *Codi
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: codingproblem.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if csuo.mutation.StaffDataCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   codingsubmission.StaffDataTable,
+			Columns: []string{codingsubmission.StaffDataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingsubmissionstaffdata.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := csuo.mutation.StaffDataIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   codingsubmission.StaffDataTable,
+			Columns: []string{codingsubmission.StaffDataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingsubmissionstaffdata.FieldID,
 				},
 			},
 		}

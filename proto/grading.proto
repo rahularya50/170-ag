@@ -1,8 +1,0 @@
-syntax = "proto3";
-
-option go_package = "proto/schemas";
-
-message GradingResponse {
-  fixed64 id_nonce = 1;
-  string stdout = 2;
-}

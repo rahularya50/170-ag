@@ -23,6 +23,8 @@ const (
 	EdgeAuthor = "author"
 	// EdgeCodingProblem holds the string denoting the coding_problem edge name in mutations.
 	EdgeCodingProblem = "coding_problem"
+	// EdgeStaffData holds the string denoting the staff_data edge name in mutations.
+	EdgeStaffData = "staff_data"
 	// Table holds the table name of the codingsubmission in the database.
 	Table = "coding_submissions"
 	// AuthorTable is the table that holds the author relation/edge.
@@ -39,6 +41,13 @@ const (
 	CodingProblemInverseTable = "coding_problems"
 	// CodingProblemColumn is the table column denoting the coding_problem relation/edge.
 	CodingProblemColumn = "coding_submission_coding_problem"
+	// StaffDataTable is the table that holds the staff_data relation/edge.
+	StaffDataTable = "coding_submissions"
+	// StaffDataInverseTable is the table name for the CodingSubmissionStaffData entity.
+	// It exists in this package in order to avoid circular dependency with the "codingsubmissionstaffdata" package.
+	StaffDataInverseTable = "coding_submission_staff_data"
+	// StaffDataColumn is the table column denoting the staff_data relation/edge.
+	StaffDataColumn = "coding_submission_staff_data_coding_submission"
 )
 
 // Columns holds all SQL columns for codingsubmission fields.
@@ -53,6 +62,7 @@ var Columns = []string{
 var ForeignKeys = []string{
 	"coding_submission_author",
 	"coding_submission_coding_problem",
+	"coding_submission_staff_data_coding_submission",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

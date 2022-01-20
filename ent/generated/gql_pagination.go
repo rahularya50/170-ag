@@ -5,7 +5,9 @@ package generated
 import (
 	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/codingproblem"
+	"170-ag/ent/generated/codingproblemstaffdata"
 	"170-ag/ent/generated/codingsubmission"
+	"170-ag/ent/generated/codingsubmissionstaffdata"
 	"170-ag/ent/generated/user"
 	"context"
 	"encoding/base64"
@@ -689,6 +691,233 @@ func (cp *CodingProblem) ToEdge(order *CodingProblemOrder) *CodingProblemEdge {
 	}
 }
 
+// CodingProblemStaffDataEdge is the edge representation of CodingProblemStaffData.
+type CodingProblemStaffDataEdge struct {
+	Node   *CodingProblemStaffData `json:"node"`
+	Cursor Cursor                  `json:"cursor"`
+}
+
+// CodingProblemStaffDataConnection is the connection containing edges to CodingProblemStaffData.
+type CodingProblemStaffDataConnection struct {
+	Edges      []*CodingProblemStaffDataEdge `json:"edges"`
+	PageInfo   PageInfo                      `json:"pageInfo"`
+	TotalCount int                           `json:"totalCount"`
+}
+
+// CodingProblemStaffDataPaginateOption enables pagination customization.
+type CodingProblemStaffDataPaginateOption func(*codingProblemStaffDataPager) error
+
+// WithCodingProblemStaffDataOrder configures pagination ordering.
+func WithCodingProblemStaffDataOrder(order *CodingProblemStaffDataOrder) CodingProblemStaffDataPaginateOption {
+	if order == nil {
+		order = DefaultCodingProblemStaffDataOrder
+	}
+	o := *order
+	return func(pager *codingProblemStaffDataPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultCodingProblemStaffDataOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithCodingProblemStaffDataFilter configures pagination filter.
+func WithCodingProblemStaffDataFilter(filter func(*CodingProblemStaffDataQuery) (*CodingProblemStaffDataQuery, error)) CodingProblemStaffDataPaginateOption {
+	return func(pager *codingProblemStaffDataPager) error {
+		if filter == nil {
+			return errors.New("CodingProblemStaffDataQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type codingProblemStaffDataPager struct {
+	order  *CodingProblemStaffDataOrder
+	filter func(*CodingProblemStaffDataQuery) (*CodingProblemStaffDataQuery, error)
+}
+
+func newCodingProblemStaffDataPager(opts []CodingProblemStaffDataPaginateOption) (*codingProblemStaffDataPager, error) {
+	pager := &codingProblemStaffDataPager{}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultCodingProblemStaffDataOrder
+	}
+	return pager, nil
+}
+
+func (p *codingProblemStaffDataPager) applyFilter(query *CodingProblemStaffDataQuery) (*CodingProblemStaffDataQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *codingProblemStaffDataPager) toCursor(cpsd *CodingProblemStaffData) Cursor {
+	return p.order.Field.toCursor(cpsd)
+}
+
+func (p *codingProblemStaffDataPager) applyCursors(query *CodingProblemStaffDataQuery, after, before *Cursor) *CodingProblemStaffDataQuery {
+	for _, predicate := range cursorsToPredicates(
+		p.order.Direction, after, before,
+		p.order.Field.field, DefaultCodingProblemStaffDataOrder.Field.field,
+	) {
+		query = query.Where(predicate)
+	}
+	return query
+}
+
+func (p *codingProblemStaffDataPager) applyOrder(query *CodingProblemStaffDataQuery, reverse bool) *CodingProblemStaffDataQuery {
+	direction := p.order.Direction
+	if reverse {
+		direction = direction.reverse()
+	}
+	query = query.Order(direction.orderFunc(p.order.Field.field))
+	if p.order.Field != DefaultCodingProblemStaffDataOrder.Field {
+		query = query.Order(direction.orderFunc(DefaultCodingProblemStaffDataOrder.Field.field))
+	}
+	return query
+}
+
+// Paginate executes the query and returns a relay based cursor connection to CodingProblemStaffData.
+func (cpsd *CodingProblemStaffDataQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...CodingProblemStaffDataPaginateOption,
+) (*CodingProblemStaffDataConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newCodingProblemStaffDataPager(opts)
+	if err != nil {
+		return nil, err
+	}
+
+	if cpsd, err = pager.applyFilter(cpsd); err != nil {
+		return nil, err
+	}
+
+	conn := &CodingProblemStaffDataConnection{Edges: []*CodingProblemStaffDataEdge{}}
+	if !hasCollectedField(ctx, edgesField) || first != nil && *first == 0 || last != nil && *last == 0 {
+		if hasCollectedField(ctx, totalCountField) ||
+			hasCollectedField(ctx, pageInfoField) {
+			count, err := cpsd.Count(ctx)
+			if err != nil {
+				return nil, err
+			}
+			conn.TotalCount = count
+			conn.PageInfo.HasNextPage = first != nil && count > 0
+			conn.PageInfo.HasPreviousPage = last != nil && count > 0
+		}
+		return conn, nil
+	}
+
+	if (after != nil || first != nil || before != nil || last != nil) && hasCollectedField(ctx, totalCountField) {
+		count, err := cpsd.Clone().Count(ctx)
+		if err != nil {
+			return nil, err
+		}
+		conn.TotalCount = count
+	}
+
+	cpsd = pager.applyCursors(cpsd, after, before)
+	cpsd = pager.applyOrder(cpsd, last != nil)
+	var limit int
+	if first != nil {
+		limit = *first + 1
+	} else if last != nil {
+		limit = *last + 1
+	}
+	if limit > 0 {
+		cpsd = cpsd.Limit(limit)
+	}
+
+	if field := getCollectedField(ctx, edgesField, nodeField); field != nil {
+		cpsd = cpsd.collectField(graphql.GetOperationContext(ctx), *field)
+	}
+
+	nodes, err := cpsd.All(ctx)
+	if err != nil || len(nodes) == 0 {
+		return conn, err
+	}
+
+	if len(nodes) == limit {
+		conn.PageInfo.HasNextPage = first != nil
+		conn.PageInfo.HasPreviousPage = last != nil
+		nodes = nodes[:len(nodes)-1]
+	}
+
+	var nodeAt func(int) *CodingProblemStaffData
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *CodingProblemStaffData {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *CodingProblemStaffData {
+			return nodes[i]
+		}
+	}
+
+	conn.Edges = make([]*CodingProblemStaffDataEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		conn.Edges[i] = &CodingProblemStaffDataEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+
+	conn.PageInfo.StartCursor = &conn.Edges[0].Cursor
+	conn.PageInfo.EndCursor = &conn.Edges[len(conn.Edges)-1].Cursor
+	if conn.TotalCount == 0 {
+		conn.TotalCount = len(nodes)
+	}
+
+	return conn, nil
+}
+
+// CodingProblemStaffDataOrderField defines the ordering field of CodingProblemStaffData.
+type CodingProblemStaffDataOrderField struct {
+	field    string
+	toCursor func(*CodingProblemStaffData) Cursor
+}
+
+// CodingProblemStaffDataOrder defines the ordering of CodingProblemStaffData.
+type CodingProblemStaffDataOrder struct {
+	Direction OrderDirection                    `json:"direction"`
+	Field     *CodingProblemStaffDataOrderField `json:"field"`
+}
+
+// DefaultCodingProblemStaffDataOrder is the default ordering of CodingProblemStaffData.
+var DefaultCodingProblemStaffDataOrder = &CodingProblemStaffDataOrder{
+	Direction: OrderDirectionAsc,
+	Field: &CodingProblemStaffDataOrderField{
+		field: codingproblemstaffdata.FieldID,
+		toCursor: func(cpsd *CodingProblemStaffData) Cursor {
+			return Cursor{ID: cpsd.ID}
+		},
+	},
+}
+
+// ToEdge converts CodingProblemStaffData into CodingProblemStaffDataEdge.
+func (cpsd *CodingProblemStaffData) ToEdge(order *CodingProblemStaffDataOrder) *CodingProblemStaffDataEdge {
+	if order == nil {
+		order = DefaultCodingProblemStaffDataOrder
+	}
+	return &CodingProblemStaffDataEdge{
+		Node:   cpsd,
+		Cursor: order.Field.toCursor(cpsd),
+	}
+}
+
 // CodingSubmissionEdge is the edge representation of CodingSubmission.
 type CodingSubmissionEdge struct {
 	Node   *CodingSubmission `json:"node"`
@@ -913,6 +1142,233 @@ func (cs *CodingSubmission) ToEdge(order *CodingSubmissionOrder) *CodingSubmissi
 	return &CodingSubmissionEdge{
 		Node:   cs,
 		Cursor: order.Field.toCursor(cs),
+	}
+}
+
+// CodingSubmissionStaffDataEdge is the edge representation of CodingSubmissionStaffData.
+type CodingSubmissionStaffDataEdge struct {
+	Node   *CodingSubmissionStaffData `json:"node"`
+	Cursor Cursor                     `json:"cursor"`
+}
+
+// CodingSubmissionStaffDataConnection is the connection containing edges to CodingSubmissionStaffData.
+type CodingSubmissionStaffDataConnection struct {
+	Edges      []*CodingSubmissionStaffDataEdge `json:"edges"`
+	PageInfo   PageInfo                         `json:"pageInfo"`
+	TotalCount int                              `json:"totalCount"`
+}
+
+// CodingSubmissionStaffDataPaginateOption enables pagination customization.
+type CodingSubmissionStaffDataPaginateOption func(*codingSubmissionStaffDataPager) error
+
+// WithCodingSubmissionStaffDataOrder configures pagination ordering.
+func WithCodingSubmissionStaffDataOrder(order *CodingSubmissionStaffDataOrder) CodingSubmissionStaffDataPaginateOption {
+	if order == nil {
+		order = DefaultCodingSubmissionStaffDataOrder
+	}
+	o := *order
+	return func(pager *codingSubmissionStaffDataPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultCodingSubmissionStaffDataOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithCodingSubmissionStaffDataFilter configures pagination filter.
+func WithCodingSubmissionStaffDataFilter(filter func(*CodingSubmissionStaffDataQuery) (*CodingSubmissionStaffDataQuery, error)) CodingSubmissionStaffDataPaginateOption {
+	return func(pager *codingSubmissionStaffDataPager) error {
+		if filter == nil {
+			return errors.New("CodingSubmissionStaffDataQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type codingSubmissionStaffDataPager struct {
+	order  *CodingSubmissionStaffDataOrder
+	filter func(*CodingSubmissionStaffDataQuery) (*CodingSubmissionStaffDataQuery, error)
+}
+
+func newCodingSubmissionStaffDataPager(opts []CodingSubmissionStaffDataPaginateOption) (*codingSubmissionStaffDataPager, error) {
+	pager := &codingSubmissionStaffDataPager{}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultCodingSubmissionStaffDataOrder
+	}
+	return pager, nil
+}
+
+func (p *codingSubmissionStaffDataPager) applyFilter(query *CodingSubmissionStaffDataQuery) (*CodingSubmissionStaffDataQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *codingSubmissionStaffDataPager) toCursor(cssd *CodingSubmissionStaffData) Cursor {
+	return p.order.Field.toCursor(cssd)
+}
+
+func (p *codingSubmissionStaffDataPager) applyCursors(query *CodingSubmissionStaffDataQuery, after, before *Cursor) *CodingSubmissionStaffDataQuery {
+	for _, predicate := range cursorsToPredicates(
+		p.order.Direction, after, before,
+		p.order.Field.field, DefaultCodingSubmissionStaffDataOrder.Field.field,
+	) {
+		query = query.Where(predicate)
+	}
+	return query
+}
+
+func (p *codingSubmissionStaffDataPager) applyOrder(query *CodingSubmissionStaffDataQuery, reverse bool) *CodingSubmissionStaffDataQuery {
+	direction := p.order.Direction
+	if reverse {
+		direction = direction.reverse()
+	}
+	query = query.Order(direction.orderFunc(p.order.Field.field))
+	if p.order.Field != DefaultCodingSubmissionStaffDataOrder.Field {
+		query = query.Order(direction.orderFunc(DefaultCodingSubmissionStaffDataOrder.Field.field))
+	}
+	return query
+}
+
+// Paginate executes the query and returns a relay based cursor connection to CodingSubmissionStaffData.
+func (cssd *CodingSubmissionStaffDataQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...CodingSubmissionStaffDataPaginateOption,
+) (*CodingSubmissionStaffDataConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newCodingSubmissionStaffDataPager(opts)
+	if err != nil {
+		return nil, err
+	}
+
+	if cssd, err = pager.applyFilter(cssd); err != nil {
+		return nil, err
+	}
+
+	conn := &CodingSubmissionStaffDataConnection{Edges: []*CodingSubmissionStaffDataEdge{}}
+	if !hasCollectedField(ctx, edgesField) || first != nil && *first == 0 || last != nil && *last == 0 {
+		if hasCollectedField(ctx, totalCountField) ||
+			hasCollectedField(ctx, pageInfoField) {
+			count, err := cssd.Count(ctx)
+			if err != nil {
+				return nil, err
+			}
+			conn.TotalCount = count
+			conn.PageInfo.HasNextPage = first != nil && count > 0
+			conn.PageInfo.HasPreviousPage = last != nil && count > 0
+		}
+		return conn, nil
+	}
+
+	if (after != nil || first != nil || before != nil || last != nil) && hasCollectedField(ctx, totalCountField) {
+		count, err := cssd.Clone().Count(ctx)
+		if err != nil {
+			return nil, err
+		}
+		conn.TotalCount = count
+	}
+
+	cssd = pager.applyCursors(cssd, after, before)
+	cssd = pager.applyOrder(cssd, last != nil)
+	var limit int
+	if first != nil {
+		limit = *first + 1
+	} else if last != nil {
+		limit = *last + 1
+	}
+	if limit > 0 {
+		cssd = cssd.Limit(limit)
+	}
+
+	if field := getCollectedField(ctx, edgesField, nodeField); field != nil {
+		cssd = cssd.collectField(graphql.GetOperationContext(ctx), *field)
+	}
+
+	nodes, err := cssd.All(ctx)
+	if err != nil || len(nodes) == 0 {
+		return conn, err
+	}
+
+	if len(nodes) == limit {
+		conn.PageInfo.HasNextPage = first != nil
+		conn.PageInfo.HasPreviousPage = last != nil
+		nodes = nodes[:len(nodes)-1]
+	}
+
+	var nodeAt func(int) *CodingSubmissionStaffData
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *CodingSubmissionStaffData {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *CodingSubmissionStaffData {
+			return nodes[i]
+		}
+	}
+
+	conn.Edges = make([]*CodingSubmissionStaffDataEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		conn.Edges[i] = &CodingSubmissionStaffDataEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+
+	conn.PageInfo.StartCursor = &conn.Edges[0].Cursor
+	conn.PageInfo.EndCursor = &conn.Edges[len(conn.Edges)-1].Cursor
+	if conn.TotalCount == 0 {
+		conn.TotalCount = len(nodes)
+	}
+
+	return conn, nil
+}
+
+// CodingSubmissionStaffDataOrderField defines the ordering field of CodingSubmissionStaffData.
+type CodingSubmissionStaffDataOrderField struct {
+	field    string
+	toCursor func(*CodingSubmissionStaffData) Cursor
+}
+
+// CodingSubmissionStaffDataOrder defines the ordering of CodingSubmissionStaffData.
+type CodingSubmissionStaffDataOrder struct {
+	Direction OrderDirection                       `json:"direction"`
+	Field     *CodingSubmissionStaffDataOrderField `json:"field"`
+}
+
+// DefaultCodingSubmissionStaffDataOrder is the default ordering of CodingSubmissionStaffData.
+var DefaultCodingSubmissionStaffDataOrder = &CodingSubmissionStaffDataOrder{
+	Direction: OrderDirectionAsc,
+	Field: &CodingSubmissionStaffDataOrderField{
+		field: codingsubmissionstaffdata.FieldID,
+		toCursor: func(cssd *CodingSubmissionStaffData) Cursor {
+			return Cursor{ID: cssd.ID}
+		},
+	},
+}
+
+// ToEdge converts CodingSubmissionStaffData into CodingSubmissionStaffDataEdge.
+func (cssd *CodingSubmissionStaffData) ToEdge(order *CodingSubmissionStaffDataOrder) *CodingSubmissionStaffDataEdge {
+	if order == nil {
+		order = DefaultCodingSubmissionStaffDataOrder
+	}
+	return &CodingSubmissionStaffDataEdge{
+		Node:   cssd,
+		Cursor: order.Field.toCursor(cssd),
 	}
 }
 

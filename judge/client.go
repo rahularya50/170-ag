@@ -1,11 +1,7 @@
 package judge
 
-import (
-	"context"
+import "google.golang.org/grpc"
 
-	"cloud.google.com/go/pubsub"
-)
-
-func NewClient(ctx context.Context) (*pubsub.Client, error) {
-	return pubsub.NewClient(ctx, "formidable-gate-337712")
+func NewConn() (*grpc.ClientConn, error) {
+	return grpc.Dial("judge-scaler.default.svc.cluster.local:6000", grpc.WithInsecure())
 }

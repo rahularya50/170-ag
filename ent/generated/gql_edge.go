@@ -28,6 +28,30 @@ func (cp *CodingProblem) Drafts(ctx context.Context) ([]*CodingDraft, error) {
 	return result, err
 }
 
+func (cp *CodingProblem) StaffData(ctx context.Context) (*CodingProblemStaffData, error) {
+	result, err := cp.Edges.StaffDataOrErr()
+	if IsNotLoaded(err) {
+		result, err = cp.QueryStaffData().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (cp *CodingProblem) Submissions(ctx context.Context) ([]*CodingSubmission, error) {
+	result, err := cp.Edges.SubmissionsOrErr()
+	if IsNotLoaded(err) {
+		result, err = cp.QuerySubmissions().All(ctx)
+	}
+	return result, err
+}
+
+func (cpsd *CodingProblemStaffData) CodingProblem(ctx context.Context) (*CodingProblem, error) {
+	result, err := cpsd.Edges.CodingProblemOrErr()
+	if IsNotLoaded(err) {
+		result, err = cpsd.QueryCodingProblem().Only(ctx)
+	}
+	return result, err
+}
+
 func (cs *CodingSubmission) Author(ctx context.Context) (*User, error) {
 	result, err := cs.Edges.AuthorOrErr()
 	if IsNotLoaded(err) {
@@ -40,6 +64,22 @@ func (cs *CodingSubmission) CodingProblem(ctx context.Context) (*CodingProblem, 
 	result, err := cs.Edges.CodingProblemOrErr()
 	if IsNotLoaded(err) {
 		result, err = cs.QueryCodingProblem().Only(ctx)
+	}
+	return result, err
+}
+
+func (cs *CodingSubmission) StaffData(ctx context.Context) (*CodingSubmissionStaffData, error) {
+	result, err := cs.Edges.StaffDataOrErr()
+	if IsNotLoaded(err) {
+		result, err = cs.QueryStaffData().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (cssd *CodingSubmissionStaffData) CodingSubmission(ctx context.Context) (*CodingSubmission, error) {
+	result, err := cssd.Edges.CodingSubmissionOrErr()
+	if IsNotLoaded(err) {
+		result, err = cssd.QueryCodingSubmission().Only(ctx)
 	}
 	return result, err
 }

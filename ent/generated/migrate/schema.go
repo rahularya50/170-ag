@@ -48,12 +48,32 @@ var (
 		{Name: "name", Type: field.TypeString, Size: 128},
 		{Name: "statement", Type: field.TypeString, Size: 2147483647, Default: "This is the problem statement"},
 		{Name: "released", Type: field.TypeBool, Default: false},
+		{Name: "coding_problem_staff_data_coding_problem", Type: field.TypeInt, Unique: true, Nullable: true},
 	}
 	// CodingProblemsTable holds the schema information for the "coding_problems" table.
 	CodingProblemsTable = &schema.Table{
 		Name:       "coding_problems",
 		Columns:    CodingProblemsColumns,
 		PrimaryKey: []*schema.Column{CodingProblemsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "coding_problems_coding_problem_staff_data_coding_problem",
+				Columns:    []*schema.Column{CodingProblemsColumns[4]},
+				RefColumns: []*schema.Column{CodingProblemStaffDataColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// CodingProblemStaffDataColumns holds the columns for the "coding_problem_staff_data" table.
+	CodingProblemStaffDataColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "input", Type: field.TypeString, Size: 2147483647},
+	}
+	// CodingProblemStaffDataTable holds the schema information for the "coding_problem_staff_data" table.
+	CodingProblemStaffDataTable = &schema.Table{
+		Name:       "coding_problem_staff_data",
+		Columns:    CodingProblemStaffDataColumns,
+		PrimaryKey: []*schema.Column{CodingProblemStaffDataColumns[0]},
 	}
 	// CodingSubmissionsColumns holds the columns for the "coding_submissions" table.
 	CodingSubmissionsColumns = []*schema.Column{
@@ -62,6 +82,7 @@ var (
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"QUEUED", "RUNNING", "COMPLETED"}, Default: "QUEUED"},
 		{Name: "coding_submission_author", Type: field.TypeInt, Nullable: true},
 		{Name: "coding_submission_coding_problem", Type: field.TypeInt, Nullable: true},
+		{Name: "coding_submission_staff_data_coding_submission", Type: field.TypeInt, Unique: true, Nullable: true},
 	}
 	// CodingSubmissionsTable holds the schema information for the "coding_submissions" table.
 	CodingSubmissionsTable = &schema.Table{
@@ -81,6 +102,12 @@ var (
 				RefColumns: []*schema.Column{CodingProblemsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
+			{
+				Symbol:     "coding_submissions_coding_submission_staff_data_coding_submission",
+				Columns:    []*schema.Column{CodingSubmissionsColumns[5]},
+				RefColumns: []*schema.Column{CodingSubmissionStaffDataColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
 		},
 		Indexes: []*schema.Index{
 			{
@@ -97,6 +124,26 @@ var (
 				Name:    "codingsubmission_status",
 				Unique:  false,
 				Columns: []*schema.Column{CodingSubmissionsColumns[2]},
+			},
+		},
+	}
+	// CodingSubmissionStaffDataColumns holds the columns for the "coding_submission_staff_data" table.
+	CodingSubmissionStaffDataColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "execution_id", Type: field.TypeInt64, Nullable: true},
+		{Name: "input", Type: field.TypeString, Size: 2147483647},
+		{Name: "output", Type: field.TypeString, Nullable: true, Size: 65535},
+	}
+	// CodingSubmissionStaffDataTable holds the schema information for the "coding_submission_staff_data" table.
+	CodingSubmissionStaffDataTable = &schema.Table{
+		Name:       "coding_submission_staff_data",
+		Columns:    CodingSubmissionStaffDataColumns,
+		PrimaryKey: []*schema.Column{CodingSubmissionStaffDataColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "codingsubmissionstaffdata_execution_id",
+				Unique:  false,
+				Columns: []*schema.Column{CodingSubmissionStaffDataColumns[1]},
 			},
 		},
 	}
@@ -124,7 +171,9 @@ var (
 	Tables = []*schema.Table{
 		CodingDraftsTable,
 		CodingProblemsTable,
+		CodingProblemStaffDataTable,
 		CodingSubmissionsTable,
+		CodingSubmissionStaffDataTable,
 		UsersTable,
 	}
 )
@@ -132,6 +181,8 @@ var (
 func init() {
 	CodingDraftsTable.ForeignKeys[0].RefTable = UsersTable
 	CodingDraftsTable.ForeignKeys[1].RefTable = CodingProblemsTable
+	CodingProblemsTable.ForeignKeys[0].RefTable = CodingProblemStaffDataTable
 	CodingSubmissionsTable.ForeignKeys[0].RefTable = UsersTable
 	CodingSubmissionsTable.ForeignKeys[1].RefTable = CodingProblemsTable
+	CodingSubmissionsTable.ForeignKeys[2].RefTable = CodingSubmissionStaffDataTable
 }

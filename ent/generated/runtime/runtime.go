@@ -5,7 +5,9 @@ package runtime
 import (
 	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/codingproblem"
+	"170-ag/ent/generated/codingproblemstaffdata"
 	"170-ag/ent/generated/codingsubmission"
+	"170-ag/ent/generated/codingsubmissionstaffdata"
 	"170-ag/ent/generated/user"
 	"170-ag/ent/schema"
 	"context"
@@ -66,6 +68,15 @@ func init() {
 	codingproblemDescReleased := codingproblemFields[2].Descriptor()
 	// codingproblem.DefaultReleased holds the default value on creation for the released field.
 	codingproblem.DefaultReleased = codingproblemDescReleased.Default.(bool)
+	codingproblemstaffdata.Policy = privacy.NewPolicies(schema.CodingProblemStaffData{})
+	codingproblemstaffdata.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := codingproblemstaffdata.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
 	codingsubmission.Policy = privacy.NewPolicies(schema.CodingSubmission{})
 	codingsubmission.Hooks[0] = func(next ent.Mutator) ent.Mutator {
 		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
@@ -77,6 +88,21 @@ func init() {
 	}
 	codingsubmissionFields := schema.CodingSubmission{}.Fields()
 	_ = codingsubmissionFields
+	codingsubmissionstaffdata.Policy = privacy.NewPolicies(schema.CodingSubmissionStaffData{})
+	codingsubmissionstaffdata.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := codingsubmissionstaffdata.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	codingsubmissionstaffdataFields := schema.CodingSubmissionStaffData{}.Fields()
+	_ = codingsubmissionstaffdataFields
+	// codingsubmissionstaffdataDescOutput is the schema descriptor for output field.
+	codingsubmissionstaffdataDescOutput := codingsubmissionstaffdataFields[2].Descriptor()
+	// codingsubmissionstaffdata.OutputValidator is a validator for the "output" field. It is called by the builders before save.
+	codingsubmissionstaffdata.OutputValidator = codingsubmissionstaffdataDescOutput.Validators[0].(func(string) error)
 	user.Policy = privacy.NewPolicies(schema.User{})
 	user.Hooks[0] = func(next ent.Mutator) ent.Mutator {
 		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {

@@ -212,6 +212,30 @@ func (f CodingProblemMutationRuleFunc) EvalMutation(ctx context.Context, m gener
 	return Denyf("generated/privacy: unexpected mutation type %T, expect *generated.CodingProblemMutation", m)
 }
 
+// The CodingProblemStaffDataQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type CodingProblemStaffDataQueryRuleFunc func(context.Context, *generated.CodingProblemStaffDataQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f CodingProblemStaffDataQueryRuleFunc) EvalQuery(ctx context.Context, q generated.Query) error {
+	if q, ok := q.(*generated.CodingProblemStaffDataQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("generated/privacy: unexpected query type %T, expect *generated.CodingProblemStaffDataQuery", q)
+}
+
+// The CodingProblemStaffDataMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type CodingProblemStaffDataMutationRuleFunc func(context.Context, *generated.CodingProblemStaffDataMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f CodingProblemStaffDataMutationRuleFunc) EvalMutation(ctx context.Context, m generated.Mutation) error {
+	if m, ok := m.(*generated.CodingProblemStaffDataMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("generated/privacy: unexpected mutation type %T, expect *generated.CodingProblemStaffDataMutation", m)
+}
+
 // The CodingSubmissionQueryRuleFunc type is an adapter to allow the use of ordinary
 // functions as a query rule.
 type CodingSubmissionQueryRuleFunc func(context.Context, *generated.CodingSubmissionQuery) error
@@ -234,6 +258,30 @@ func (f CodingSubmissionMutationRuleFunc) EvalMutation(ctx context.Context, m ge
 		return f(ctx, m)
 	}
 	return Denyf("generated/privacy: unexpected mutation type %T, expect *generated.CodingSubmissionMutation", m)
+}
+
+// The CodingSubmissionStaffDataQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type CodingSubmissionStaffDataQueryRuleFunc func(context.Context, *generated.CodingSubmissionStaffDataQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f CodingSubmissionStaffDataQueryRuleFunc) EvalQuery(ctx context.Context, q generated.Query) error {
+	if q, ok := q.(*generated.CodingSubmissionStaffDataQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("generated/privacy: unexpected query type %T, expect *generated.CodingSubmissionStaffDataQuery", q)
+}
+
+// The CodingSubmissionStaffDataMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type CodingSubmissionStaffDataMutationRuleFunc func(context.Context, *generated.CodingSubmissionStaffDataMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f CodingSubmissionStaffDataMutationRuleFunc) EvalMutation(ctx context.Context, m generated.Mutation) error {
+	if m, ok := m.(*generated.CodingSubmissionStaffDataMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("generated/privacy: unexpected mutation type %T, expect *generated.CodingSubmissionStaffDataMutation", m)
 }
 
 // The UserQueryRuleFunc type is an adapter to allow the use of ordinary
@@ -299,7 +347,11 @@ func queryFilter(q generated.Query) (Filter, error) {
 		return q.Filter(), nil
 	case *generated.CodingProblemQuery:
 		return q.Filter(), nil
+	case *generated.CodingProblemStaffDataQuery:
+		return q.Filter(), nil
 	case *generated.CodingSubmissionQuery:
+		return q.Filter(), nil
+	case *generated.CodingSubmissionStaffDataQuery:
 		return q.Filter(), nil
 	case *generated.UserQuery:
 		return q.Filter(), nil
@@ -314,7 +366,11 @@ func mutationFilter(m generated.Mutation) (Filter, error) {
 		return m.Filter(), nil
 	case *generated.CodingProblemMutation:
 		return m.Filter(), nil
+	case *generated.CodingProblemStaffDataMutation:
+		return m.Filter(), nil
 	case *generated.CodingSubmissionMutation:
+		return m.Filter(), nil
+	case *generated.CodingSubmissionStaffDataMutation:
 		return m.Filter(), nil
 	case *generated.UserMutation:
 		return m.Filter(), nil

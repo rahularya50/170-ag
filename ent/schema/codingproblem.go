@@ -30,6 +30,8 @@ func (CodingProblem) Fields() []ent.Field {
 func (CodingProblem) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("drafts", CodingDraft.Type).Ref("coding_problem").Annotations(entgql.Bind()),
+		edge.From("staff_data", CodingProblemStaffData.Type).Ref("coding_problem").Unique().Annotations(entgql.Bind()),
+		edge.From("submissions", CodingSubmission.Type).Ref("coding_problem").Annotations(entgql.Bind()),
 	}
 }
 

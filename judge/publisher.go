@@ -1,33 +1,25 @@
 package judge
 
 import (
+	"170-ag/proto/schemas"
 	"context"
-
-	"cloud.google.com/go/pubsub"
-	"google.golang.org/protobuf/proto"
 )
 
 func PushToGradingQueue(ctx context.Context) error {
-	client, err := NewClient(ctx)
+	conn, err := NewConn()
 	if err != nil {
 		return err
 	}
-	defer client.Close()
+	defer conn.Close()
 
 	response, err := loadGradingProto()
 	if err != nil {
 		return err
 	}
 
-	data, err := proto.Marshal(response)
-	if err != nil {
-		return err
-	}
-	result := client.Topic("grading").Publish(ctx, &pubsub.Message{
-		Data: []byte(data),
-	})
+	client := schemas.NewJudgingServerClient(conn)
 
-	_, err = result.Get(ctx)
+	_, err = client.SubmitGradingResponse(ctx, response)
 	if err != nil {
 		return err
 	}

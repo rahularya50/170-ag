@@ -6,7 +6,10 @@ import (
 	"170-ag/proto/schemas"
 	"170-ag/site"
 	"context"
+	"crypto/rand"
 	"log"
+	"math"
+	"math/big"
 	"net"
 
 	ent "170-ag/ent/generated"
@@ -29,20 +32,42 @@ func countEnqueuedSubmissions(c context.Context, client *ent.Client) (int, error
 		Count(c)
 }
 
-func dequeueSubmission(c context.Context, client *ent.Client) (*ent.CodingSubmission, error) {
+func dequeueSubmission(c context.Context, client *ent.Client) (*ent.CodingSubmission, *ent.CodingSubmissionStaffData, error) {
 	c = privacyrules.NewContextWithAccessToken(c, privacyrules.JudgeScalingServerAccessToken)
-	submission, err := client.CodingSubmission.
+	tx, err := client.Tx(c)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer tx.Rollback()
+
+	submission, err := tx.CodingSubmission.
 		Query().
 		Where(codingsubmission.StatusEQ(codingsubmission.StatusQueued)).
 		First(c)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
+	}
+	nonce, err := rand.Int(rand.Reader, big.NewInt(int64(math.MaxInt64)))
+	if err != nil {
+		return nil, nil, err
+	}
+	staff_data, err := tx.CodingSubmissionStaffData.
+		Create().
+		SetCodingSubmission(submission).
+		SetExecutionID(nonce.Int64()).
+		Save(c)
+	if err != nil {
+		return nil, nil, err
 	}
 	submission, err = submission.Update().SetStatus(codingsubmission.StatusRunning).Save(c)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return submission, nil
+	err = tx.Commit()
+	if err != nil {
+		return nil, nil, err
+	}
+	return submission.Unwrap(), staff_data.Unwrap(), nil
 }
 
 func (s *ScalerServer) IsActive(c context.Context, _ *schemas.ScaledObjectRef) (*schemas.IsActiveResponse, error) {
@@ -56,34 +81,34 @@ func (s *ScalerServer) IsActive(c context.Context, _ *schemas.ScaledObjectRef) (
 func (*ScalerServer) GetMetricSpec(context.Context, *schemas.ScaledObjectRef) (*schemas.GetMetricSpecResponse, error) {
 	return &schemas.GetMetricSpecResponse{
 		MetricSpecs: []*schemas.MetricSpec{{
-			MetricName: "JobsPerTask",
+			MetricName: "queueLength",
 			TargetSize: 1,
 		}},
 	}, nil
 }
 
-func (s *ScalerServer) GetMetrics(c context.Context, _ *schemas.GetMetricsRequest) (*schemas.GetMetricsResponse, error) {
+func (s *ScalerServer) GetMetrics(c context.Context, req *schemas.GetMetricsRequest) (*schemas.GetMetricsResponse, error) {
 	count, err := countEnqueuedSubmissions(c, s.client)
 	if err != nil {
 		return nil, err
 	}
 	return &schemas.GetMetricsResponse{
 		MetricValues: []*schemas.MetricValue{{
-			MetricName:  "JobsPerTask",
+			MetricName:  "queueLength",
 			MetricValue: int64(count),
 		}},
 	}, nil
 }
 
 func (s *ScalerServer) GetJudgingRequest(ctx context.Context, _ *schemas.GetJudgingRequestParams) (*schemas.JudgingRequest, error) {
-	submission, err := dequeueSubmission(ctx, s.client)
+	submission, staff_data, err := dequeueSubmission(ctx, s.client)
 	if err != nil {
 		return nil, err
 	}
 	return &schemas.JudgingRequest{
 		Code:    submission.Code,
 		Input:   "",
-		IdNonce: 1, // TODO FIXME
+		IdNonce: uint64(*submission.QueryStaffData().OnlyX(ctx).ExecutionID), // TODO FIXME
 	}, nil
 }
 

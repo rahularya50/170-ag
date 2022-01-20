@@ -10,6 +10,7 @@ type accessTokenSentinel struct{}
 type privacyAccessToken int
 
 var JudgeScalingServerAccessToken privacyAccessToken = 0
+var SubmissionEnqueuingAccessToken privacyAccessToken = 1
 
 func AllowWithPrivacyAccessToken(token privacyAccessToken) privacy.QueryMutationRule {
 	return privacy.ContextQueryMutationRule(func(c context.Context) error {

@@ -377,6 +377,62 @@ func HasDraftsWith(preds ...predicate.CodingDraft) predicate.CodingProblem {
 	})
 }
 
+// HasStaffData applies the HasEdge predicate on the "staff_data" edge.
+func HasStaffData() predicate.CodingProblem {
+	return predicate.CodingProblem(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(StaffDataTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, StaffDataTable, StaffDataColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasStaffDataWith applies the HasEdge predicate on the "staff_data" edge with a given conditions (other predicates).
+func HasStaffDataWith(preds ...predicate.CodingProblemStaffData) predicate.CodingProblem {
+	return predicate.CodingProblem(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(StaffDataInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, StaffDataTable, StaffDataColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasSubmissions applies the HasEdge predicate on the "submissions" edge.
+func HasSubmissions() predicate.CodingProblem {
+	return predicate.CodingProblem(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(SubmissionsTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, SubmissionsTable, SubmissionsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSubmissionsWith applies the HasEdge predicate on the "submissions" edge with a given conditions (other predicates).
+func HasSubmissionsWith(preds ...predicate.CodingSubmission) predicate.CodingProblem {
+	return predicate.CodingProblem(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(SubmissionsInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, SubmissionsTable, SubmissionsColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.CodingProblem) predicate.CodingProblem {
 	return predicate.CodingProblem(func(s *sql.Selector) {

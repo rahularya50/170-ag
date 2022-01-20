@@ -4,6 +4,11 @@ steps:
   env:
     - "DOCKER_BUILDKIT=1"
   entrypoint: 'bash'
+  args: ['-c', 'docker pull gcr.io/formidable-gate-337712/autograder-gobuild:latest || exit 0']
+- name: 'gcr.io/cloud-builders/docker'
+  env:
+    - "DOCKER_BUILDKIT=1"
+  entrypoint: 'bash'
   args: ['-c', 'docker pull gcr.io/formidable-gate-337712/autograder-jsbuild:latest || exit 0']
 - name: 'gcr.io/cloud-builders/docker'
   env:

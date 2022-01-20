@@ -68,6 +68,13 @@ type CodingProblem implements Node {
     before: Cursor
     last: Int
   ): CodingSubmissionConnection
+  all_submissions(
+    after: Cursor
+    first: Int
+    before: Cursor
+    last: Int
+  ): CodingSubmissionConnection
+  staff_data: CodingProblemStaffData
 }
 
 type CodingProblemConnection {
@@ -85,6 +92,11 @@ input CodingProblemInput {
   name: String!
   statement: String!
   released: Boolean!
+}
+
+type CodingProblemStaffData {
+  input: String!
+  coding_problem: CodingProblem!
 }
 
 type CodingDraft implements Node {
@@ -112,6 +124,7 @@ type CodingSubmission implements Node {
   code: String!
   coding_problem: CodingProblem!
   status: CodingSubmissionStatus!
+  staff_data: CodingSubmissionStaffData!
 }
 
 input CodingSubmissionInput {
@@ -128,4 +141,11 @@ type CodingSubmissionConnection {
 type CodingSubmissionEdge {
   node: CodingSubmission!
   cursor: Cursor!
+}
+
+type CodingSubmissionStaffData {
+  execution_id: String
+  input: String!
+  output: String
+  coding_submission: CodingSubmission!
 }

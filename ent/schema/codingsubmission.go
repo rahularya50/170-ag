@@ -39,6 +39,7 @@ func (CodingSubmission) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("author", User.Type).Required().Unique().Annotations(entgql.Bind()),
 		edge.To("coding_problem", CodingProblem.Type).Required().Unique().Annotations(entgql.Bind()),
+		edge.From("staff_data", CodingSubmissionStaffData.Type).Ref("coding_submission").Unique().Annotations(entgql.Bind()),
 	}
 }
 

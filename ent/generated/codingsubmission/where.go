@@ -314,6 +314,34 @@ func HasCodingProblemWith(preds ...predicate.CodingProblem) predicate.CodingSubm
 	})
 }
 
+// HasStaffData applies the HasEdge predicate on the "staff_data" edge.
+func HasStaffData() predicate.CodingSubmission {
+	return predicate.CodingSubmission(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(StaffDataTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, StaffDataTable, StaffDataColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasStaffDataWith applies the HasEdge predicate on the "staff_data" edge with a given conditions (other predicates).
+func HasStaffDataWith(preds ...predicate.CodingSubmissionStaffData) predicate.CodingSubmission {
+	return predicate.CodingSubmission(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(StaffDataInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, StaffDataTable, StaffDataColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.CodingSubmission) predicate.CodingSubmission {
 	return predicate.CodingSubmission(func(s *sql.Selector) {

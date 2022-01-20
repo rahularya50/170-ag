@@ -11,7 +11,9 @@ import (
 
 	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/codingproblem"
+	"170-ag/ent/generated/codingproblemstaffdata"
 	"170-ag/ent/generated/codingsubmission"
+	"170-ag/ent/generated/codingsubmissionstaffdata"
 	"170-ag/ent/generated/user"
 
 	"entgo.io/ent/dialect"
@@ -28,8 +30,12 @@ type Client struct {
 	CodingDraft *CodingDraftClient
 	// CodingProblem is the client for interacting with the CodingProblem builders.
 	CodingProblem *CodingProblemClient
+	// CodingProblemStaffData is the client for interacting with the CodingProblemStaffData builders.
+	CodingProblemStaffData *CodingProblemStaffDataClient
 	// CodingSubmission is the client for interacting with the CodingSubmission builders.
 	CodingSubmission *CodingSubmissionClient
+	// CodingSubmissionStaffData is the client for interacting with the CodingSubmissionStaffData builders.
+	CodingSubmissionStaffData *CodingSubmissionStaffDataClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 	// additional fields for node api
@@ -49,7 +55,9 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.CodingDraft = NewCodingDraftClient(c.config)
 	c.CodingProblem = NewCodingProblemClient(c.config)
+	c.CodingProblemStaffData = NewCodingProblemStaffDataClient(c.config)
 	c.CodingSubmission = NewCodingSubmissionClient(c.config)
+	c.CodingSubmissionStaffData = NewCodingSubmissionStaffDataClient(c.config)
 	c.User = NewUserClient(c.config)
 }
 
@@ -82,12 +90,14 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:              ctx,
-		config:           cfg,
-		CodingDraft:      NewCodingDraftClient(cfg),
-		CodingProblem:    NewCodingProblemClient(cfg),
-		CodingSubmission: NewCodingSubmissionClient(cfg),
-		User:             NewUserClient(cfg),
+		ctx:                       ctx,
+		config:                    cfg,
+		CodingDraft:               NewCodingDraftClient(cfg),
+		CodingProblem:             NewCodingProblemClient(cfg),
+		CodingProblemStaffData:    NewCodingProblemStaffDataClient(cfg),
+		CodingSubmission:          NewCodingSubmissionClient(cfg),
+		CodingSubmissionStaffData: NewCodingSubmissionStaffDataClient(cfg),
+		User:                      NewUserClient(cfg),
 	}, nil
 }
 
@@ -105,11 +115,13 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		config:           cfg,
-		CodingDraft:      NewCodingDraftClient(cfg),
-		CodingProblem:    NewCodingProblemClient(cfg),
-		CodingSubmission: NewCodingSubmissionClient(cfg),
-		User:             NewUserClient(cfg),
+		config:                    cfg,
+		CodingDraft:               NewCodingDraftClient(cfg),
+		CodingProblem:             NewCodingProblemClient(cfg),
+		CodingProblemStaffData:    NewCodingProblemStaffDataClient(cfg),
+		CodingSubmission:          NewCodingSubmissionClient(cfg),
+		CodingSubmissionStaffData: NewCodingSubmissionStaffDataClient(cfg),
+		User:                      NewUserClient(cfg),
 	}, nil
 }
 
@@ -141,7 +153,9 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	c.CodingDraft.Use(hooks...)
 	c.CodingProblem.Use(hooks...)
+	c.CodingProblemStaffData.Use(hooks...)
 	c.CodingSubmission.Use(hooks...)
+	c.CodingSubmissionStaffData.Use(hooks...)
 	c.User.Use(hooks...)
 }
 
@@ -369,10 +383,149 @@ func (c *CodingProblemClient) QueryDrafts(cp *CodingProblem) *CodingDraftQuery {
 	return query
 }
 
+// QueryStaffData queries the staff_data edge of a CodingProblem.
+func (c *CodingProblemClient) QueryStaffData(cp *CodingProblem) *CodingProblemStaffDataQuery {
+	query := &CodingProblemStaffDataQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := cp.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(codingproblem.Table, codingproblem.FieldID, id),
+			sqlgraph.To(codingproblemstaffdata.Table, codingproblemstaffdata.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, codingproblem.StaffDataTable, codingproblem.StaffDataColumn),
+		)
+		fromV = sqlgraph.Neighbors(cp.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySubmissions queries the submissions edge of a CodingProblem.
+func (c *CodingProblemClient) QuerySubmissions(cp *CodingProblem) *CodingSubmissionQuery {
+	query := &CodingSubmissionQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := cp.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(codingproblem.Table, codingproblem.FieldID, id),
+			sqlgraph.To(codingsubmission.Table, codingsubmission.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, codingproblem.SubmissionsTable, codingproblem.SubmissionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(cp.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *CodingProblemClient) Hooks() []Hook {
 	hooks := c.hooks.CodingProblem
 	return append(hooks[:len(hooks):len(hooks)], codingproblem.Hooks[:]...)
+}
+
+// CodingProblemStaffDataClient is a client for the CodingProblemStaffData schema.
+type CodingProblemStaffDataClient struct {
+	config
+}
+
+// NewCodingProblemStaffDataClient returns a client for the CodingProblemStaffData from the given config.
+func NewCodingProblemStaffDataClient(c config) *CodingProblemStaffDataClient {
+	return &CodingProblemStaffDataClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `codingproblemstaffdata.Hooks(f(g(h())))`.
+func (c *CodingProblemStaffDataClient) Use(hooks ...Hook) {
+	c.hooks.CodingProblemStaffData = append(c.hooks.CodingProblemStaffData, hooks...)
+}
+
+// Create returns a create builder for CodingProblemStaffData.
+func (c *CodingProblemStaffDataClient) Create() *CodingProblemStaffDataCreate {
+	mutation := newCodingProblemStaffDataMutation(c.config, OpCreate)
+	return &CodingProblemStaffDataCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of CodingProblemStaffData entities.
+func (c *CodingProblemStaffDataClient) CreateBulk(builders ...*CodingProblemStaffDataCreate) *CodingProblemStaffDataCreateBulk {
+	return &CodingProblemStaffDataCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for CodingProblemStaffData.
+func (c *CodingProblemStaffDataClient) Update() *CodingProblemStaffDataUpdate {
+	mutation := newCodingProblemStaffDataMutation(c.config, OpUpdate)
+	return &CodingProblemStaffDataUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CodingProblemStaffDataClient) UpdateOne(cpsd *CodingProblemStaffData) *CodingProblemStaffDataUpdateOne {
+	mutation := newCodingProblemStaffDataMutation(c.config, OpUpdateOne, withCodingProblemStaffData(cpsd))
+	return &CodingProblemStaffDataUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CodingProblemStaffDataClient) UpdateOneID(id int) *CodingProblemStaffDataUpdateOne {
+	mutation := newCodingProblemStaffDataMutation(c.config, OpUpdateOne, withCodingProblemStaffDataID(id))
+	return &CodingProblemStaffDataUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for CodingProblemStaffData.
+func (c *CodingProblemStaffDataClient) Delete() *CodingProblemStaffDataDelete {
+	mutation := newCodingProblemStaffDataMutation(c.config, OpDelete)
+	return &CodingProblemStaffDataDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *CodingProblemStaffDataClient) DeleteOne(cpsd *CodingProblemStaffData) *CodingProblemStaffDataDeleteOne {
+	return c.DeleteOneID(cpsd.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *CodingProblemStaffDataClient) DeleteOneID(id int) *CodingProblemStaffDataDeleteOne {
+	builder := c.Delete().Where(codingproblemstaffdata.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CodingProblemStaffDataDeleteOne{builder}
+}
+
+// Query returns a query builder for CodingProblemStaffData.
+func (c *CodingProblemStaffDataClient) Query() *CodingProblemStaffDataQuery {
+	return &CodingProblemStaffDataQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a CodingProblemStaffData entity by its id.
+func (c *CodingProblemStaffDataClient) Get(ctx context.Context, id int) (*CodingProblemStaffData, error) {
+	return c.Query().Where(codingproblemstaffdata.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CodingProblemStaffDataClient) GetX(ctx context.Context, id int) *CodingProblemStaffData {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCodingProblem queries the coding_problem edge of a CodingProblemStaffData.
+func (c *CodingProblemStaffDataClient) QueryCodingProblem(cpsd *CodingProblemStaffData) *CodingProblemQuery {
+	query := &CodingProblemQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := cpsd.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(codingproblemstaffdata.Table, codingproblemstaffdata.FieldID, id),
+			sqlgraph.To(codingproblem.Table, codingproblem.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, codingproblemstaffdata.CodingProblemTable, codingproblemstaffdata.CodingProblemColumn),
+		)
+		fromV = sqlgraph.Neighbors(cpsd.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *CodingProblemStaffDataClient) Hooks() []Hook {
+	hooks := c.hooks.CodingProblemStaffData
+	return append(hooks[:len(hooks):len(hooks)], codingproblemstaffdata.Hooks[:]...)
 }
 
 // CodingSubmissionClient is a client for the CodingSubmission schema.
@@ -492,10 +645,133 @@ func (c *CodingSubmissionClient) QueryCodingProblem(cs *CodingSubmission) *Codin
 	return query
 }
 
+// QueryStaffData queries the staff_data edge of a CodingSubmission.
+func (c *CodingSubmissionClient) QueryStaffData(cs *CodingSubmission) *CodingSubmissionStaffDataQuery {
+	query := &CodingSubmissionStaffDataQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := cs.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(codingsubmission.Table, codingsubmission.FieldID, id),
+			sqlgraph.To(codingsubmissionstaffdata.Table, codingsubmissionstaffdata.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, codingsubmission.StaffDataTable, codingsubmission.StaffDataColumn),
+		)
+		fromV = sqlgraph.Neighbors(cs.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *CodingSubmissionClient) Hooks() []Hook {
 	hooks := c.hooks.CodingSubmission
 	return append(hooks[:len(hooks):len(hooks)], codingsubmission.Hooks[:]...)
+}
+
+// CodingSubmissionStaffDataClient is a client for the CodingSubmissionStaffData schema.
+type CodingSubmissionStaffDataClient struct {
+	config
+}
+
+// NewCodingSubmissionStaffDataClient returns a client for the CodingSubmissionStaffData from the given config.
+func NewCodingSubmissionStaffDataClient(c config) *CodingSubmissionStaffDataClient {
+	return &CodingSubmissionStaffDataClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `codingsubmissionstaffdata.Hooks(f(g(h())))`.
+func (c *CodingSubmissionStaffDataClient) Use(hooks ...Hook) {
+	c.hooks.CodingSubmissionStaffData = append(c.hooks.CodingSubmissionStaffData, hooks...)
+}
+
+// Create returns a create builder for CodingSubmissionStaffData.
+func (c *CodingSubmissionStaffDataClient) Create() *CodingSubmissionStaffDataCreate {
+	mutation := newCodingSubmissionStaffDataMutation(c.config, OpCreate)
+	return &CodingSubmissionStaffDataCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of CodingSubmissionStaffData entities.
+func (c *CodingSubmissionStaffDataClient) CreateBulk(builders ...*CodingSubmissionStaffDataCreate) *CodingSubmissionStaffDataCreateBulk {
+	return &CodingSubmissionStaffDataCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for CodingSubmissionStaffData.
+func (c *CodingSubmissionStaffDataClient) Update() *CodingSubmissionStaffDataUpdate {
+	mutation := newCodingSubmissionStaffDataMutation(c.config, OpUpdate)
+	return &CodingSubmissionStaffDataUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CodingSubmissionStaffDataClient) UpdateOne(cssd *CodingSubmissionStaffData) *CodingSubmissionStaffDataUpdateOne {
+	mutation := newCodingSubmissionStaffDataMutation(c.config, OpUpdateOne, withCodingSubmissionStaffData(cssd))
+	return &CodingSubmissionStaffDataUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CodingSubmissionStaffDataClient) UpdateOneID(id int) *CodingSubmissionStaffDataUpdateOne {
+	mutation := newCodingSubmissionStaffDataMutation(c.config, OpUpdateOne, withCodingSubmissionStaffDataID(id))
+	return &CodingSubmissionStaffDataUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for CodingSubmissionStaffData.
+func (c *CodingSubmissionStaffDataClient) Delete() *CodingSubmissionStaffDataDelete {
+	mutation := newCodingSubmissionStaffDataMutation(c.config, OpDelete)
+	return &CodingSubmissionStaffDataDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *CodingSubmissionStaffDataClient) DeleteOne(cssd *CodingSubmissionStaffData) *CodingSubmissionStaffDataDeleteOne {
+	return c.DeleteOneID(cssd.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *CodingSubmissionStaffDataClient) DeleteOneID(id int) *CodingSubmissionStaffDataDeleteOne {
+	builder := c.Delete().Where(codingsubmissionstaffdata.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CodingSubmissionStaffDataDeleteOne{builder}
+}
+
+// Query returns a query builder for CodingSubmissionStaffData.
+func (c *CodingSubmissionStaffDataClient) Query() *CodingSubmissionStaffDataQuery {
+	return &CodingSubmissionStaffDataQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a CodingSubmissionStaffData entity by its id.
+func (c *CodingSubmissionStaffDataClient) Get(ctx context.Context, id int) (*CodingSubmissionStaffData, error) {
+	return c.Query().Where(codingsubmissionstaffdata.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CodingSubmissionStaffDataClient) GetX(ctx context.Context, id int) *CodingSubmissionStaffData {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCodingSubmission queries the coding_submission edge of a CodingSubmissionStaffData.
+func (c *CodingSubmissionStaffDataClient) QueryCodingSubmission(cssd *CodingSubmissionStaffData) *CodingSubmissionQuery {
+	query := &CodingSubmissionQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := cssd.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(codingsubmissionstaffdata.Table, codingsubmissionstaffdata.FieldID, id),
+			sqlgraph.To(codingsubmission.Table, codingsubmission.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, codingsubmissionstaffdata.CodingSubmissionTable, codingsubmissionstaffdata.CodingSubmissionColumn),
+		)
+		fromV = sqlgraph.Neighbors(cssd.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *CodingSubmissionStaffDataClient) Hooks() []Hook {
+	hooks := c.hooks.CodingSubmissionStaffData
+	return append(hooks[:len(hooks):len(hooks)], codingsubmissionstaffdata.Hooks[:]...)
 }
 
 // UserClient is a client for the User schema.

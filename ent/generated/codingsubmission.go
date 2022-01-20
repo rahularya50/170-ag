@@ -5,6 +5,7 @@ package generated
 import (
 	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/codingsubmission"
+	"170-ag/ent/generated/codingsubmissionstaffdata"
 	"170-ag/ent/generated/user"
 	"fmt"
 	"strings"
@@ -23,9 +24,10 @@ type CodingSubmission struct {
 	Status codingsubmission.Status `json:"status,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CodingSubmissionQuery when eager-loading is set.
-	Edges                            CodingSubmissionEdges `json:"edges"`
-	coding_submission_author         *int
-	coding_submission_coding_problem *int
+	Edges                                          CodingSubmissionEdges `json:"edges"`
+	coding_submission_author                       *int
+	coding_submission_coding_problem               *int
+	coding_submission_staff_data_coding_submission *int
 }
 
 // CodingSubmissionEdges holds the relations/edges for other nodes in the graph.
@@ -34,9 +36,11 @@ type CodingSubmissionEdges struct {
 	Author *User `json:"author,omitempty"`
 	// CodingProblem holds the value of the coding_problem edge.
 	CodingProblem *CodingProblem `json:"coding_problem,omitempty"`
+	// StaffData holds the value of the staff_data edge.
+	StaffData *CodingSubmissionStaffData `json:"staff_data,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // AuthorOrErr returns the Author value or an error if the edge
@@ -67,6 +71,20 @@ func (e CodingSubmissionEdges) CodingProblemOrErr() (*CodingProblem, error) {
 	return nil, &NotLoadedError{edge: "coding_problem"}
 }
 
+// StaffDataOrErr returns the StaffData value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e CodingSubmissionEdges) StaffDataOrErr() (*CodingSubmissionStaffData, error) {
+	if e.loadedTypes[2] {
+		if e.StaffData == nil {
+			// The edge staff_data was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: codingsubmissionstaffdata.Label}
+		}
+		return e.StaffData, nil
+	}
+	return nil, &NotLoadedError{edge: "staff_data"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*CodingSubmission) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
@@ -79,6 +97,8 @@ func (*CodingSubmission) scanValues(columns []string) ([]interface{}, error) {
 		case codingsubmission.ForeignKeys[0]: // coding_submission_author
 			values[i] = new(sql.NullInt64)
 		case codingsubmission.ForeignKeys[1]: // coding_submission_coding_problem
+			values[i] = new(sql.NullInt64)
+		case codingsubmission.ForeignKeys[2]: // coding_submission_staff_data_coding_submission
 			values[i] = new(sql.NullInt64)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type CodingSubmission", columns[i])
@@ -127,6 +147,13 @@ func (cs *CodingSubmission) assignValues(columns []string, values []interface{})
 				cs.coding_submission_coding_problem = new(int)
 				*cs.coding_submission_coding_problem = int(value.Int64)
 			}
+		case codingsubmission.ForeignKeys[2]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field coding_submission_staff_data_coding_submission", value)
+			} else if value.Valid {
+				cs.coding_submission_staff_data_coding_submission = new(int)
+				*cs.coding_submission_staff_data_coding_submission = int(value.Int64)
+			}
 		}
 	}
 	return nil
@@ -140,6 +167,11 @@ func (cs *CodingSubmission) QueryAuthor() *UserQuery {
 // QueryCodingProblem queries the "coding_problem" edge of the CodingSubmission entity.
 func (cs *CodingSubmission) QueryCodingProblem() *CodingProblemQuery {
 	return (&CodingSubmissionClient{config: cs.config}).QueryCodingProblem(cs)
+}
+
+// QueryStaffData queries the "staff_data" edge of the CodingSubmission entity.
+func (cs *CodingSubmission) QueryStaffData() *CodingSubmissionStaffDataQuery {
+	return (&CodingSubmissionClient{config: cs.config}).QueryStaffData(cs)
 }
 
 // Update returns a builder for updating this CodingSubmission.

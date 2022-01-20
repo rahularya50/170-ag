@@ -5,6 +5,8 @@ package generated
 import (
 	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/codingproblem"
+	"170-ag/ent/generated/codingproblemstaffdata"
+	"170-ag/ent/generated/codingsubmission"
 	"context"
 	"errors"
 	"fmt"
@@ -69,6 +71,40 @@ func (cpc *CodingProblemCreate) AddDrafts(c ...*CodingDraft) *CodingProblemCreat
 		ids[i] = c[i].ID
 	}
 	return cpc.AddDraftIDs(ids...)
+}
+
+// SetStaffDataID sets the "staff_data" edge to the CodingProblemStaffData entity by ID.
+func (cpc *CodingProblemCreate) SetStaffDataID(id int) *CodingProblemCreate {
+	cpc.mutation.SetStaffDataID(id)
+	return cpc
+}
+
+// SetNillableStaffDataID sets the "staff_data" edge to the CodingProblemStaffData entity by ID if the given value is not nil.
+func (cpc *CodingProblemCreate) SetNillableStaffDataID(id *int) *CodingProblemCreate {
+	if id != nil {
+		cpc = cpc.SetStaffDataID(*id)
+	}
+	return cpc
+}
+
+// SetStaffData sets the "staff_data" edge to the CodingProblemStaffData entity.
+func (cpc *CodingProblemCreate) SetStaffData(c *CodingProblemStaffData) *CodingProblemCreate {
+	return cpc.SetStaffDataID(c.ID)
+}
+
+// AddSubmissionIDs adds the "submissions" edge to the CodingSubmission entity by IDs.
+func (cpc *CodingProblemCreate) AddSubmissionIDs(ids ...int) *CodingProblemCreate {
+	cpc.mutation.AddSubmissionIDs(ids...)
+	return cpc
+}
+
+// AddSubmissions adds the "submissions" edges to the CodingSubmission entity.
+func (cpc *CodingProblemCreate) AddSubmissions(c ...*CodingSubmission) *CodingProblemCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cpc.AddSubmissionIDs(ids...)
 }
 
 // Mutation returns the CodingProblemMutation object of the builder.
@@ -239,6 +275,45 @@ func (cpc *CodingProblemCreate) createSpec() (*CodingProblem, *sqlgraph.CreateSp
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: codingdraft.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cpc.mutation.StaffDataIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   codingproblem.StaffDataTable,
+			Columns: []string{codingproblem.StaffDataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingproblemstaffdata.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.coding_problem_staff_data_coding_problem = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cpc.mutation.SubmissionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   codingproblem.SubmissionsTable,
+			Columns: []string{codingproblem.SubmissionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingsubmission.FieldID,
 				},
 			},
 		}

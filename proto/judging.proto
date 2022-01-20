@@ -10,6 +10,14 @@ message JudgingRequest {
 
 message GetJudgingRequestParams {}
 
+message GradingResponse {
+  fixed64 id_nonce = 1;
+  string stdout = 2;
+}
+
+message GradingReply {}
+
 service JudgingServer {
   rpc GetJudgingRequest(GetJudgingRequestParams) returns (JudgingRequest) {}
+  rpc SubmitGradingResponse(GradingResponse) returns (GradingReply) {}
 }
