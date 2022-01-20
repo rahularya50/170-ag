@@ -22,6 +22,10 @@ type CodingSubmissionStaffData struct {
 	Input string `json:"input,omitempty"`
 	// Output holds the value of the "output" field.
 	Output *string `json:"output,omitempty"`
+	// Stderr holds the value of the "stderr" field.
+	Stderr *string `json:"stderr,omitempty"`
+	// ExitError holds the value of the "exit_error" field.
+	ExitError *string `json:"exit_error,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CodingSubmissionStaffDataQuery when eager-loading is set.
 	Edges CodingSubmissionStaffDataEdges `json:"edges"`
@@ -57,7 +61,7 @@ func (*CodingSubmissionStaffData) scanValues(columns []string) ([]interface{}, e
 		switch columns[i] {
 		case codingsubmissionstaffdata.FieldID, codingsubmissionstaffdata.FieldExecutionID:
 			values[i] = new(sql.NullInt64)
-		case codingsubmissionstaffdata.FieldInput, codingsubmissionstaffdata.FieldOutput:
+		case codingsubmissionstaffdata.FieldInput, codingsubmissionstaffdata.FieldOutput, codingsubmissionstaffdata.FieldStderr, codingsubmissionstaffdata.FieldExitError:
 			values[i] = new(sql.NullString)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type CodingSubmissionStaffData", columns[i])
@@ -100,6 +104,20 @@ func (cssd *CodingSubmissionStaffData) assignValues(columns []string, values []i
 				cssd.Output = new(string)
 				*cssd.Output = value.String
 			}
+		case codingsubmissionstaffdata.FieldStderr:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field stderr", values[i])
+			} else if value.Valid {
+				cssd.Stderr = new(string)
+				*cssd.Stderr = value.String
+			}
+		case codingsubmissionstaffdata.FieldExitError:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field exit_error", values[i])
+			} else if value.Valid {
+				cssd.ExitError = new(string)
+				*cssd.ExitError = value.String
+			}
 		}
 	}
 	return nil
@@ -141,6 +159,14 @@ func (cssd *CodingSubmissionStaffData) String() string {
 	builder.WriteString(cssd.Input)
 	if v := cssd.Output; v != nil {
 		builder.WriteString(", output=")
+		builder.WriteString(*v)
+	}
+	if v := cssd.Stderr; v != nil {
+		builder.WriteString(", stderr=")
+		builder.WriteString(*v)
+	}
+	if v := cssd.ExitError; v != nil {
+		builder.WriteString(", exit_error=")
 		builder.WriteString(*v)
 	}
 	builder.WriteByte(')')

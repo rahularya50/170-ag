@@ -103,6 +103,14 @@ func init() {
 	codingsubmissionstaffdataDescOutput := codingsubmissionstaffdataFields[2].Descriptor()
 	// codingsubmissionstaffdata.OutputValidator is a validator for the "output" field. It is called by the builders before save.
 	codingsubmissionstaffdata.OutputValidator = codingsubmissionstaffdataDescOutput.Validators[0].(func(string) error)
+	// codingsubmissionstaffdataDescStderr is the schema descriptor for stderr field.
+	codingsubmissionstaffdataDescStderr := codingsubmissionstaffdataFields[3].Descriptor()
+	// codingsubmissionstaffdata.StderrValidator is a validator for the "stderr" field. It is called by the builders before save.
+	codingsubmissionstaffdata.StderrValidator = codingsubmissionstaffdataDescStderr.Validators[0].(func(string) error)
+	// codingsubmissionstaffdataDescExitError is the schema descriptor for exit_error field.
+	codingsubmissionstaffdataDescExitError := codingsubmissionstaffdataFields[4].Descriptor()
+	// codingsubmissionstaffdata.ExitErrorValidator is a validator for the "exit_error" field. It is called by the builders before save.
+	codingsubmissionstaffdata.ExitErrorValidator = codingsubmissionstaffdataDescExitError.Validators[0].(func(string) error)
 	user.Policy = privacy.NewPolicies(schema.User{})
 	user.Hooks[0] = func(next ent.Mutator) ent.Mutator {
 		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {

@@ -13,6 +13,8 @@ message GetJudgingRequestParams {}
 message GradingResponse {
   fixed64 id_nonce = 1;
   string stdout = 2;
+  string stderr = 3;
+  string error_code = 4;
 }
 
 message GradingReply {}

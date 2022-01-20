@@ -11,10 +11,20 @@ func JudgeLoadedRequest(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	cmd := exec.Command("python", "-c", request.GetCode())
-	stdout, _ := cmd.Output() // TODO: handle err, stderr, inputs
+	cmd := exec.Command("python3", "-c", request.GetCode())
+	stdout, err := cmd.Output() // TODO: handle err, stderr, inputs
+	exit_err, _ := err.(*exec.ExitError)
+	var stderr string
+	var errorCode string
+	if exit_err != nil {
+		stderr = string(exit_err.Stderr)
+		errorCode = err.Error()
+	}
 	response := &schemas.GradingResponse{
-		IdNonce: request.IdNonce, Stdout: string(stdout),
+		IdNonce:   request.IdNonce,
+		Stdout:    string(stdout),
+		Stderr:    stderr,
+		ErrorCode: errorCode,
 	}
 	err = storeGradingProto(response)
 	if err != nil {

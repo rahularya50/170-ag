@@ -1993,6 +1993,8 @@ type CodingSubmissionStaffDataMutation struct {
 	addexecution_id          *int64
 	input                    *string
 	output                   *string
+	stderr                   *string
+	exit_error               *string
 	clearedFields            map[string]struct{}
 	coding_submission        *int
 	clearedcoding_submission bool
@@ -2235,6 +2237,104 @@ func (m *CodingSubmissionStaffDataMutation) ResetOutput() {
 	delete(m.clearedFields, codingsubmissionstaffdata.FieldOutput)
 }
 
+// SetStderr sets the "stderr" field.
+func (m *CodingSubmissionStaffDataMutation) SetStderr(s string) {
+	m.stderr = &s
+}
+
+// Stderr returns the value of the "stderr" field in the mutation.
+func (m *CodingSubmissionStaffDataMutation) Stderr() (r string, exists bool) {
+	v := m.stderr
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStderr returns the old "stderr" field's value of the CodingSubmissionStaffData entity.
+// If the CodingSubmissionStaffData object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CodingSubmissionStaffDataMutation) OldStderr(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldStderr is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldStderr requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStderr: %w", err)
+	}
+	return oldValue.Stderr, nil
+}
+
+// ClearStderr clears the value of the "stderr" field.
+func (m *CodingSubmissionStaffDataMutation) ClearStderr() {
+	m.stderr = nil
+	m.clearedFields[codingsubmissionstaffdata.FieldStderr] = struct{}{}
+}
+
+// StderrCleared returns if the "stderr" field was cleared in this mutation.
+func (m *CodingSubmissionStaffDataMutation) StderrCleared() bool {
+	_, ok := m.clearedFields[codingsubmissionstaffdata.FieldStderr]
+	return ok
+}
+
+// ResetStderr resets all changes to the "stderr" field.
+func (m *CodingSubmissionStaffDataMutation) ResetStderr() {
+	m.stderr = nil
+	delete(m.clearedFields, codingsubmissionstaffdata.FieldStderr)
+}
+
+// SetExitError sets the "exit_error" field.
+func (m *CodingSubmissionStaffDataMutation) SetExitError(s string) {
+	m.exit_error = &s
+}
+
+// ExitError returns the value of the "exit_error" field in the mutation.
+func (m *CodingSubmissionStaffDataMutation) ExitError() (r string, exists bool) {
+	v := m.exit_error
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldExitError returns the old "exit_error" field's value of the CodingSubmissionStaffData entity.
+// If the CodingSubmissionStaffData object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CodingSubmissionStaffDataMutation) OldExitError(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldExitError is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldExitError requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldExitError: %w", err)
+	}
+	return oldValue.ExitError, nil
+}
+
+// ClearExitError clears the value of the "exit_error" field.
+func (m *CodingSubmissionStaffDataMutation) ClearExitError() {
+	m.exit_error = nil
+	m.clearedFields[codingsubmissionstaffdata.FieldExitError] = struct{}{}
+}
+
+// ExitErrorCleared returns if the "exit_error" field was cleared in this mutation.
+func (m *CodingSubmissionStaffDataMutation) ExitErrorCleared() bool {
+	_, ok := m.clearedFields[codingsubmissionstaffdata.FieldExitError]
+	return ok
+}
+
+// ResetExitError resets all changes to the "exit_error" field.
+func (m *CodingSubmissionStaffDataMutation) ResetExitError() {
+	m.exit_error = nil
+	delete(m.clearedFields, codingsubmissionstaffdata.FieldExitError)
+}
+
 // SetCodingSubmissionID sets the "coding_submission" edge to the CodingSubmission entity by id.
 func (m *CodingSubmissionStaffDataMutation) SetCodingSubmissionID(id int) {
 	m.coding_submission = &id
@@ -2293,7 +2393,7 @@ func (m *CodingSubmissionStaffDataMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CodingSubmissionStaffDataMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 5)
 	if m.execution_id != nil {
 		fields = append(fields, codingsubmissionstaffdata.FieldExecutionID)
 	}
@@ -2302,6 +2402,12 @@ func (m *CodingSubmissionStaffDataMutation) Fields() []string {
 	}
 	if m.output != nil {
 		fields = append(fields, codingsubmissionstaffdata.FieldOutput)
+	}
+	if m.stderr != nil {
+		fields = append(fields, codingsubmissionstaffdata.FieldStderr)
+	}
+	if m.exit_error != nil {
+		fields = append(fields, codingsubmissionstaffdata.FieldExitError)
 	}
 	return fields
 }
@@ -2317,6 +2423,10 @@ func (m *CodingSubmissionStaffDataMutation) Field(name string) (ent.Value, bool)
 		return m.Input()
 	case codingsubmissionstaffdata.FieldOutput:
 		return m.Output()
+	case codingsubmissionstaffdata.FieldStderr:
+		return m.Stderr()
+	case codingsubmissionstaffdata.FieldExitError:
+		return m.ExitError()
 	}
 	return nil, false
 }
@@ -2332,6 +2442,10 @@ func (m *CodingSubmissionStaffDataMutation) OldField(ctx context.Context, name s
 		return m.OldInput(ctx)
 	case codingsubmissionstaffdata.FieldOutput:
 		return m.OldOutput(ctx)
+	case codingsubmissionstaffdata.FieldStderr:
+		return m.OldStderr(ctx)
+	case codingsubmissionstaffdata.FieldExitError:
+		return m.OldExitError(ctx)
 	}
 	return nil, fmt.Errorf("unknown CodingSubmissionStaffData field %s", name)
 }
@@ -2361,6 +2475,20 @@ func (m *CodingSubmissionStaffDataMutation) SetField(name string, value ent.Valu
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetOutput(v)
+		return nil
+	case codingsubmissionstaffdata.FieldStderr:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStderr(v)
+		return nil
+	case codingsubmissionstaffdata.FieldExitError:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExitError(v)
 		return nil
 	}
 	return fmt.Errorf("unknown CodingSubmissionStaffData field %s", name)
@@ -2413,6 +2541,12 @@ func (m *CodingSubmissionStaffDataMutation) ClearedFields() []string {
 	if m.FieldCleared(codingsubmissionstaffdata.FieldOutput) {
 		fields = append(fields, codingsubmissionstaffdata.FieldOutput)
 	}
+	if m.FieldCleared(codingsubmissionstaffdata.FieldStderr) {
+		fields = append(fields, codingsubmissionstaffdata.FieldStderr)
+	}
+	if m.FieldCleared(codingsubmissionstaffdata.FieldExitError) {
+		fields = append(fields, codingsubmissionstaffdata.FieldExitError)
+	}
 	return fields
 }
 
@@ -2433,6 +2567,12 @@ func (m *CodingSubmissionStaffDataMutation) ClearField(name string) error {
 	case codingsubmissionstaffdata.FieldOutput:
 		m.ClearOutput()
 		return nil
+	case codingsubmissionstaffdata.FieldStderr:
+		m.ClearStderr()
+		return nil
+	case codingsubmissionstaffdata.FieldExitError:
+		m.ClearExitError()
+		return nil
 	}
 	return fmt.Errorf("unknown CodingSubmissionStaffData nullable field %s", name)
 }
@@ -2449,6 +2589,12 @@ func (m *CodingSubmissionStaffDataMutation) ResetField(name string) error {
 		return nil
 	case codingsubmissionstaffdata.FieldOutput:
 		m.ResetOutput()
+		return nil
+	case codingsubmissionstaffdata.FieldStderr:
+		m.ResetStderr()
+		return nil
+	case codingsubmissionstaffdata.FieldExitError:
+		m.ResetExitError()
 		return nil
 	}
 	return fmt.Errorf("unknown CodingSubmissionStaffData field %s", name)

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"170-ag/ent/generated/codingsubmissionstaffdata"
 	_ "170-ag/ent/generated/runtime"
 	"170-ag/privacyrules"
 	"170-ag/proto/schemas"
@@ -51,11 +52,11 @@ func dequeueSubmission(c context.Context, client *ent.Client) (*ent.CodingSubmis
 	if err != nil {
 		return nil, nil, err
 	}
-	staff_data, err := tx.CodingSubmissionStaffData.
-		Create().
-		SetCodingSubmission(submission).
-		SetExecutionID(nonce.Int64()).
-		Save(c)
+	staff_data, err := submission.StaffData(c)
+	if err != nil {
+		return nil, nil, err
+	}
+	staff_data, err = staff_data.Update().SetExecutionID(nonce.Int64()).Save(c)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -108,8 +109,41 @@ func (s *ScalerServer) GetJudgingRequest(ctx context.Context, _ *schemas.GetJudg
 	return &schemas.JudgingRequest{
 		Code:    submission.Code,
 		Input:   "",
-		IdNonce: uint64(*submission.QueryStaffData().OnlyX(ctx).ExecutionID), // TODO FIXME
+		IdNonce: uint64(*staff_data.ExecutionID),
 	}, nil
+}
+
+func (s *ScalerServer) SubmitGradingResponse(ctx context.Context, response *schemas.GradingResponse) (*schemas.GradingReply, error) {
+	nonce := int64(response.IdNonce)
+	ctx = privacyrules.NewContextWithAccessToken(ctx, privacyrules.JudgeScalingServerAccessToken)
+	tx, err := s.client.Tx(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback()
+	staff_data, err := tx.CodingSubmissionStaffData.Query().Where(codingsubmissionstaffdata.ExecutionID(nonce)).Only(ctx)
+	if err != nil {
+		return nil, err
+	}
+	submission, err := staff_data.CodingSubmission(ctx)
+	if err != nil {
+		return nil, err
+	}
+	err = submission.Update().SetStatus(codingsubmission.StatusCompleted).Exec(ctx)
+	if err != nil {
+		return nil, err
+	}
+	err = staff_data.Update().
+		SetOutput(response.Stdout).
+		SetStderr(response.Stderr).
+		SetExitError(response.ErrorCode).
+		Exec(ctx)
+	if err != nil {
+		return nil, err
+	}
+	// TODO: actually grade the output against the input
+	tx.Commit()
+	return &schemas.GradingReply{}, nil
 }
 
 func main() {

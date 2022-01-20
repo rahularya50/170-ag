@@ -41,7 +41,7 @@ func (r *codingSubmissionStaffDataResolver) ExecutionID(ctx context.Context, obj
 	if obj.ExecutionID == nil {
 		return nil, nil
 	}
-	s := string(*obj.ExecutionID)
+	s := fmt.Sprint(*obj.ExecutionID)
 	return &s, nil
 }
 

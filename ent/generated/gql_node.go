@@ -245,7 +245,7 @@ func (cssd *CodingSubmissionStaffData) Node(ctx context.Context) (node *Node, er
 	node = &Node{
 		ID:     cssd.ID,
 		Type:   "CodingSubmissionStaffData",
-		Fields: make([]*Field, 3),
+		Fields: make([]*Field, 5),
 		Edges:  make([]*Edge, 1),
 	}
 	var buf []byte
@@ -271,6 +271,22 @@ func (cssd *CodingSubmissionStaffData) Node(ctx context.Context) (node *Node, er
 	node.Fields[2] = &Field{
 		Type:  "string",
 		Name:  "output",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(cssd.Stderr); err != nil {
+		return nil, err
+	}
+	node.Fields[3] = &Field{
+		Type:  "string",
+		Name:  "stderr",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(cssd.ExitError); err != nil {
+		return nil, err
+	}
+	node.Fields[4] = &Field{
+		Type:  "string",
+		Name:  "exit_error",
 		Value: string(buf),
 	}
 	node.Edges[0] = &Edge{

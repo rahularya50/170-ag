@@ -113,6 +113,20 @@ func Output(v string) predicate.CodingSubmissionStaffData {
 	})
 }
 
+// Stderr applies equality check predicate on the "stderr" field. It's identical to StderrEQ.
+func Stderr(v string) predicate.CodingSubmissionStaffData {
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldStderr), v))
+	})
+}
+
+// ExitError applies equality check predicate on the "exit_error" field. It's identical to ExitErrorEQ.
+func ExitError(v string) predicate.CodingSubmissionStaffData {
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldExitError), v))
+	})
+}
+
 // ExecutionIDEQ applies the EQ predicate on the "execution_id" field.
 func ExecutionIDEQ(v int64) predicate.CodingSubmissionStaffData {
 	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
@@ -436,6 +450,256 @@ func OutputEqualFold(v string) predicate.CodingSubmissionStaffData {
 func OutputContainsFold(v string) predicate.CodingSubmissionStaffData {
 	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldOutput), v))
+	})
+}
+
+// StderrEQ applies the EQ predicate on the "stderr" field.
+func StderrEQ(v string) predicate.CodingSubmissionStaffData {
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldStderr), v))
+	})
+}
+
+// StderrNEQ applies the NEQ predicate on the "stderr" field.
+func StderrNEQ(v string) predicate.CodingSubmissionStaffData {
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldStderr), v))
+	})
+}
+
+// StderrIn applies the In predicate on the "stderr" field.
+func StderrIn(vs ...string) predicate.CodingSubmissionStaffData {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldStderr), v...))
+	})
+}
+
+// StderrNotIn applies the NotIn predicate on the "stderr" field.
+func StderrNotIn(vs ...string) predicate.CodingSubmissionStaffData {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldStderr), v...))
+	})
+}
+
+// StderrGT applies the GT predicate on the "stderr" field.
+func StderrGT(v string) predicate.CodingSubmissionStaffData {
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldStderr), v))
+	})
+}
+
+// StderrGTE applies the GTE predicate on the "stderr" field.
+func StderrGTE(v string) predicate.CodingSubmissionStaffData {
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldStderr), v))
+	})
+}
+
+// StderrLT applies the LT predicate on the "stderr" field.
+func StderrLT(v string) predicate.CodingSubmissionStaffData {
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldStderr), v))
+	})
+}
+
+// StderrLTE applies the LTE predicate on the "stderr" field.
+func StderrLTE(v string) predicate.CodingSubmissionStaffData {
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldStderr), v))
+	})
+}
+
+// StderrContains applies the Contains predicate on the "stderr" field.
+func StderrContains(v string) predicate.CodingSubmissionStaffData {
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldStderr), v))
+	})
+}
+
+// StderrHasPrefix applies the HasPrefix predicate on the "stderr" field.
+func StderrHasPrefix(v string) predicate.CodingSubmissionStaffData {
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldStderr), v))
+	})
+}
+
+// StderrHasSuffix applies the HasSuffix predicate on the "stderr" field.
+func StderrHasSuffix(v string) predicate.CodingSubmissionStaffData {
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldStderr), v))
+	})
+}
+
+// StderrIsNil applies the IsNil predicate on the "stderr" field.
+func StderrIsNil() predicate.CodingSubmissionStaffData {
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldStderr)))
+	})
+}
+
+// StderrNotNil applies the NotNil predicate on the "stderr" field.
+func StderrNotNil() predicate.CodingSubmissionStaffData {
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldStderr)))
+	})
+}
+
+// StderrEqualFold applies the EqualFold predicate on the "stderr" field.
+func StderrEqualFold(v string) predicate.CodingSubmissionStaffData {
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldStderr), v))
+	})
+}
+
+// StderrContainsFold applies the ContainsFold predicate on the "stderr" field.
+func StderrContainsFold(v string) predicate.CodingSubmissionStaffData {
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldStderr), v))
+	})
+}
+
+// ExitErrorEQ applies the EQ predicate on the "exit_error" field.
+func ExitErrorEQ(v string) predicate.CodingSubmissionStaffData {
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldExitError), v))
+	})
+}
+
+// ExitErrorNEQ applies the NEQ predicate on the "exit_error" field.
+func ExitErrorNEQ(v string) predicate.CodingSubmissionStaffData {
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldExitError), v))
+	})
+}
+
+// ExitErrorIn applies the In predicate on the "exit_error" field.
+func ExitErrorIn(vs ...string) predicate.CodingSubmissionStaffData {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldExitError), v...))
+	})
+}
+
+// ExitErrorNotIn applies the NotIn predicate on the "exit_error" field.
+func ExitErrorNotIn(vs ...string) predicate.CodingSubmissionStaffData {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldExitError), v...))
+	})
+}
+
+// ExitErrorGT applies the GT predicate on the "exit_error" field.
+func ExitErrorGT(v string) predicate.CodingSubmissionStaffData {
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldExitError), v))
+	})
+}
+
+// ExitErrorGTE applies the GTE predicate on the "exit_error" field.
+func ExitErrorGTE(v string) predicate.CodingSubmissionStaffData {
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldExitError), v))
+	})
+}
+
+// ExitErrorLT applies the LT predicate on the "exit_error" field.
+func ExitErrorLT(v string) predicate.CodingSubmissionStaffData {
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldExitError), v))
+	})
+}
+
+// ExitErrorLTE applies the LTE predicate on the "exit_error" field.
+func ExitErrorLTE(v string) predicate.CodingSubmissionStaffData {
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldExitError), v))
+	})
+}
+
+// ExitErrorContains applies the Contains predicate on the "exit_error" field.
+func ExitErrorContains(v string) predicate.CodingSubmissionStaffData {
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldExitError), v))
+	})
+}
+
+// ExitErrorHasPrefix applies the HasPrefix predicate on the "exit_error" field.
+func ExitErrorHasPrefix(v string) predicate.CodingSubmissionStaffData {
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldExitError), v))
+	})
+}
+
+// ExitErrorHasSuffix applies the HasSuffix predicate on the "exit_error" field.
+func ExitErrorHasSuffix(v string) predicate.CodingSubmissionStaffData {
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldExitError), v))
+	})
+}
+
+// ExitErrorIsNil applies the IsNil predicate on the "exit_error" field.
+func ExitErrorIsNil() predicate.CodingSubmissionStaffData {
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldExitError)))
+	})
+}
+
+// ExitErrorNotNil applies the NotNil predicate on the "exit_error" field.
+func ExitErrorNotNil() predicate.CodingSubmissionStaffData {
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldExitError)))
+	})
+}
+
+// ExitErrorEqualFold applies the EqualFold predicate on the "exit_error" field.
+func ExitErrorEqualFold(v string) predicate.CodingSubmissionStaffData {
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldExitError), v))
+	})
+}
+
+// ExitErrorContainsFold applies the ContainsFold predicate on the "exit_error" field.
+func ExitErrorContainsFold(v string) predicate.CodingSubmissionStaffData {
+	return predicate.CodingSubmissionStaffData(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldExitError), v))
 	})
 }
 

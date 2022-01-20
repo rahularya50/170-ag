@@ -133,6 +133,8 @@ var (
 		{Name: "execution_id", Type: field.TypeInt64, Nullable: true},
 		{Name: "input", Type: field.TypeString, Size: 2147483647},
 		{Name: "output", Type: field.TypeString, Nullable: true, Size: 65535},
+		{Name: "stderr", Type: field.TypeString, Nullable: true, Size: 65535},
+		{Name: "exit_error", Type: field.TypeString, Nullable: true, Size: 65535},
 	}
 	// CodingSubmissionStaffDataTable holds the schema information for the "coding_submission_staff_data" table.
 	CodingSubmissionStaffDataTable = &schema.Table{

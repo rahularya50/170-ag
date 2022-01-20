@@ -93,6 +93,8 @@ var schemaGraph = func() *sqlgraph.Schema {
 			codingsubmissionstaffdata.FieldExecutionID: {Type: field.TypeInt64, Column: codingsubmissionstaffdata.FieldExecutionID},
 			codingsubmissionstaffdata.FieldInput:       {Type: field.TypeString, Column: codingsubmissionstaffdata.FieldInput},
 			codingsubmissionstaffdata.FieldOutput:      {Type: field.TypeString, Column: codingsubmissionstaffdata.FieldOutput},
+			codingsubmissionstaffdata.FieldStderr:      {Type: field.TypeString, Column: codingsubmissionstaffdata.FieldStderr},
+			codingsubmissionstaffdata.FieldExitError:   {Type: field.TypeString, Column: codingsubmissionstaffdata.FieldExitError},
 		},
 	}
 	graph.Nodes[5] = &sqlgraph.Node{
@@ -621,6 +623,16 @@ func (f *CodingSubmissionStaffDataFilter) WhereInput(p entql.StringP) {
 // WhereOutput applies the entql string predicate on the output field.
 func (f *CodingSubmissionStaffDataFilter) WhereOutput(p entql.StringP) {
 	f.Where(p.Field(codingsubmissionstaffdata.FieldOutput))
+}
+
+// WhereStderr applies the entql string predicate on the stderr field.
+func (f *CodingSubmissionStaffDataFilter) WhereStderr(p entql.StringP) {
+	f.Where(p.Field(codingsubmissionstaffdata.FieldStderr))
+}
+
+// WhereExitError applies the entql string predicate on the exit_error field.
+func (f *CodingSubmissionStaffDataFilter) WhereExitError(p entql.StringP) {
+	f.Where(p.Field(codingsubmissionstaffdata.FieldExitError))
 }
 
 // WhereHasCodingSubmission applies a predicate to check if query has an edge coding_submission.

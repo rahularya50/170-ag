@@ -62,6 +62,8 @@ ENTRYPOINT ["/webserver"]
 FROM alpine AS judge
 RUN apk add --no-cache ca-certificates
 
+RUN apk update && apk add python3-dev gcc g++ libc-dev
+
 WORKDIR /
 
 COPY --from=gobuild /judge /judge

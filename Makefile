@@ -30,4 +30,4 @@ connect-db:
 	./cloud_sql_proxy -enable_iam_login -instances=formidable-gate-337712:us-west2:cs170-db=tcp:5432
 
 enter-db:
-	psql --host=localhost --port=5432 --user=rahularya50@gmail.com --dbname=autograder
+	psql --host=localhost --port=5432 --user=autograder-web@formidable-gate-337712.iam --dbname=autograder

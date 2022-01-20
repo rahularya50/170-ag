@@ -56,6 +56,34 @@ func (cssdc *CodingSubmissionStaffDataCreate) SetNillableOutput(s *string) *Codi
 	return cssdc
 }
 
+// SetStderr sets the "stderr" field.
+func (cssdc *CodingSubmissionStaffDataCreate) SetStderr(s string) *CodingSubmissionStaffDataCreate {
+	cssdc.mutation.SetStderr(s)
+	return cssdc
+}
+
+// SetNillableStderr sets the "stderr" field if the given value is not nil.
+func (cssdc *CodingSubmissionStaffDataCreate) SetNillableStderr(s *string) *CodingSubmissionStaffDataCreate {
+	if s != nil {
+		cssdc.SetStderr(*s)
+	}
+	return cssdc
+}
+
+// SetExitError sets the "exit_error" field.
+func (cssdc *CodingSubmissionStaffDataCreate) SetExitError(s string) *CodingSubmissionStaffDataCreate {
+	cssdc.mutation.SetExitError(s)
+	return cssdc
+}
+
+// SetNillableExitError sets the "exit_error" field if the given value is not nil.
+func (cssdc *CodingSubmissionStaffDataCreate) SetNillableExitError(s *string) *CodingSubmissionStaffDataCreate {
+	if s != nil {
+		cssdc.SetExitError(*s)
+	}
+	return cssdc
+}
+
 // SetCodingSubmissionID sets the "coding_submission" edge to the CodingSubmission entity by ID.
 func (cssdc *CodingSubmissionStaffDataCreate) SetCodingSubmissionID(id int) *CodingSubmissionStaffDataCreate {
 	cssdc.mutation.SetCodingSubmissionID(id)
@@ -145,6 +173,16 @@ func (cssdc *CodingSubmissionStaffDataCreate) check() error {
 			return &ValidationError{Name: "output", err: fmt.Errorf(`generated: validator failed for field "output": %w`, err)}
 		}
 	}
+	if v, ok := cssdc.mutation.Stderr(); ok {
+		if err := codingsubmissionstaffdata.StderrValidator(v); err != nil {
+			return &ValidationError{Name: "stderr", err: fmt.Errorf(`generated: validator failed for field "stderr": %w`, err)}
+		}
+	}
+	if v, ok := cssdc.mutation.ExitError(); ok {
+		if err := codingsubmissionstaffdata.ExitErrorValidator(v); err != nil {
+			return &ValidationError{Name: "exit_error", err: fmt.Errorf(`generated: validator failed for field "exit_error": %w`, err)}
+		}
+	}
 	if _, ok := cssdc.mutation.CodingSubmissionID(); !ok {
 		return &ValidationError{Name: "coding_submission", err: errors.New("generated: missing required edge \"coding_submission\"")}
 	}
@@ -199,6 +237,22 @@ func (cssdc *CodingSubmissionStaffDataCreate) createSpec() (*CodingSubmissionSta
 			Column: codingsubmissionstaffdata.FieldOutput,
 		})
 		_node.Output = &value
+	}
+	if value, ok := cssdc.mutation.Stderr(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: codingsubmissionstaffdata.FieldStderr,
+		})
+		_node.Stderr = &value
+	}
+	if value, ok := cssdc.mutation.ExitError(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: codingsubmissionstaffdata.FieldExitError,
+		})
+		_node.ExitError = &value
 	}
 	if nodes := cssdc.mutation.CodingSubmissionIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -321,6 +375,42 @@ func (u *CodingSubmissionStaffDataUpsert) ClearOutput() *CodingSubmissionStaffDa
 	return u
 }
 
+// SetStderr sets the "stderr" field.
+func (u *CodingSubmissionStaffDataUpsert) SetStderr(v string) *CodingSubmissionStaffDataUpsert {
+	u.Set(codingsubmissionstaffdata.FieldStderr, v)
+	return u
+}
+
+// UpdateStderr sets the "stderr" field to the value that was provided on create.
+func (u *CodingSubmissionStaffDataUpsert) UpdateStderr() *CodingSubmissionStaffDataUpsert {
+	u.SetExcluded(codingsubmissionstaffdata.FieldStderr)
+	return u
+}
+
+// ClearStderr clears the value of the "stderr" field.
+func (u *CodingSubmissionStaffDataUpsert) ClearStderr() *CodingSubmissionStaffDataUpsert {
+	u.SetNull(codingsubmissionstaffdata.FieldStderr)
+	return u
+}
+
+// SetExitError sets the "exit_error" field.
+func (u *CodingSubmissionStaffDataUpsert) SetExitError(v string) *CodingSubmissionStaffDataUpsert {
+	u.Set(codingsubmissionstaffdata.FieldExitError, v)
+	return u
+}
+
+// UpdateExitError sets the "exit_error" field to the value that was provided on create.
+func (u *CodingSubmissionStaffDataUpsert) UpdateExitError() *CodingSubmissionStaffDataUpsert {
+	u.SetExcluded(codingsubmissionstaffdata.FieldExitError)
+	return u
+}
+
+// ClearExitError clears the value of the "exit_error" field.
+func (u *CodingSubmissionStaffDataUpsert) ClearExitError() *CodingSubmissionStaffDataUpsert {
+	u.SetNull(codingsubmissionstaffdata.FieldExitError)
+	return u
+}
+
 // UpdateNewValues updates the fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
@@ -416,6 +506,48 @@ func (u *CodingSubmissionStaffDataUpsertOne) UpdateOutput() *CodingSubmissionSta
 func (u *CodingSubmissionStaffDataUpsertOne) ClearOutput() *CodingSubmissionStaffDataUpsertOne {
 	return u.Update(func(s *CodingSubmissionStaffDataUpsert) {
 		s.ClearOutput()
+	})
+}
+
+// SetStderr sets the "stderr" field.
+func (u *CodingSubmissionStaffDataUpsertOne) SetStderr(v string) *CodingSubmissionStaffDataUpsertOne {
+	return u.Update(func(s *CodingSubmissionStaffDataUpsert) {
+		s.SetStderr(v)
+	})
+}
+
+// UpdateStderr sets the "stderr" field to the value that was provided on create.
+func (u *CodingSubmissionStaffDataUpsertOne) UpdateStderr() *CodingSubmissionStaffDataUpsertOne {
+	return u.Update(func(s *CodingSubmissionStaffDataUpsert) {
+		s.UpdateStderr()
+	})
+}
+
+// ClearStderr clears the value of the "stderr" field.
+func (u *CodingSubmissionStaffDataUpsertOne) ClearStderr() *CodingSubmissionStaffDataUpsertOne {
+	return u.Update(func(s *CodingSubmissionStaffDataUpsert) {
+		s.ClearStderr()
+	})
+}
+
+// SetExitError sets the "exit_error" field.
+func (u *CodingSubmissionStaffDataUpsertOne) SetExitError(v string) *CodingSubmissionStaffDataUpsertOne {
+	return u.Update(func(s *CodingSubmissionStaffDataUpsert) {
+		s.SetExitError(v)
+	})
+}
+
+// UpdateExitError sets the "exit_error" field to the value that was provided on create.
+func (u *CodingSubmissionStaffDataUpsertOne) UpdateExitError() *CodingSubmissionStaffDataUpsertOne {
+	return u.Update(func(s *CodingSubmissionStaffDataUpsert) {
+		s.UpdateExitError()
+	})
+}
+
+// ClearExitError clears the value of the "exit_error" field.
+func (u *CodingSubmissionStaffDataUpsertOne) ClearExitError() *CodingSubmissionStaffDataUpsertOne {
+	return u.Update(func(s *CodingSubmissionStaffDataUpsert) {
+		s.ClearExitError()
 	})
 }
 
@@ -675,6 +807,48 @@ func (u *CodingSubmissionStaffDataUpsertBulk) UpdateOutput() *CodingSubmissionSt
 func (u *CodingSubmissionStaffDataUpsertBulk) ClearOutput() *CodingSubmissionStaffDataUpsertBulk {
 	return u.Update(func(s *CodingSubmissionStaffDataUpsert) {
 		s.ClearOutput()
+	})
+}
+
+// SetStderr sets the "stderr" field.
+func (u *CodingSubmissionStaffDataUpsertBulk) SetStderr(v string) *CodingSubmissionStaffDataUpsertBulk {
+	return u.Update(func(s *CodingSubmissionStaffDataUpsert) {
+		s.SetStderr(v)
+	})
+}
+
+// UpdateStderr sets the "stderr" field to the value that was provided on create.
+func (u *CodingSubmissionStaffDataUpsertBulk) UpdateStderr() *CodingSubmissionStaffDataUpsertBulk {
+	return u.Update(func(s *CodingSubmissionStaffDataUpsert) {
+		s.UpdateStderr()
+	})
+}
+
+// ClearStderr clears the value of the "stderr" field.
+func (u *CodingSubmissionStaffDataUpsertBulk) ClearStderr() *CodingSubmissionStaffDataUpsertBulk {
+	return u.Update(func(s *CodingSubmissionStaffDataUpsert) {
+		s.ClearStderr()
+	})
+}
+
+// SetExitError sets the "exit_error" field.
+func (u *CodingSubmissionStaffDataUpsertBulk) SetExitError(v string) *CodingSubmissionStaffDataUpsertBulk {
+	return u.Update(func(s *CodingSubmissionStaffDataUpsert) {
+		s.SetExitError(v)
+	})
+}
+
+// UpdateExitError sets the "exit_error" field to the value that was provided on create.
+func (u *CodingSubmissionStaffDataUpsertBulk) UpdateExitError() *CodingSubmissionStaffDataUpsertBulk {
+	return u.Update(func(s *CodingSubmissionStaffDataUpsert) {
+		s.UpdateExitError()
+	})
+}
+
+// ClearExitError clears the value of the "exit_error" field.
+func (u *CodingSubmissionStaffDataUpsertBulk) ClearExitError() *CodingSubmissionStaffDataUpsertBulk {
+	return u.Update(func(s *CodingSubmissionStaffDataUpsert) {
+		s.ClearExitError()
 	})
 }
 

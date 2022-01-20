@@ -94,7 +94,8 @@ input CodingProblemInput {
   released: Boolean!
 }
 
-type CodingProblemStaffData {
+type CodingProblemStaffData implements Node {
+  id: ID!
   input: String!
   coding_problem: CodingProblem!
 }
@@ -143,9 +144,12 @@ type CodingSubmissionEdge {
   cursor: Cursor!
 }
 
-type CodingSubmissionStaffData {
+type CodingSubmissionStaffData implements Node {
+  id: ID!
   execution_id: String
   input: String!
   output: String
   coding_submission: CodingSubmission!
+  stderr: String
+  exit_error: String
 }

@@ -81,6 +81,46 @@ func (cssdu *CodingSubmissionStaffDataUpdate) ClearOutput() *CodingSubmissionSta
 	return cssdu
 }
 
+// SetStderr sets the "stderr" field.
+func (cssdu *CodingSubmissionStaffDataUpdate) SetStderr(s string) *CodingSubmissionStaffDataUpdate {
+	cssdu.mutation.SetStderr(s)
+	return cssdu
+}
+
+// SetNillableStderr sets the "stderr" field if the given value is not nil.
+func (cssdu *CodingSubmissionStaffDataUpdate) SetNillableStderr(s *string) *CodingSubmissionStaffDataUpdate {
+	if s != nil {
+		cssdu.SetStderr(*s)
+	}
+	return cssdu
+}
+
+// ClearStderr clears the value of the "stderr" field.
+func (cssdu *CodingSubmissionStaffDataUpdate) ClearStderr() *CodingSubmissionStaffDataUpdate {
+	cssdu.mutation.ClearStderr()
+	return cssdu
+}
+
+// SetExitError sets the "exit_error" field.
+func (cssdu *CodingSubmissionStaffDataUpdate) SetExitError(s string) *CodingSubmissionStaffDataUpdate {
+	cssdu.mutation.SetExitError(s)
+	return cssdu
+}
+
+// SetNillableExitError sets the "exit_error" field if the given value is not nil.
+func (cssdu *CodingSubmissionStaffDataUpdate) SetNillableExitError(s *string) *CodingSubmissionStaffDataUpdate {
+	if s != nil {
+		cssdu.SetExitError(*s)
+	}
+	return cssdu
+}
+
+// ClearExitError clears the value of the "exit_error" field.
+func (cssdu *CodingSubmissionStaffDataUpdate) ClearExitError() *CodingSubmissionStaffDataUpdate {
+	cssdu.mutation.ClearExitError()
+	return cssdu
+}
+
 // SetCodingSubmissionID sets the "coding_submission" edge to the CodingSubmission entity by ID.
 func (cssdu *CodingSubmissionStaffDataUpdate) SetCodingSubmissionID(id int) *CodingSubmissionStaffDataUpdate {
 	cssdu.mutation.SetCodingSubmissionID(id)
@@ -170,6 +210,16 @@ func (cssdu *CodingSubmissionStaffDataUpdate) check() error {
 			return &ValidationError{Name: "output", err: fmt.Errorf("generated: validator failed for field \"output\": %w", err)}
 		}
 	}
+	if v, ok := cssdu.mutation.Stderr(); ok {
+		if err := codingsubmissionstaffdata.StderrValidator(v); err != nil {
+			return &ValidationError{Name: "stderr", err: fmt.Errorf("generated: validator failed for field \"stderr\": %w", err)}
+		}
+	}
+	if v, ok := cssdu.mutation.ExitError(); ok {
+		if err := codingsubmissionstaffdata.ExitErrorValidator(v); err != nil {
+			return &ValidationError{Name: "exit_error", err: fmt.Errorf("generated: validator failed for field \"exit_error\": %w", err)}
+		}
+	}
 	if _, ok := cssdu.mutation.CodingSubmissionID(); cssdu.mutation.CodingSubmissionCleared() && !ok {
 		return errors.New("generated: clearing a required unique edge \"coding_submission\"")
 	}
@@ -232,6 +282,32 @@ func (cssdu *CodingSubmissionStaffDataUpdate) sqlSave(ctx context.Context) (n in
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Column: codingsubmissionstaffdata.FieldOutput,
+		})
+	}
+	if value, ok := cssdu.mutation.Stderr(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: codingsubmissionstaffdata.FieldStderr,
+		})
+	}
+	if cssdu.mutation.StderrCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: codingsubmissionstaffdata.FieldStderr,
+		})
+	}
+	if value, ok := cssdu.mutation.ExitError(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: codingsubmissionstaffdata.FieldExitError,
+		})
+	}
+	if cssdu.mutation.ExitErrorCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: codingsubmissionstaffdata.FieldExitError,
 		})
 	}
 	if cssdu.mutation.CodingSubmissionCleared() {
@@ -341,6 +417,46 @@ func (cssduo *CodingSubmissionStaffDataUpdateOne) ClearOutput() *CodingSubmissio
 	return cssduo
 }
 
+// SetStderr sets the "stderr" field.
+func (cssduo *CodingSubmissionStaffDataUpdateOne) SetStderr(s string) *CodingSubmissionStaffDataUpdateOne {
+	cssduo.mutation.SetStderr(s)
+	return cssduo
+}
+
+// SetNillableStderr sets the "stderr" field if the given value is not nil.
+func (cssduo *CodingSubmissionStaffDataUpdateOne) SetNillableStderr(s *string) *CodingSubmissionStaffDataUpdateOne {
+	if s != nil {
+		cssduo.SetStderr(*s)
+	}
+	return cssduo
+}
+
+// ClearStderr clears the value of the "stderr" field.
+func (cssduo *CodingSubmissionStaffDataUpdateOne) ClearStderr() *CodingSubmissionStaffDataUpdateOne {
+	cssduo.mutation.ClearStderr()
+	return cssduo
+}
+
+// SetExitError sets the "exit_error" field.
+func (cssduo *CodingSubmissionStaffDataUpdateOne) SetExitError(s string) *CodingSubmissionStaffDataUpdateOne {
+	cssduo.mutation.SetExitError(s)
+	return cssduo
+}
+
+// SetNillableExitError sets the "exit_error" field if the given value is not nil.
+func (cssduo *CodingSubmissionStaffDataUpdateOne) SetNillableExitError(s *string) *CodingSubmissionStaffDataUpdateOne {
+	if s != nil {
+		cssduo.SetExitError(*s)
+	}
+	return cssduo
+}
+
+// ClearExitError clears the value of the "exit_error" field.
+func (cssduo *CodingSubmissionStaffDataUpdateOne) ClearExitError() *CodingSubmissionStaffDataUpdateOne {
+	cssduo.mutation.ClearExitError()
+	return cssduo
+}
+
 // SetCodingSubmissionID sets the "coding_submission" edge to the CodingSubmission entity by ID.
 func (cssduo *CodingSubmissionStaffDataUpdateOne) SetCodingSubmissionID(id int) *CodingSubmissionStaffDataUpdateOne {
 	cssduo.mutation.SetCodingSubmissionID(id)
@@ -437,6 +553,16 @@ func (cssduo *CodingSubmissionStaffDataUpdateOne) check() error {
 			return &ValidationError{Name: "output", err: fmt.Errorf("generated: validator failed for field \"output\": %w", err)}
 		}
 	}
+	if v, ok := cssduo.mutation.Stderr(); ok {
+		if err := codingsubmissionstaffdata.StderrValidator(v); err != nil {
+			return &ValidationError{Name: "stderr", err: fmt.Errorf("generated: validator failed for field \"stderr\": %w", err)}
+		}
+	}
+	if v, ok := cssduo.mutation.ExitError(); ok {
+		if err := codingsubmissionstaffdata.ExitErrorValidator(v); err != nil {
+			return &ValidationError{Name: "exit_error", err: fmt.Errorf("generated: validator failed for field \"exit_error\": %w", err)}
+		}
+	}
 	if _, ok := cssduo.mutation.CodingSubmissionID(); cssduo.mutation.CodingSubmissionCleared() && !ok {
 		return errors.New("generated: clearing a required unique edge \"coding_submission\"")
 	}
@@ -516,6 +642,32 @@ func (cssduo *CodingSubmissionStaffDataUpdateOne) sqlSave(ctx context.Context) (
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Column: codingsubmissionstaffdata.FieldOutput,
+		})
+	}
+	if value, ok := cssduo.mutation.Stderr(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: codingsubmissionstaffdata.FieldStderr,
+		})
+	}
+	if cssduo.mutation.StderrCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: codingsubmissionstaffdata.FieldStderr,
+		})
+	}
+	if value, ok := cssduo.mutation.ExitError(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: codingsubmissionstaffdata.FieldExitError,
+		})
+	}
+	if cssduo.mutation.ExitErrorCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: codingsubmissionstaffdata.FieldExitError,
 		})
 	}
 	if cssduo.mutation.CodingSubmissionCleared() {

@@ -17,6 +17,10 @@ const (
 	FieldInput = "input"
 	// FieldOutput holds the string denoting the output field in the database.
 	FieldOutput = "output"
+	// FieldStderr holds the string denoting the stderr field in the database.
+	FieldStderr = "stderr"
+	// FieldExitError holds the string denoting the exit_error field in the database.
+	FieldExitError = "exit_error"
 	// EdgeCodingSubmission holds the string denoting the coding_submission edge name in mutations.
 	EdgeCodingSubmission = "coding_submission"
 	// Table holds the table name of the codingsubmissionstaffdata in the database.
@@ -36,6 +40,8 @@ var Columns = []string{
 	FieldExecutionID,
 	FieldInput,
 	FieldOutput,
+	FieldStderr,
+	FieldExitError,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -59,4 +65,8 @@ var (
 	Policy ent.Policy
 	// OutputValidator is a validator for the "output" field. It is called by the builders before save.
 	OutputValidator func(string) error
+	// StderrValidator is a validator for the "stderr" field. It is called by the builders before save.
+	StderrValidator func(string) error
+	// ExitErrorValidator is a validator for the "exit_error" field. It is called by the builders before save.
+	ExitErrorValidator func(string) error
 )
