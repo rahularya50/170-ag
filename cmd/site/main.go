@@ -1,7 +1,6 @@
 package main
 
 import (
-	ent "170-ag/ent/generated"
 	"170-ag/ent/generated/migrate"
 	_ "170-ag/ent/generated/runtime"
 	"170-ag/resolvers"
@@ -14,8 +13,6 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
-	_ "github.com/lib/pq"
-	_ "github.com/mattn/go-sqlite3"
 )
 
 const defaultPort = "8080"
@@ -26,23 +23,7 @@ func main() {
 		port = defaultPort
 	}
 
-	env := os.Getenv("ENV")
-
-	var client *ent.Client
-	var err error
-	if env == "dev" {
-		client, err = ent.Open(
-			"sqlite3",
-			"file:app.db?&_fk=1",
-		)
-	} else {
-		// This connects to the Cloud SQL Proxy on the same Pod, which has an encrypted connection to the actual db
-		// This is why it is OK for SSL to be disabled!
-		client, err = ent.Open(
-			"postgres",
-			"host=localhost port=5432 user=autograder-web@formidable-gate-337712.iam dbname=autograder sslmode=disable",
-		)
-	}
+	client, err := site.GetEntClient()
 	if err != nil {
 		log.Fatal("opening ent client", err)
 	}

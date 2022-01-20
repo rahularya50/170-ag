@@ -24,6 +24,7 @@ RUN make proto
 RUN make graphql
 RUN CGO_ENABLED=0 GOOS=linux go build -v -o /webserver ./cmd/site/
 RUN CGO_ENABLED=0 GOOS=linux go build -v -o /judge ./cmd/judge/
+RUN CGO_ENABLED=0 GOOS=linux go build -v -o /scaler ./cmd/scaler/
 
 # Compile frontend
 FROM node:16 as jsbuild
@@ -57,7 +58,7 @@ USER nonroot
 
 ENTRYPOINT ["/webserver"]
 
-# Start webserver
+# Start judge
 FROM alpine AS judge
 RUN apk add --no-cache ca-certificates
 
@@ -69,3 +70,16 @@ RUN adduser -D nonroot
 USER nonroot
 
 ENTRYPOINT ["/judge"]
+
+# Start judge scaler
+FROM alpine AS judge-scaler
+RUN apk add --no-cache ca-certificates
+
+WORKDIR /
+
+COPY --from=gobuild /scaler /scaler
+
+RUN adduser -D nonroot
+USER nonroot
+
+ENTRYPOINT ["/scaler"]

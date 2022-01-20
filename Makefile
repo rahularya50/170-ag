@@ -1,4 +1,4 @@
-.PHONY: ent graphql proto relay flow view
+.PHONY: ent graphql proto relay flow view connect-db enter-db
 
 # generate Go interfaces to interact with data models from Ent schema
 ent:
@@ -9,7 +9,7 @@ graphql:
 	go run github.com/99designs/gqlgen generate
 
 proto:
-	protoc -I proto/ --go_out . proto/*.proto
+	protoc -I proto/ --go_out . proto/*.proto --go-grpc_out .
 
 # compile graphQL fragments in frontend and generate Flow typings
 relay:
@@ -25,3 +25,9 @@ view: export ENV = dev
 
 view:
 	go run ./cmd/site
+
+connect-db:
+	./cloud_sql_proxy -enable_iam_login -instances=formidable-gate-337712:us-west2:cs170-db=tcp:5432
+
+enter-db:
+	psql --host=localhost --port=5432 --user=rahularya50@gmail.com --dbname=autograder

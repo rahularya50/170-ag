@@ -1,0 +1,22 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  env:
+    - "DOCKER_BUILDKIT=1"
+  entrypoint: 'bash'
+  args: ['-c', 'docker pull gcr.io/formidable-gate-337712/autograder-gobuild:latest || exit 0']
+- name: 'gcr.io/cloud-builders/docker'
+  env:
+    - "DOCKER_BUILDKIT=1"
+  args: [
+            'build',
+            '-t', 'gcr.io/formidable-gate-337712/autograder-gobuild:latest',
+            '--target', 'gobuild',
+            '--build-arg', 'BUILDKIT_INLINE_CACHE=1',
+            '--cache-from', 'gcr.io/formidable-gate-337712/autograder-gobuild:latest',
+            '.',
+        ]
+
+images: [
+  'gcr.io/formidable-gate-337712/autograder-gobuild:latest',
+]
+timeout: 1800s

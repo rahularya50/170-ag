@@ -93,6 +93,11 @@ var (
 				Unique:  false,
 				Columns: []*schema.Column{CodingSubmissionsColumns[4]},
 			},
+			{
+				Name:    "codingsubmission_status",
+				Unique:  false,
+				Columns: []*schema.Column{CodingSubmissionsColumns[2]},
+			},
 		},
 	}
 	// UsersColumns holds the columns for the "users" table.

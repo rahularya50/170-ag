@@ -1,12 +1,46 @@
-apiVersion: keda.sh/v1alpha1
-kind: TriggerAuthentication
+apiVersion: v1
+kind: Service
 metadata:
-  name: scaled-judge-trigger-credentials
+  name: judge-scaler
 spec:
-  secretTargetRef:
-  - parameter: GoogleApplicationCredentials
-    name: judge-secrets
-    key: "credentials.json"
+  ports:
+  - port: 6000
+    targetPort: 6000
+  selector:
+    app: judge-scaler
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: judge-scaler
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: judge-scaler
+  template:
+    metadata:
+      labels:
+        app: judge-scaler
+    spec:
+      containers:
+      - name: scaler
+        image: gcr.io/formidable-gate-337712/autograder-judge-scaler:latest
+        env:
+          - name: ENV
+            value: prod
+        ports:
+        - containerPort: 6000
+      - name: cloud-sql-proxy
+        image: gcr.io/cloudsql-docker/gce-proxy:1.28.0
+        command:
+          - "/cloud_sql_proxy"
+          - "-instances=formidable-gate-337712:us-west2:cs170-db=tcp:5432"
+          - "-enable_iam_login"
+          - "-ip_address_types=PRIVATE"
+        securityContext:
+          runAsNonRoot: true
+      serviceAccountName: autograder-web
 ---
 apiVersion: keda.sh/v1alpha1
 kind: ScaledJob
@@ -32,8 +66,6 @@ spec:
             env:
               - name: MODE
                 value: SUBSCRIBE
-              - name: GOOGLE_APPLICATION_CREDENTIALS
-                value: /secrets/credentials.json
           - name: judge-executor
             image: gcr.io/formidable-gate-337712/autograder-judge:latest
             volumeMounts:
@@ -68,10 +100,6 @@ spec:
   successfulJobsHistoryLimit: 5
   successfulJobsHistoryLimit: 5
   triggers:
-  - type: gcp-pubsub
-    metadata:
-      mode: SubscriptionSize
-      value: "1"
-      subscriptionName: judge
-    authenticationRef:
-      name: scaled-judge-trigger-credentials
+    - type: external
+      metadata:
+        scalerAddress: "judge-scaler.default.svc.cluster.local:6000"

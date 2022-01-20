@@ -7,3 +7,9 @@ message JudgingRequest {
   string input = 2;
   fixed64 id_nonce = 3;
 }
+
+message GetJudgingRequestParams {}
+
+service JudgingServer {
+  rpc GetJudgingRequest(GetJudgingRequestParams) returns (JudgingRequest) {}
+}
