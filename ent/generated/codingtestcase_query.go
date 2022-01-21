@@ -5,6 +5,7 @@ package generated
 import (
 	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/codingtestcase"
+	"170-ag/ent/generated/codingtestcasedata"
 	"170-ag/ent/generated/predicate"
 	"context"
 	"errors"
@@ -27,6 +28,7 @@ type CodingTestCaseQuery struct {
 	predicates []predicate.CodingTestCase
 	// eager-loading edges.
 	withCodingProblem *CodingProblemQuery
+	withData          *CodingTestCaseDataQuery
 	withFKs           bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -79,6 +81,28 @@ func (ctcq *CodingTestCaseQuery) QueryCodingProblem() *CodingProblemQuery {
 			sqlgraph.From(codingtestcase.Table, codingtestcase.FieldID, selector),
 			sqlgraph.To(codingproblem.Table, codingproblem.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, codingtestcase.CodingProblemTable, codingtestcase.CodingProblemColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(ctcq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryData chains the current query on the "data" edge.
+func (ctcq *CodingTestCaseQuery) QueryData() *CodingTestCaseDataQuery {
+	query := &CodingTestCaseDataQuery{config: ctcq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := ctcq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := ctcq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(codingtestcase.Table, codingtestcase.FieldID, selector),
+			sqlgraph.To(codingtestcasedata.Table, codingtestcasedata.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, codingtestcase.DataTable, codingtestcase.DataColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(ctcq.driver.Dialect(), step)
 		return fromU, nil
@@ -268,6 +292,7 @@ func (ctcq *CodingTestCaseQuery) Clone() *CodingTestCaseQuery {
 		order:             append([]OrderFunc{}, ctcq.order...),
 		predicates:        append([]predicate.CodingTestCase{}, ctcq.predicates...),
 		withCodingProblem: ctcq.withCodingProblem.Clone(),
+		withData:          ctcq.withData.Clone(),
 		// clone intermediate query.
 		sql:  ctcq.sql.Clone(),
 		path: ctcq.path,
@@ -285,18 +310,29 @@ func (ctcq *CodingTestCaseQuery) WithCodingProblem(opts ...func(*CodingProblemQu
 	return ctcq
 }
 
+// WithData tells the query-builder to eager-load the nodes that are connected to
+// the "data" edge. The optional arguments are used to configure the query builder of the edge.
+func (ctcq *CodingTestCaseQuery) WithData(opts ...func(*CodingTestCaseDataQuery)) *CodingTestCaseQuery {
+	query := &CodingTestCaseDataQuery{config: ctcq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	ctcq.withData = query
+	return ctcq
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
 // Example:
 //
 //	var v []struct {
-//		Input string `json:"input,omitempty"`
+//		Points int `json:"points,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.CodingTestCase.Query().
-//		GroupBy(codingtestcase.FieldInput).
+//		GroupBy(codingtestcase.FieldPoints).
 //		Aggregate(generated.Count()).
 //		Scan(ctx, &v)
 //
@@ -318,11 +354,11 @@ func (ctcq *CodingTestCaseQuery) GroupBy(field string, fields ...string) *Coding
 // Example:
 //
 //	var v []struct {
-//		Input string `json:"input,omitempty"`
+//		Points int `json:"points,omitempty"`
 //	}
 //
 //	client.CodingTestCase.Query().
-//		Select(codingtestcase.FieldInput).
+//		Select(codingtestcase.FieldPoints).
 //		Scan(ctx, &v)
 //
 func (ctcq *CodingTestCaseQuery) Select(fields ...string) *CodingTestCaseSelect {
@@ -357,11 +393,12 @@ func (ctcq *CodingTestCaseQuery) sqlAll(ctx context.Context) ([]*CodingTestCase,
 		nodes       = []*CodingTestCase{}
 		withFKs     = ctcq.withFKs
 		_spec       = ctcq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			ctcq.withCodingProblem != nil,
+			ctcq.withData != nil,
 		}
 	)
-	if ctcq.withCodingProblem != nil {
+	if ctcq.withCodingProblem != nil || ctcq.withData != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -412,6 +449,35 @@ func (ctcq *CodingTestCaseQuery) sqlAll(ctx context.Context) ([]*CodingTestCase,
 			}
 			for i := range nodes {
 				nodes[i].Edges.CodingProblem = n
+			}
+		}
+	}
+
+	if query := ctcq.withData; query != nil {
+		ids := make([]int, 0, len(nodes))
+		nodeids := make(map[int][]*CodingTestCase)
+		for i := range nodes {
+			if nodes[i].coding_test_case_data_test_case == nil {
+				continue
+			}
+			fk := *nodes[i].coding_test_case_data_test_case
+			if _, ok := nodeids[fk]; !ok {
+				ids = append(ids, fk)
+			}
+			nodeids[fk] = append(nodeids[fk], nodes[i])
+		}
+		query.Where(codingtestcasedata.IDIn(ids...))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			nodes, ok := nodeids[n.ID]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "coding_test_case_data_test_case" returned %v`, n.ID)
+			}
+			for i := range nodes {
+				nodes[i].Edges.Data = n
 			}
 		}
 	}

@@ -5,6 +5,7 @@ package generated
 import (
 	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/codingtestcase"
+	"170-ag/ent/generated/codingtestcasedata"
 	"fmt"
 	"strings"
 
@@ -16,27 +17,26 @@ type CodingTestCase struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// Input holds the value of the "input" field.
-	Input string `json:"input,omitempty"`
-	// Output holds the value of the "output" field.
-	Output string `json:"output,omitempty"`
 	// Points holds the value of the "points" field.
 	Points int `json:"points,omitempty"`
-	// Visible holds the value of the "visible" field.
-	Visible bool `json:"visible,omitempty"`
+	// Public holds the value of the "public" field.
+	Public bool `json:"public,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CodingTestCaseQuery when eager-loading is set.
-	Edges                     CodingTestCaseEdges `json:"edges"`
-	coding_problem_test_cases *int
+	Edges                           CodingTestCaseEdges `json:"edges"`
+	coding_problem_test_cases       *int
+	coding_test_case_data_test_case *int
 }
 
 // CodingTestCaseEdges holds the relations/edges for other nodes in the graph.
 type CodingTestCaseEdges struct {
 	// CodingProblem holds the value of the coding_problem edge.
 	CodingProblem *CodingProblem `json:"coding_problem,omitempty"`
+	// Data holds the value of the data edge.
+	Data *CodingTestCaseData `json:"data,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // CodingProblemOrErr returns the CodingProblem value or an error if the edge
@@ -53,18 +53,32 @@ func (e CodingTestCaseEdges) CodingProblemOrErr() (*CodingProblem, error) {
 	return nil, &NotLoadedError{edge: "coding_problem"}
 }
 
+// DataOrErr returns the Data value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e CodingTestCaseEdges) DataOrErr() (*CodingTestCaseData, error) {
+	if e.loadedTypes[1] {
+		if e.Data == nil {
+			// The edge data was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: codingtestcasedata.Label}
+		}
+		return e.Data, nil
+	}
+	return nil, &NotLoadedError{edge: "data"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*CodingTestCase) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case codingtestcase.FieldVisible:
+		case codingtestcase.FieldPublic:
 			values[i] = new(sql.NullBool)
 		case codingtestcase.FieldID, codingtestcase.FieldPoints:
 			values[i] = new(sql.NullInt64)
-		case codingtestcase.FieldInput, codingtestcase.FieldOutput:
-			values[i] = new(sql.NullString)
 		case codingtestcase.ForeignKeys[0]: // coding_problem_test_cases
+			values[i] = new(sql.NullInt64)
+		case codingtestcase.ForeignKeys[1]: // coding_test_case_data_test_case
 			values[i] = new(sql.NullInt64)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type CodingTestCase", columns[i])
@@ -87,29 +101,17 @@ func (ctc *CodingTestCase) assignValues(columns []string, values []interface{}) 
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			ctc.ID = int(value.Int64)
-		case codingtestcase.FieldInput:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field input", values[i])
-			} else if value.Valid {
-				ctc.Input = value.String
-			}
-		case codingtestcase.FieldOutput:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field output", values[i])
-			} else if value.Valid {
-				ctc.Output = value.String
-			}
 		case codingtestcase.FieldPoints:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field points", values[i])
 			} else if value.Valid {
 				ctc.Points = int(value.Int64)
 			}
-		case codingtestcase.FieldVisible:
+		case codingtestcase.FieldPublic:
 			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field visible", values[i])
+				return fmt.Errorf("unexpected type %T for field public", values[i])
 			} else if value.Valid {
-				ctc.Visible = value.Bool
+				ctc.Public = value.Bool
 			}
 		case codingtestcase.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -117,6 +119,13 @@ func (ctc *CodingTestCase) assignValues(columns []string, values []interface{}) 
 			} else if value.Valid {
 				ctc.coding_problem_test_cases = new(int)
 				*ctc.coding_problem_test_cases = int(value.Int64)
+			}
+		case codingtestcase.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field coding_test_case_data_test_case", value)
+			} else if value.Valid {
+				ctc.coding_test_case_data_test_case = new(int)
+				*ctc.coding_test_case_data_test_case = int(value.Int64)
 			}
 		}
 	}
@@ -126,6 +135,11 @@ func (ctc *CodingTestCase) assignValues(columns []string, values []interface{}) 
 // QueryCodingProblem queries the "coding_problem" edge of the CodingTestCase entity.
 func (ctc *CodingTestCase) QueryCodingProblem() *CodingProblemQuery {
 	return (&CodingTestCaseClient{config: ctc.config}).QueryCodingProblem(ctc)
+}
+
+// QueryData queries the "data" edge of the CodingTestCase entity.
+func (ctc *CodingTestCase) QueryData() *CodingTestCaseDataQuery {
+	return (&CodingTestCaseClient{config: ctc.config}).QueryData(ctc)
 }
 
 // Update returns a builder for updating this CodingTestCase.
@@ -151,14 +165,10 @@ func (ctc *CodingTestCase) String() string {
 	var builder strings.Builder
 	builder.WriteString("CodingTestCase(")
 	builder.WriteString(fmt.Sprintf("id=%v", ctc.ID))
-	builder.WriteString(", input=")
-	builder.WriteString(ctc.Input)
-	builder.WriteString(", output=")
-	builder.WriteString(ctc.Output)
 	builder.WriteString(", points=")
 	builder.WriteString(fmt.Sprintf("%v", ctc.Points))
-	builder.WriteString(", visible=")
-	builder.WriteString(fmt.Sprintf("%v", ctc.Visible))
+	builder.WriteString(", public=")
+	builder.WriteString(fmt.Sprintf("%v", ctc.Public))
 	builder.WriteByte(')')
 	return builder.String()
 }

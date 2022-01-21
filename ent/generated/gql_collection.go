@@ -123,9 +123,33 @@ func (ctc *CodingTestCaseQuery) collectField(ctx *graphql.OperationContext, fiel
 			ctc = ctc.WithCodingProblem(func(query *CodingProblemQuery) {
 				query.collectField(ctx, field)
 			})
+		case "data":
+			ctc = ctc.WithData(func(query *CodingTestCaseDataQuery) {
+				query.collectField(ctx, field)
+			})
 		}
 	}
 	return ctc
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (ctcd *CodingTestCaseDataQuery) CollectFields(ctx context.Context, satisfies ...string) *CodingTestCaseDataQuery {
+	if fc := graphql.GetFieldContext(ctx); fc != nil {
+		ctcd = ctcd.collectField(graphql.GetOperationContext(ctx), fc.Field, satisfies...)
+	}
+	return ctcd
+}
+
+func (ctcd *CodingTestCaseDataQuery) collectField(ctx *graphql.OperationContext, field graphql.CollectedField, satisfies ...string) *CodingTestCaseDataQuery {
+	for _, field := range graphql.CollectFields(ctx, field.Selections, satisfies) {
+		switch field.Name {
+		case "test_case":
+			ctcd = ctcd.WithTestCase(func(query *CodingTestCaseQuery) {
+				query.collectField(ctx, field)
+			})
+		}
+	}
+	return ctcd
 }
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.

@@ -92,20 +92,6 @@ func IDLTE(id int) predicate.CodingTestCase {
 	})
 }
 
-// Input applies equality check predicate on the "input" field. It's identical to InputEQ.
-func Input(v string) predicate.CodingTestCase {
-	return predicate.CodingTestCase(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldInput), v))
-	})
-}
-
-// Output applies equality check predicate on the "output" field. It's identical to OutputEQ.
-func Output(v string) predicate.CodingTestCase {
-	return predicate.CodingTestCase(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldOutput), v))
-	})
-}
-
 // Points applies equality check predicate on the "points" field. It's identical to PointsEQ.
 func Points(v int) predicate.CodingTestCase {
 	return predicate.CodingTestCase(func(s *sql.Selector) {
@@ -113,232 +99,10 @@ func Points(v int) predicate.CodingTestCase {
 	})
 }
 
-// Visible applies equality check predicate on the "visible" field. It's identical to VisibleEQ.
-func Visible(v bool) predicate.CodingTestCase {
+// Public applies equality check predicate on the "public" field. It's identical to PublicEQ.
+func Public(v bool) predicate.CodingTestCase {
 	return predicate.CodingTestCase(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldVisible), v))
-	})
-}
-
-// InputEQ applies the EQ predicate on the "input" field.
-func InputEQ(v string) predicate.CodingTestCase {
-	return predicate.CodingTestCase(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldInput), v))
-	})
-}
-
-// InputNEQ applies the NEQ predicate on the "input" field.
-func InputNEQ(v string) predicate.CodingTestCase {
-	return predicate.CodingTestCase(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldInput), v))
-	})
-}
-
-// InputIn applies the In predicate on the "input" field.
-func InputIn(vs ...string) predicate.CodingTestCase {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.CodingTestCase(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.In(s.C(FieldInput), v...))
-	})
-}
-
-// InputNotIn applies the NotIn predicate on the "input" field.
-func InputNotIn(vs ...string) predicate.CodingTestCase {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.CodingTestCase(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.NotIn(s.C(FieldInput), v...))
-	})
-}
-
-// InputGT applies the GT predicate on the "input" field.
-func InputGT(v string) predicate.CodingTestCase {
-	return predicate.CodingTestCase(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldInput), v))
-	})
-}
-
-// InputGTE applies the GTE predicate on the "input" field.
-func InputGTE(v string) predicate.CodingTestCase {
-	return predicate.CodingTestCase(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldInput), v))
-	})
-}
-
-// InputLT applies the LT predicate on the "input" field.
-func InputLT(v string) predicate.CodingTestCase {
-	return predicate.CodingTestCase(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldInput), v))
-	})
-}
-
-// InputLTE applies the LTE predicate on the "input" field.
-func InputLTE(v string) predicate.CodingTestCase {
-	return predicate.CodingTestCase(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldInput), v))
-	})
-}
-
-// InputContains applies the Contains predicate on the "input" field.
-func InputContains(v string) predicate.CodingTestCase {
-	return predicate.CodingTestCase(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldInput), v))
-	})
-}
-
-// InputHasPrefix applies the HasPrefix predicate on the "input" field.
-func InputHasPrefix(v string) predicate.CodingTestCase {
-	return predicate.CodingTestCase(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldInput), v))
-	})
-}
-
-// InputHasSuffix applies the HasSuffix predicate on the "input" field.
-func InputHasSuffix(v string) predicate.CodingTestCase {
-	return predicate.CodingTestCase(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldInput), v))
-	})
-}
-
-// InputEqualFold applies the EqualFold predicate on the "input" field.
-func InputEqualFold(v string) predicate.CodingTestCase {
-	return predicate.CodingTestCase(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldInput), v))
-	})
-}
-
-// InputContainsFold applies the ContainsFold predicate on the "input" field.
-func InputContainsFold(v string) predicate.CodingTestCase {
-	return predicate.CodingTestCase(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldInput), v))
-	})
-}
-
-// OutputEQ applies the EQ predicate on the "output" field.
-func OutputEQ(v string) predicate.CodingTestCase {
-	return predicate.CodingTestCase(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldOutput), v))
-	})
-}
-
-// OutputNEQ applies the NEQ predicate on the "output" field.
-func OutputNEQ(v string) predicate.CodingTestCase {
-	return predicate.CodingTestCase(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldOutput), v))
-	})
-}
-
-// OutputIn applies the In predicate on the "output" field.
-func OutputIn(vs ...string) predicate.CodingTestCase {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.CodingTestCase(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.In(s.C(FieldOutput), v...))
-	})
-}
-
-// OutputNotIn applies the NotIn predicate on the "output" field.
-func OutputNotIn(vs ...string) predicate.CodingTestCase {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.CodingTestCase(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.NotIn(s.C(FieldOutput), v...))
-	})
-}
-
-// OutputGT applies the GT predicate on the "output" field.
-func OutputGT(v string) predicate.CodingTestCase {
-	return predicate.CodingTestCase(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldOutput), v))
-	})
-}
-
-// OutputGTE applies the GTE predicate on the "output" field.
-func OutputGTE(v string) predicate.CodingTestCase {
-	return predicate.CodingTestCase(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldOutput), v))
-	})
-}
-
-// OutputLT applies the LT predicate on the "output" field.
-func OutputLT(v string) predicate.CodingTestCase {
-	return predicate.CodingTestCase(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldOutput), v))
-	})
-}
-
-// OutputLTE applies the LTE predicate on the "output" field.
-func OutputLTE(v string) predicate.CodingTestCase {
-	return predicate.CodingTestCase(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldOutput), v))
-	})
-}
-
-// OutputContains applies the Contains predicate on the "output" field.
-func OutputContains(v string) predicate.CodingTestCase {
-	return predicate.CodingTestCase(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldOutput), v))
-	})
-}
-
-// OutputHasPrefix applies the HasPrefix predicate on the "output" field.
-func OutputHasPrefix(v string) predicate.CodingTestCase {
-	return predicate.CodingTestCase(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldOutput), v))
-	})
-}
-
-// OutputHasSuffix applies the HasSuffix predicate on the "output" field.
-func OutputHasSuffix(v string) predicate.CodingTestCase {
-	return predicate.CodingTestCase(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldOutput), v))
-	})
-}
-
-// OutputEqualFold applies the EqualFold predicate on the "output" field.
-func OutputEqualFold(v string) predicate.CodingTestCase {
-	return predicate.CodingTestCase(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldOutput), v))
-	})
-}
-
-// OutputContainsFold applies the ContainsFold predicate on the "output" field.
-func OutputContainsFold(v string) predicate.CodingTestCase {
-	return predicate.CodingTestCase(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldOutput), v))
+		s.Where(sql.EQ(s.C(FieldPublic), v))
 	})
 }
 
@@ -418,17 +182,17 @@ func PointsLTE(v int) predicate.CodingTestCase {
 	})
 }
 
-// VisibleEQ applies the EQ predicate on the "visible" field.
-func VisibleEQ(v bool) predicate.CodingTestCase {
+// PublicEQ applies the EQ predicate on the "public" field.
+func PublicEQ(v bool) predicate.CodingTestCase {
 	return predicate.CodingTestCase(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldVisible), v))
+		s.Where(sql.EQ(s.C(FieldPublic), v))
 	})
 }
 
-// VisibleNEQ applies the NEQ predicate on the "visible" field.
-func VisibleNEQ(v bool) predicate.CodingTestCase {
+// PublicNEQ applies the NEQ predicate on the "public" field.
+func PublicNEQ(v bool) predicate.CodingTestCase {
 	return predicate.CodingTestCase(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldVisible), v))
+		s.Where(sql.NEQ(s.C(FieldPublic), v))
 	})
 }
 
@@ -451,6 +215,34 @@ func HasCodingProblemWith(preds ...predicate.CodingProblem) predicate.CodingTest
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(CodingProblemInverseTable, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, CodingProblemTable, CodingProblemColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasData applies the HasEdge predicate on the "data" edge.
+func HasData() predicate.CodingTestCase {
+	return predicate.CodingTestCase(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(DataTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, DataTable, DataColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasDataWith applies the HasEdge predicate on the "data" edge with a given conditions (other predicates).
+func HasDataWith(preds ...predicate.CodingTestCaseData) predicate.CodingTestCase {
+	return predicate.CodingTestCase(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(DataInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, DataTable, DataColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

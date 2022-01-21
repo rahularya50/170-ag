@@ -8,6 +8,7 @@ import (
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/codingsubmissionstaffdata"
 	"170-ag/ent/generated/codingtestcase"
+	"170-ag/ent/generated/codingtestcasedata"
 	"170-ag/ent/generated/predicate"
 	"170-ag/ent/generated/user"
 
@@ -19,7 +20,7 @@ import (
 
 // schemaGraph holds a representation of ent/schema at runtime.
 var schemaGraph = func() *sqlgraph.Schema {
-	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 6)}
+	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 7)}
 	graph.Nodes[0] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   codingdraft.Table,
@@ -94,13 +95,26 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "CodingTestCase",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			codingtestcase.FieldInput:   {Type: field.TypeString, Column: codingtestcase.FieldInput},
-			codingtestcase.FieldOutput:  {Type: field.TypeString, Column: codingtestcase.FieldOutput},
-			codingtestcase.FieldPoints:  {Type: field.TypeInt, Column: codingtestcase.FieldPoints},
-			codingtestcase.FieldVisible: {Type: field.TypeBool, Column: codingtestcase.FieldVisible},
+			codingtestcase.FieldPoints: {Type: field.TypeInt, Column: codingtestcase.FieldPoints},
+			codingtestcase.FieldPublic: {Type: field.TypeBool, Column: codingtestcase.FieldPublic},
 		},
 	}
 	graph.Nodes[5] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   codingtestcasedata.Table,
+			Columns: codingtestcasedata.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: codingtestcasedata.FieldID,
+			},
+		},
+		Type: "CodingTestCaseData",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			codingtestcasedata.FieldInput:  {Type: field.TypeString, Column: codingtestcasedata.FieldInput},
+			codingtestcasedata.FieldOutput: {Type: field.TypeString, Column: codingtestcasedata.FieldOutput},
+		},
+	}
+	graph.Nodes[6] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   user.Table,
 			Columns: user.Columns,
@@ -235,6 +249,30 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		"CodingTestCase",
 		"CodingProblem",
+	)
+	graph.MustAddE(
+		"data",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   codingtestcase.DataTable,
+			Columns: []string{codingtestcase.DataColumn},
+			Bidi:    false,
+		},
+		"CodingTestCase",
+		"CodingTestCaseData",
+	)
+	graph.MustAddE(
+		"test_case",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   codingtestcasedata.TestCaseTable,
+			Columns: []string{codingtestcasedata.TestCaseColumn},
+			Bidi:    false,
+		},
+		"CodingTestCaseData",
+		"CodingTestCase",
 	)
 	graph.MustAddE(
 		"drafts",
@@ -633,24 +671,14 @@ func (f *CodingTestCaseFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(codingtestcase.FieldID))
 }
 
-// WhereInput applies the entql string predicate on the input field.
-func (f *CodingTestCaseFilter) WhereInput(p entql.StringP) {
-	f.Where(p.Field(codingtestcase.FieldInput))
-}
-
-// WhereOutput applies the entql string predicate on the output field.
-func (f *CodingTestCaseFilter) WhereOutput(p entql.StringP) {
-	f.Where(p.Field(codingtestcase.FieldOutput))
-}
-
 // WherePoints applies the entql int predicate on the points field.
 func (f *CodingTestCaseFilter) WherePoints(p entql.IntP) {
 	f.Where(p.Field(codingtestcase.FieldPoints))
 }
 
-// WhereVisible applies the entql bool predicate on the visible field.
-func (f *CodingTestCaseFilter) WhereVisible(p entql.BoolP) {
-	f.Where(p.Field(codingtestcase.FieldVisible))
+// WherePublic applies the entql bool predicate on the public field.
+func (f *CodingTestCaseFilter) WherePublic(p entql.BoolP) {
+	f.Where(p.Field(codingtestcase.FieldPublic))
 }
 
 // WhereHasCodingProblem applies a predicate to check if query has an edge coding_problem.
@@ -661,6 +689,83 @@ func (f *CodingTestCaseFilter) WhereHasCodingProblem() {
 // WhereHasCodingProblemWith applies a predicate to check if query has an edge coding_problem with a given conditions (other predicates).
 func (f *CodingTestCaseFilter) WhereHasCodingProblemWith(preds ...predicate.CodingProblem) {
 	f.Where(entql.HasEdgeWith("coding_problem", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasData applies a predicate to check if query has an edge data.
+func (f *CodingTestCaseFilter) WhereHasData() {
+	f.Where(entql.HasEdge("data"))
+}
+
+// WhereHasDataWith applies a predicate to check if query has an edge data with a given conditions (other predicates).
+func (f *CodingTestCaseFilter) WhereHasDataWith(preds ...predicate.CodingTestCaseData) {
+	f.Where(entql.HasEdgeWith("data", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (ctcdq *CodingTestCaseDataQuery) addPredicate(pred func(s *sql.Selector)) {
+	ctcdq.predicates = append(ctcdq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the CodingTestCaseDataQuery builder.
+func (ctcdq *CodingTestCaseDataQuery) Filter() *CodingTestCaseDataFilter {
+	return &CodingTestCaseDataFilter{ctcdq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *CodingTestCaseDataMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the CodingTestCaseDataMutation builder.
+func (m *CodingTestCaseDataMutation) Filter() *CodingTestCaseDataFilter {
+	return &CodingTestCaseDataFilter{m}
+}
+
+// CodingTestCaseDataFilter provides a generic filtering capability at runtime for CodingTestCaseDataQuery.
+type CodingTestCaseDataFilter struct {
+	predicateAdder
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *CodingTestCaseDataFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[5].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int predicate on the id field.
+func (f *CodingTestCaseDataFilter) WhereID(p entql.IntP) {
+	f.Where(p.Field(codingtestcasedata.FieldID))
+}
+
+// WhereInput applies the entql string predicate on the input field.
+func (f *CodingTestCaseDataFilter) WhereInput(p entql.StringP) {
+	f.Where(p.Field(codingtestcasedata.FieldInput))
+}
+
+// WhereOutput applies the entql string predicate on the output field.
+func (f *CodingTestCaseDataFilter) WhereOutput(p entql.StringP) {
+	f.Where(p.Field(codingtestcasedata.FieldOutput))
+}
+
+// WhereHasTestCase applies a predicate to check if query has an edge test_case.
+func (f *CodingTestCaseDataFilter) WhereHasTestCase() {
+	f.Where(entql.HasEdge("test_case"))
+}
+
+// WhereHasTestCaseWith applies a predicate to check if query has an edge test_case with a given conditions (other predicates).
+func (f *CodingTestCaseDataFilter) WhereHasTestCaseWith(preds ...predicate.CodingTestCase) {
+	f.Where(entql.HasEdgeWith("test_case", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}
@@ -695,7 +800,7 @@ type UserFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *UserFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[5].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[6].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})

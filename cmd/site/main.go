@@ -36,10 +36,9 @@ func main() {
 		log.Fatal("running schema migration", err)
 	}
 
-	srv := site.HandlerWithViewerContext(
-		handler.NewDefaultServer(resolvers.NewSchema(client)),
-		client,
-	)
+	var srv http.Handler = handler.NewDefaultServer(resolvers.NewSchema(client))
+	srv = site.HandlerWithViewerContext(srv, client)
+	srv = site.HandleWithEntClient(srv, client)
 
 	http.Handle("/playground", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)

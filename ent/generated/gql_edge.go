@@ -84,6 +84,22 @@ func (ctc *CodingTestCase) CodingProblem(ctx context.Context) (*CodingProblem, e
 	return result, err
 }
 
+func (ctc *CodingTestCase) Data(ctx context.Context) (*CodingTestCaseData, error) {
+	result, err := ctc.Edges.DataOrErr()
+	if IsNotLoaded(err) {
+		result, err = ctc.QueryData().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (ctcd *CodingTestCaseData) TestCase(ctx context.Context) (*CodingTestCase, error) {
+	result, err := ctcd.Edges.TestCaseOrErr()
+	if IsNotLoaded(err) {
+		result, err = ctcd.QueryTestCase().Only(ctx)
+	}
+	return result, err
+}
+
 func (u *User) Drafts(ctx context.Context) ([]*CodingDraft, error) {
 	result, err := u.Edges.DraftsOrErr()
 	if IsNotLoaded(err) {

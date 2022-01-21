@@ -2,6 +2,7 @@ package schema
 
 import (
 	"170-ag/ent/generated"
+	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/privacy"
 	"170-ag/privacyrules"
 	"context"
@@ -20,10 +21,8 @@ type CodingTestCase struct {
 // Fields of the CodingTestCase.
 func (CodingTestCase) Fields() []ent.Field {
 	return []ent.Field{
-		field.Text("input"),
-		field.Text("output"),
 		field.Int("points").NonNegative(),
-		field.Bool("visible"),
+		field.Bool("public"),
 	}
 }
 
@@ -35,22 +34,11 @@ func (CodingTestCase) Edges() []ent.Edge {
 			Ref("test_cases").
 			Required().
 			Annotations(entgql.Bind()),
+		edge.From("data", CodingTestCaseData.Type).
+			Unique().
+			Ref("test_case").
+			Annotations(entgql.Bind()),
 	}
-}
-
-func denyQueryIfCodingProblemsUnreleased() privacy.CodingTestCaseQueryRuleFunc {
-	return privacy.CodingTestCaseQueryRuleFunc(func(c context.Context, q *generated.CodingTestCaseQuery) error {
-		problems, err := q.Clone().QueryCodingProblem().All(privacy.DecisionContext(c, privacy.Allow))
-		if err != nil {
-			return privacy.Deny
-		}
-		for _, problem := range problems {
-			if !problem.Released {
-				return privacy.Deny
-			}
-		}
-		return privacy.Skip
-	})
 }
 
 func (CodingTestCase) Policy() ent.Policy {
@@ -61,12 +49,12 @@ func (CodingTestCase) Policy() ent.Policy {
 			privacy.AlwaysDenyRule(),
 		},
 		Query: privacy.QueryPolicy{
-			privacyrules.AllowQueryIfSubPolicyPasses(
-				denyQueryIfCodingProblemsUnreleased(),
-				privacyrules.AllowWithPrivacyAccessToken(privacyrules.SubmissionEnqueuingAccessToken),
-			),
-			privacyrules.DenyIfNoViewer(),
-			privacyrules.AllowIfViewerIsStaff(),
+			// test cases are visible iff their associated problem is visible (the test *data* is in a different ent)
+			privacyrules.AllowQueryIfDelegatesVisible(func(allow_ctx context.Context, q generated.Query) ([]int, error) {
+				return q.(*generated.CodingTestCaseQuery).QueryCodingProblem().IDs(allow_ctx)
+			}, func(client *generated.Client, ctx context.Context, ids []int) ([]int, error) {
+				return client.CodingProblem.Query().Where(codingproblem.IDIn(ids...)).IDs(ctx)
+			}),
 			privacy.AlwaysDenyRule(),
 		},
 	}

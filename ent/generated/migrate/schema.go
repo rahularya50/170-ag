@@ -132,11 +132,10 @@ var (
 	// CodingTestCasesColumns holds the columns for the "coding_test_cases" table.
 	CodingTestCasesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "input", Type: field.TypeString, Size: 2147483647},
-		{Name: "output", Type: field.TypeString, Size: 2147483647},
 		{Name: "points", Type: field.TypeInt},
-		{Name: "visible", Type: field.TypeBool},
+		{Name: "public", Type: field.TypeBool},
 		{Name: "coding_problem_test_cases", Type: field.TypeInt, Nullable: true},
+		{Name: "coding_test_case_data_test_case", Type: field.TypeInt, Unique: true, Nullable: true},
 	}
 	// CodingTestCasesTable holds the schema information for the "coding_test_cases" table.
 	CodingTestCasesTable = &schema.Table{
@@ -146,11 +145,29 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "coding_test_cases_coding_problems_test_cases",
-				Columns:    []*schema.Column{CodingTestCasesColumns[5]},
+				Columns:    []*schema.Column{CodingTestCasesColumns[3]},
 				RefColumns: []*schema.Column{CodingProblemsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
+			{
+				Symbol:     "coding_test_cases_coding_test_case_data_test_case",
+				Columns:    []*schema.Column{CodingTestCasesColumns[4]},
+				RefColumns: []*schema.Column{CodingTestCaseDataColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
 		},
+	}
+	// CodingTestCaseDataColumns holds the columns for the "coding_test_case_data" table.
+	CodingTestCaseDataColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "input", Type: field.TypeString, Size: 2147483647},
+		{Name: "output", Type: field.TypeString, Size: 2147483647},
+	}
+	// CodingTestCaseDataTable holds the schema information for the "coding_test_case_data" table.
+	CodingTestCaseDataTable = &schema.Table{
+		Name:       "coding_test_case_data",
+		Columns:    CodingTestCaseDataColumns,
+		PrimaryKey: []*schema.Column{CodingTestCaseDataColumns[0]},
 	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
@@ -179,6 +196,7 @@ var (
 		CodingSubmissionsTable,
 		CodingSubmissionStaffDataTable,
 		CodingTestCasesTable,
+		CodingTestCaseDataTable,
 		UsersTable,
 	}
 )
@@ -190,4 +208,5 @@ func init() {
 	CodingSubmissionsTable.ForeignKeys[1].RefTable = CodingProblemsTable
 	CodingSubmissionsTable.ForeignKeys[2].RefTable = CodingSubmissionStaffDataTable
 	CodingTestCasesTable.ForeignKeys[0].RefTable = CodingProblemsTable
+	CodingTestCasesTable.ForeignKeys[1].RefTable = CodingTestCaseDataTable
 }

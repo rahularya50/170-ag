@@ -284,6 +284,30 @@ func (f CodingTestCaseMutationRuleFunc) EvalMutation(ctx context.Context, m gene
 	return Denyf("generated/privacy: unexpected mutation type %T, expect *generated.CodingTestCaseMutation", m)
 }
 
+// The CodingTestCaseDataQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type CodingTestCaseDataQueryRuleFunc func(context.Context, *generated.CodingTestCaseDataQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f CodingTestCaseDataQueryRuleFunc) EvalQuery(ctx context.Context, q generated.Query) error {
+	if q, ok := q.(*generated.CodingTestCaseDataQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("generated/privacy: unexpected query type %T, expect *generated.CodingTestCaseDataQuery", q)
+}
+
+// The CodingTestCaseDataMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type CodingTestCaseDataMutationRuleFunc func(context.Context, *generated.CodingTestCaseDataMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f CodingTestCaseDataMutationRuleFunc) EvalMutation(ctx context.Context, m generated.Mutation) error {
+	if m, ok := m.(*generated.CodingTestCaseDataMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("generated/privacy: unexpected mutation type %T, expect *generated.CodingTestCaseDataMutation", m)
+}
+
 // The UserQueryRuleFunc type is an adapter to allow the use of ordinary
 // functions as a query rule.
 type UserQueryRuleFunc func(context.Context, *generated.UserQuery) error
@@ -353,6 +377,8 @@ func queryFilter(q generated.Query) (Filter, error) {
 		return q.Filter(), nil
 	case *generated.CodingTestCaseQuery:
 		return q.Filter(), nil
+	case *generated.CodingTestCaseDataQuery:
+		return q.Filter(), nil
 	case *generated.UserQuery:
 		return q.Filter(), nil
 	default:
@@ -371,6 +397,8 @@ func mutationFilter(m generated.Mutation) (Filter, error) {
 	case *generated.CodingSubmissionStaffDataMutation:
 		return m.Filter(), nil
 	case *generated.CodingTestCaseMutation:
+		return m.Filter(), nil
+	case *generated.CodingTestCaseDataMutation:
 		return m.Filter(), nil
 	case *generated.UserMutation:
 		return m.Filter(), nil

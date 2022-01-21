@@ -8,6 +8,7 @@ import (
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/codingsubmissionstaffdata"
 	"170-ag/ent/generated/codingtestcase"
+	"170-ag/ent/generated/codingtestcasedata"
 	"170-ag/ent/generated/user"
 	"170-ag/ent/schema"
 	"context"
@@ -114,9 +115,18 @@ func init() {
 	codingtestcaseFields := schema.CodingTestCase{}.Fields()
 	_ = codingtestcaseFields
 	// codingtestcaseDescPoints is the schema descriptor for points field.
-	codingtestcaseDescPoints := codingtestcaseFields[2].Descriptor()
+	codingtestcaseDescPoints := codingtestcaseFields[0].Descriptor()
 	// codingtestcase.PointsValidator is a validator for the "points" field. It is called by the builders before save.
 	codingtestcase.PointsValidator = codingtestcaseDescPoints.Validators[0].(func(int) error)
+	codingtestcasedata.Policy = privacy.NewPolicies(schema.CodingTestCaseData{})
+	codingtestcasedata.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := codingtestcasedata.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
 	user.Policy = privacy.NewPolicies(schema.User{})
 	user.Hooks[0] = func(next ent.Mutator) ent.Mutator {
 		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {

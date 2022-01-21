@@ -8,6 +8,7 @@ import (
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/codingsubmissionstaffdata"
 	"170-ag/ent/generated/codingtestcase"
+	"170-ag/ent/generated/codingtestcasedata"
 	"170-ag/ent/generated/user"
 	"context"
 	"encoding/json"
@@ -277,40 +278,24 @@ func (ctc *CodingTestCase) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     ctc.ID,
 		Type:   "CodingTestCase",
-		Fields: make([]*Field, 4),
-		Edges:  make([]*Edge, 1),
+		Fields: make([]*Field, 2),
+		Edges:  make([]*Edge, 2),
 	}
 	var buf []byte
-	if buf, err = json.Marshal(ctc.Input); err != nil {
-		return nil, err
-	}
-	node.Fields[0] = &Field{
-		Type:  "string",
-		Name:  "input",
-		Value: string(buf),
-	}
-	if buf, err = json.Marshal(ctc.Output); err != nil {
-		return nil, err
-	}
-	node.Fields[1] = &Field{
-		Type:  "string",
-		Name:  "output",
-		Value: string(buf),
-	}
 	if buf, err = json.Marshal(ctc.Points); err != nil {
 		return nil, err
 	}
-	node.Fields[2] = &Field{
+	node.Fields[0] = &Field{
 		Type:  "int",
 		Name:  "points",
 		Value: string(buf),
 	}
-	if buf, err = json.Marshal(ctc.Visible); err != nil {
+	if buf, err = json.Marshal(ctc.Public); err != nil {
 		return nil, err
 	}
-	node.Fields[3] = &Field{
+	node.Fields[1] = &Field{
 		Type:  "bool",
-		Name:  "visible",
+		Name:  "public",
 		Value: string(buf),
 	}
 	node.Edges[0] = &Edge{
@@ -319,6 +304,53 @@ func (ctc *CodingTestCase) Node(ctx context.Context) (node *Node, err error) {
 	}
 	err = ctc.QueryCodingProblem().
 		Select(codingproblem.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[1] = &Edge{
+		Type: "CodingTestCaseData",
+		Name: "data",
+	}
+	err = ctc.QueryData().
+		Select(codingtestcasedata.FieldID).
+		Scan(ctx, &node.Edges[1].IDs)
+	if err != nil {
+		return nil, err
+	}
+	return node, nil
+}
+
+func (ctcd *CodingTestCaseData) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     ctcd.ID,
+		Type:   "CodingTestCaseData",
+		Fields: make([]*Field, 2),
+		Edges:  make([]*Edge, 1),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(ctcd.Input); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "string",
+		Name:  "input",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(ctcd.Output); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "string",
+		Name:  "output",
+		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "CodingTestCase",
+		Name: "test_case",
+	}
+	err = ctcd.QueryTestCase().
+		Select(codingtestcase.FieldID).
 		Scan(ctx, &node.Edges[0].IDs)
 	if err != nil {
 		return nil, err
@@ -483,6 +515,15 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 			return nil, err
 		}
 		return n, nil
+	case codingtestcasedata.Table:
+		n, err := c.CodingTestCaseData.Query().
+			Where(codingtestcasedata.ID(id)).
+			CollectFields(ctx, "CodingTestCaseData").
+			Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
 	case user.Table:
 		n, err := c.User.Query().
 			Where(user.ID(id)).
@@ -621,6 +662,19 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		nodes, err := c.CodingTestCase.Query().
 			Where(codingtestcase.IDIn(ids...)).
 			CollectFields(ctx, "CodingTestCase").
+			All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case codingtestcasedata.Table:
+		nodes, err := c.CodingTestCaseData.Query().
+			Where(codingtestcasedata.IDIn(ids...)).
+			CollectFields(ctx, "CodingTestCaseData").
 			All(ctx)
 		if err != nil {
 			return nil, err

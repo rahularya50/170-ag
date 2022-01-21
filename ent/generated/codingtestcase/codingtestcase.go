@@ -11,16 +11,14 @@ const (
 	Label = "coding_test_case"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldInput holds the string denoting the input field in the database.
-	FieldInput = "input"
-	// FieldOutput holds the string denoting the output field in the database.
-	FieldOutput = "output"
 	// FieldPoints holds the string denoting the points field in the database.
 	FieldPoints = "points"
-	// FieldVisible holds the string denoting the visible field in the database.
-	FieldVisible = "visible"
+	// FieldPublic holds the string denoting the public field in the database.
+	FieldPublic = "public"
 	// EdgeCodingProblem holds the string denoting the coding_problem edge name in mutations.
 	EdgeCodingProblem = "coding_problem"
+	// EdgeData holds the string denoting the data edge name in mutations.
+	EdgeData = "data"
 	// Table holds the table name of the codingtestcase in the database.
 	Table = "coding_test_cases"
 	// CodingProblemTable is the table that holds the coding_problem relation/edge.
@@ -30,21 +28,27 @@ const (
 	CodingProblemInverseTable = "coding_problems"
 	// CodingProblemColumn is the table column denoting the coding_problem relation/edge.
 	CodingProblemColumn = "coding_problem_test_cases"
+	// DataTable is the table that holds the data relation/edge.
+	DataTable = "coding_test_cases"
+	// DataInverseTable is the table name for the CodingTestCaseData entity.
+	// It exists in this package in order to avoid circular dependency with the "codingtestcasedata" package.
+	DataInverseTable = "coding_test_case_data"
+	// DataColumn is the table column denoting the data relation/edge.
+	DataColumn = "coding_test_case_data_test_case"
 )
 
 // Columns holds all SQL columns for codingtestcase fields.
 var Columns = []string{
 	FieldID,
-	FieldInput,
-	FieldOutput,
 	FieldPoints,
-	FieldVisible,
+	FieldPublic,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "coding_test_cases"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
 	"coding_problem_test_cases",
+	"coding_test_case_data_test_case",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

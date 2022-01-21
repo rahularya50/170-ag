@@ -5,6 +5,7 @@ package generated
 import (
 	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/codingtestcase"
+	"170-ag/ent/generated/codingtestcasedata"
 	"170-ag/ent/generated/predicate"
 	"context"
 	"errors"
@@ -28,18 +29,6 @@ func (ctcu *CodingTestCaseUpdate) Where(ps ...predicate.CodingTestCase) *CodingT
 	return ctcu
 }
 
-// SetInput sets the "input" field.
-func (ctcu *CodingTestCaseUpdate) SetInput(s string) *CodingTestCaseUpdate {
-	ctcu.mutation.SetInput(s)
-	return ctcu
-}
-
-// SetOutput sets the "output" field.
-func (ctcu *CodingTestCaseUpdate) SetOutput(s string) *CodingTestCaseUpdate {
-	ctcu.mutation.SetOutput(s)
-	return ctcu
-}
-
 // SetPoints sets the "points" field.
 func (ctcu *CodingTestCaseUpdate) SetPoints(i int) *CodingTestCaseUpdate {
 	ctcu.mutation.ResetPoints()
@@ -53,9 +42,9 @@ func (ctcu *CodingTestCaseUpdate) AddPoints(i int) *CodingTestCaseUpdate {
 	return ctcu
 }
 
-// SetVisible sets the "visible" field.
-func (ctcu *CodingTestCaseUpdate) SetVisible(b bool) *CodingTestCaseUpdate {
-	ctcu.mutation.SetVisible(b)
+// SetPublic sets the "public" field.
+func (ctcu *CodingTestCaseUpdate) SetPublic(b bool) *CodingTestCaseUpdate {
+	ctcu.mutation.SetPublic(b)
 	return ctcu
 }
 
@@ -70,6 +59,25 @@ func (ctcu *CodingTestCaseUpdate) SetCodingProblem(c *CodingProblem) *CodingTest
 	return ctcu.SetCodingProblemID(c.ID)
 }
 
+// SetDataID sets the "data" edge to the CodingTestCaseData entity by ID.
+func (ctcu *CodingTestCaseUpdate) SetDataID(id int) *CodingTestCaseUpdate {
+	ctcu.mutation.SetDataID(id)
+	return ctcu
+}
+
+// SetNillableDataID sets the "data" edge to the CodingTestCaseData entity by ID if the given value is not nil.
+func (ctcu *CodingTestCaseUpdate) SetNillableDataID(id *int) *CodingTestCaseUpdate {
+	if id != nil {
+		ctcu = ctcu.SetDataID(*id)
+	}
+	return ctcu
+}
+
+// SetData sets the "data" edge to the CodingTestCaseData entity.
+func (ctcu *CodingTestCaseUpdate) SetData(c *CodingTestCaseData) *CodingTestCaseUpdate {
+	return ctcu.SetDataID(c.ID)
+}
+
 // Mutation returns the CodingTestCaseMutation object of the builder.
 func (ctcu *CodingTestCaseUpdate) Mutation() *CodingTestCaseMutation {
 	return ctcu.mutation
@@ -78,6 +86,12 @@ func (ctcu *CodingTestCaseUpdate) Mutation() *CodingTestCaseMutation {
 // ClearCodingProblem clears the "coding_problem" edge to the CodingProblem entity.
 func (ctcu *CodingTestCaseUpdate) ClearCodingProblem() *CodingTestCaseUpdate {
 	ctcu.mutation.ClearCodingProblem()
+	return ctcu
+}
+
+// ClearData clears the "data" edge to the CodingTestCaseData entity.
+func (ctcu *CodingTestCaseUpdate) ClearData() *CodingTestCaseUpdate {
+	ctcu.mutation.ClearData()
 	return ctcu
 }
 
@@ -172,20 +186,6 @@ func (ctcu *CodingTestCaseUpdate) sqlSave(ctx context.Context) (n int, err error
 			}
 		}
 	}
-	if value, ok := ctcu.mutation.Input(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: codingtestcase.FieldInput,
-		})
-	}
-	if value, ok := ctcu.mutation.Output(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: codingtestcase.FieldOutput,
-		})
-	}
 	if value, ok := ctcu.mutation.Points(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
@@ -200,11 +200,11 @@ func (ctcu *CodingTestCaseUpdate) sqlSave(ctx context.Context) (n int, err error
 			Column: codingtestcase.FieldPoints,
 		})
 	}
-	if value, ok := ctcu.mutation.Visible(); ok {
+	if value, ok := ctcu.mutation.Public(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeBool,
 			Value:  value,
-			Column: codingtestcase.FieldVisible,
+			Column: codingtestcase.FieldPublic,
 		})
 	}
 	if ctcu.mutation.CodingProblemCleared() {
@@ -242,6 +242,41 @@ func (ctcu *CodingTestCaseUpdate) sqlSave(ctx context.Context) (n int, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if ctcu.mutation.DataCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   codingtestcase.DataTable,
+			Columns: []string{codingtestcase.DataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingtestcasedata.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ctcu.mutation.DataIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   codingtestcase.DataTable,
+			Columns: []string{codingtestcase.DataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingtestcasedata.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, ctcu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{codingtestcase.Label}
@@ -261,18 +296,6 @@ type CodingTestCaseUpdateOne struct {
 	mutation *CodingTestCaseMutation
 }
 
-// SetInput sets the "input" field.
-func (ctcuo *CodingTestCaseUpdateOne) SetInput(s string) *CodingTestCaseUpdateOne {
-	ctcuo.mutation.SetInput(s)
-	return ctcuo
-}
-
-// SetOutput sets the "output" field.
-func (ctcuo *CodingTestCaseUpdateOne) SetOutput(s string) *CodingTestCaseUpdateOne {
-	ctcuo.mutation.SetOutput(s)
-	return ctcuo
-}
-
 // SetPoints sets the "points" field.
 func (ctcuo *CodingTestCaseUpdateOne) SetPoints(i int) *CodingTestCaseUpdateOne {
 	ctcuo.mutation.ResetPoints()
@@ -286,9 +309,9 @@ func (ctcuo *CodingTestCaseUpdateOne) AddPoints(i int) *CodingTestCaseUpdateOne 
 	return ctcuo
 }
 
-// SetVisible sets the "visible" field.
-func (ctcuo *CodingTestCaseUpdateOne) SetVisible(b bool) *CodingTestCaseUpdateOne {
-	ctcuo.mutation.SetVisible(b)
+// SetPublic sets the "public" field.
+func (ctcuo *CodingTestCaseUpdateOne) SetPublic(b bool) *CodingTestCaseUpdateOne {
+	ctcuo.mutation.SetPublic(b)
 	return ctcuo
 }
 
@@ -303,6 +326,25 @@ func (ctcuo *CodingTestCaseUpdateOne) SetCodingProblem(c *CodingProblem) *Coding
 	return ctcuo.SetCodingProblemID(c.ID)
 }
 
+// SetDataID sets the "data" edge to the CodingTestCaseData entity by ID.
+func (ctcuo *CodingTestCaseUpdateOne) SetDataID(id int) *CodingTestCaseUpdateOne {
+	ctcuo.mutation.SetDataID(id)
+	return ctcuo
+}
+
+// SetNillableDataID sets the "data" edge to the CodingTestCaseData entity by ID if the given value is not nil.
+func (ctcuo *CodingTestCaseUpdateOne) SetNillableDataID(id *int) *CodingTestCaseUpdateOne {
+	if id != nil {
+		ctcuo = ctcuo.SetDataID(*id)
+	}
+	return ctcuo
+}
+
+// SetData sets the "data" edge to the CodingTestCaseData entity.
+func (ctcuo *CodingTestCaseUpdateOne) SetData(c *CodingTestCaseData) *CodingTestCaseUpdateOne {
+	return ctcuo.SetDataID(c.ID)
+}
+
 // Mutation returns the CodingTestCaseMutation object of the builder.
 func (ctcuo *CodingTestCaseUpdateOne) Mutation() *CodingTestCaseMutation {
 	return ctcuo.mutation
@@ -311,6 +353,12 @@ func (ctcuo *CodingTestCaseUpdateOne) Mutation() *CodingTestCaseMutation {
 // ClearCodingProblem clears the "coding_problem" edge to the CodingProblem entity.
 func (ctcuo *CodingTestCaseUpdateOne) ClearCodingProblem() *CodingTestCaseUpdateOne {
 	ctcuo.mutation.ClearCodingProblem()
+	return ctcuo
+}
+
+// ClearData clears the "data" edge to the CodingTestCaseData entity.
+func (ctcuo *CodingTestCaseUpdateOne) ClearData() *CodingTestCaseUpdateOne {
+	ctcuo.mutation.ClearData()
 	return ctcuo
 }
 
@@ -429,20 +477,6 @@ func (ctcuo *CodingTestCaseUpdateOne) sqlSave(ctx context.Context) (_node *Codin
 			}
 		}
 	}
-	if value, ok := ctcuo.mutation.Input(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: codingtestcase.FieldInput,
-		})
-	}
-	if value, ok := ctcuo.mutation.Output(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: codingtestcase.FieldOutput,
-		})
-	}
 	if value, ok := ctcuo.mutation.Points(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
@@ -457,11 +491,11 @@ func (ctcuo *CodingTestCaseUpdateOne) sqlSave(ctx context.Context) (_node *Codin
 			Column: codingtestcase.FieldPoints,
 		})
 	}
-	if value, ok := ctcuo.mutation.Visible(); ok {
+	if value, ok := ctcuo.mutation.Public(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeBool,
 			Value:  value,
-			Column: codingtestcase.FieldVisible,
+			Column: codingtestcase.FieldPublic,
 		})
 	}
 	if ctcuo.mutation.CodingProblemCleared() {
@@ -491,6 +525,41 @@ func (ctcuo *CodingTestCaseUpdateOne) sqlSave(ctx context.Context) (_node *Codin
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: codingproblem.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if ctcuo.mutation.DataCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   codingtestcase.DataTable,
+			Columns: []string{codingtestcase.DataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingtestcasedata.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ctcuo.mutation.DataIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   codingtestcase.DataTable,
+			Columns: []string{codingtestcase.DataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingtestcasedata.FieldID,
 				},
 			},
 		}

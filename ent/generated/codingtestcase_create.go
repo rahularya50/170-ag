@@ -5,6 +5,7 @@ package generated
 import (
 	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/codingtestcase"
+	"170-ag/ent/generated/codingtestcasedata"
 	"context"
 	"errors"
 	"fmt"
@@ -22,27 +23,15 @@ type CodingTestCaseCreate struct {
 	conflict []sql.ConflictOption
 }
 
-// SetInput sets the "input" field.
-func (ctcc *CodingTestCaseCreate) SetInput(s string) *CodingTestCaseCreate {
-	ctcc.mutation.SetInput(s)
-	return ctcc
-}
-
-// SetOutput sets the "output" field.
-func (ctcc *CodingTestCaseCreate) SetOutput(s string) *CodingTestCaseCreate {
-	ctcc.mutation.SetOutput(s)
-	return ctcc
-}
-
 // SetPoints sets the "points" field.
 func (ctcc *CodingTestCaseCreate) SetPoints(i int) *CodingTestCaseCreate {
 	ctcc.mutation.SetPoints(i)
 	return ctcc
 }
 
-// SetVisible sets the "visible" field.
-func (ctcc *CodingTestCaseCreate) SetVisible(b bool) *CodingTestCaseCreate {
-	ctcc.mutation.SetVisible(b)
+// SetPublic sets the "public" field.
+func (ctcc *CodingTestCaseCreate) SetPublic(b bool) *CodingTestCaseCreate {
+	ctcc.mutation.SetPublic(b)
 	return ctcc
 }
 
@@ -55,6 +44,25 @@ func (ctcc *CodingTestCaseCreate) SetCodingProblemID(id int) *CodingTestCaseCrea
 // SetCodingProblem sets the "coding_problem" edge to the CodingProblem entity.
 func (ctcc *CodingTestCaseCreate) SetCodingProblem(c *CodingProblem) *CodingTestCaseCreate {
 	return ctcc.SetCodingProblemID(c.ID)
+}
+
+// SetDataID sets the "data" edge to the CodingTestCaseData entity by ID.
+func (ctcc *CodingTestCaseCreate) SetDataID(id int) *CodingTestCaseCreate {
+	ctcc.mutation.SetDataID(id)
+	return ctcc
+}
+
+// SetNillableDataID sets the "data" edge to the CodingTestCaseData entity by ID if the given value is not nil.
+func (ctcc *CodingTestCaseCreate) SetNillableDataID(id *int) *CodingTestCaseCreate {
+	if id != nil {
+		ctcc = ctcc.SetDataID(*id)
+	}
+	return ctcc
+}
+
+// SetData sets the "data" edge to the CodingTestCaseData entity.
+func (ctcc *CodingTestCaseCreate) SetData(c *CodingTestCaseData) *CodingTestCaseCreate {
+	return ctcc.SetDataID(c.ID)
 }
 
 // Mutation returns the CodingTestCaseMutation object of the builder.
@@ -127,12 +135,6 @@ func (ctcc *CodingTestCaseCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (ctcc *CodingTestCaseCreate) check() error {
-	if _, ok := ctcc.mutation.Input(); !ok {
-		return &ValidationError{Name: "input", err: errors.New(`generated: missing required field "input"`)}
-	}
-	if _, ok := ctcc.mutation.Output(); !ok {
-		return &ValidationError{Name: "output", err: errors.New(`generated: missing required field "output"`)}
-	}
 	if _, ok := ctcc.mutation.Points(); !ok {
 		return &ValidationError{Name: "points", err: errors.New(`generated: missing required field "points"`)}
 	}
@@ -141,8 +143,8 @@ func (ctcc *CodingTestCaseCreate) check() error {
 			return &ValidationError{Name: "points", err: fmt.Errorf(`generated: validator failed for field "points": %w`, err)}
 		}
 	}
-	if _, ok := ctcc.mutation.Visible(); !ok {
-		return &ValidationError{Name: "visible", err: errors.New(`generated: missing required field "visible"`)}
+	if _, ok := ctcc.mutation.Public(); !ok {
+		return &ValidationError{Name: "public", err: errors.New(`generated: missing required field "public"`)}
 	}
 	if _, ok := ctcc.mutation.CodingProblemID(); !ok {
 		return &ValidationError{Name: "coding_problem", err: errors.New("generated: missing required edge \"coding_problem\"")}
@@ -175,22 +177,6 @@ func (ctcc *CodingTestCaseCreate) createSpec() (*CodingTestCase, *sqlgraph.Creat
 		}
 	)
 	_spec.OnConflict = ctcc.conflict
-	if value, ok := ctcc.mutation.Input(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: codingtestcase.FieldInput,
-		})
-		_node.Input = value
-	}
-	if value, ok := ctcc.mutation.Output(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: codingtestcase.FieldOutput,
-		})
-		_node.Output = value
-	}
 	if value, ok := ctcc.mutation.Points(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
@@ -199,13 +185,13 @@ func (ctcc *CodingTestCaseCreate) createSpec() (*CodingTestCase, *sqlgraph.Creat
 		})
 		_node.Points = value
 	}
-	if value, ok := ctcc.mutation.Visible(); ok {
+	if value, ok := ctcc.mutation.Public(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeBool,
 			Value:  value,
-			Column: codingtestcase.FieldVisible,
+			Column: codingtestcase.FieldPublic,
 		})
-		_node.Visible = value
+		_node.Public = value
 	}
 	if nodes := ctcc.mutation.CodingProblemIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -227,6 +213,26 @@ func (ctcc *CodingTestCaseCreate) createSpec() (*CodingTestCase, *sqlgraph.Creat
 		_node.coding_problem_test_cases = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
+	if nodes := ctcc.mutation.DataIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   codingtestcase.DataTable,
+			Columns: []string{codingtestcase.DataColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingtestcasedata.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.coding_test_case_data_test_case = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	return _node, _spec
 }
 
@@ -234,7 +240,7 @@ func (ctcc *CodingTestCaseCreate) createSpec() (*CodingTestCase, *sqlgraph.Creat
 // of the `INSERT` statement. For example:
 //
 //	client.CodingTestCase.Create().
-//		SetInput(v).
+//		SetPoints(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
@@ -243,7 +249,7 @@ func (ctcc *CodingTestCaseCreate) createSpec() (*CodingTestCase, *sqlgraph.Creat
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.CodingTestCaseUpsert) {
-//			SetInput(v+v).
+//			SetPoints(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -281,30 +287,6 @@ type (
 	}
 )
 
-// SetInput sets the "input" field.
-func (u *CodingTestCaseUpsert) SetInput(v string) *CodingTestCaseUpsert {
-	u.Set(codingtestcase.FieldInput, v)
-	return u
-}
-
-// UpdateInput sets the "input" field to the value that was provided on create.
-func (u *CodingTestCaseUpsert) UpdateInput() *CodingTestCaseUpsert {
-	u.SetExcluded(codingtestcase.FieldInput)
-	return u
-}
-
-// SetOutput sets the "output" field.
-func (u *CodingTestCaseUpsert) SetOutput(v string) *CodingTestCaseUpsert {
-	u.Set(codingtestcase.FieldOutput, v)
-	return u
-}
-
-// UpdateOutput sets the "output" field to the value that was provided on create.
-func (u *CodingTestCaseUpsert) UpdateOutput() *CodingTestCaseUpsert {
-	u.SetExcluded(codingtestcase.FieldOutput)
-	return u
-}
-
 // SetPoints sets the "points" field.
 func (u *CodingTestCaseUpsert) SetPoints(v int) *CodingTestCaseUpsert {
 	u.Set(codingtestcase.FieldPoints, v)
@@ -317,15 +299,15 @@ func (u *CodingTestCaseUpsert) UpdatePoints() *CodingTestCaseUpsert {
 	return u
 }
 
-// SetVisible sets the "visible" field.
-func (u *CodingTestCaseUpsert) SetVisible(v bool) *CodingTestCaseUpsert {
-	u.Set(codingtestcase.FieldVisible, v)
+// SetPublic sets the "public" field.
+func (u *CodingTestCaseUpsert) SetPublic(v bool) *CodingTestCaseUpsert {
+	u.Set(codingtestcase.FieldPublic, v)
 	return u
 }
 
-// UpdateVisible sets the "visible" field to the value that was provided on create.
-func (u *CodingTestCaseUpsert) UpdateVisible() *CodingTestCaseUpsert {
-	u.SetExcluded(codingtestcase.FieldVisible)
+// UpdatePublic sets the "public" field to the value that was provided on create.
+func (u *CodingTestCaseUpsert) UpdatePublic() *CodingTestCaseUpsert {
+	u.SetExcluded(codingtestcase.FieldPublic)
 	return u
 }
 
@@ -371,34 +353,6 @@ func (u *CodingTestCaseUpsertOne) Update(set func(*CodingTestCaseUpsert)) *Codin
 	return u
 }
 
-// SetInput sets the "input" field.
-func (u *CodingTestCaseUpsertOne) SetInput(v string) *CodingTestCaseUpsertOne {
-	return u.Update(func(s *CodingTestCaseUpsert) {
-		s.SetInput(v)
-	})
-}
-
-// UpdateInput sets the "input" field to the value that was provided on create.
-func (u *CodingTestCaseUpsertOne) UpdateInput() *CodingTestCaseUpsertOne {
-	return u.Update(func(s *CodingTestCaseUpsert) {
-		s.UpdateInput()
-	})
-}
-
-// SetOutput sets the "output" field.
-func (u *CodingTestCaseUpsertOne) SetOutput(v string) *CodingTestCaseUpsertOne {
-	return u.Update(func(s *CodingTestCaseUpsert) {
-		s.SetOutput(v)
-	})
-}
-
-// UpdateOutput sets the "output" field to the value that was provided on create.
-func (u *CodingTestCaseUpsertOne) UpdateOutput() *CodingTestCaseUpsertOne {
-	return u.Update(func(s *CodingTestCaseUpsert) {
-		s.UpdateOutput()
-	})
-}
-
 // SetPoints sets the "points" field.
 func (u *CodingTestCaseUpsertOne) SetPoints(v int) *CodingTestCaseUpsertOne {
 	return u.Update(func(s *CodingTestCaseUpsert) {
@@ -413,17 +367,17 @@ func (u *CodingTestCaseUpsertOne) UpdatePoints() *CodingTestCaseUpsertOne {
 	})
 }
 
-// SetVisible sets the "visible" field.
-func (u *CodingTestCaseUpsertOne) SetVisible(v bool) *CodingTestCaseUpsertOne {
+// SetPublic sets the "public" field.
+func (u *CodingTestCaseUpsertOne) SetPublic(v bool) *CodingTestCaseUpsertOne {
 	return u.Update(func(s *CodingTestCaseUpsert) {
-		s.SetVisible(v)
+		s.SetPublic(v)
 	})
 }
 
-// UpdateVisible sets the "visible" field to the value that was provided on create.
-func (u *CodingTestCaseUpsertOne) UpdateVisible() *CodingTestCaseUpsertOne {
+// UpdatePublic sets the "public" field to the value that was provided on create.
+func (u *CodingTestCaseUpsertOne) UpdatePublic() *CodingTestCaseUpsertOne {
 	return u.Update(func(s *CodingTestCaseUpsert) {
-		s.UpdateVisible()
+		s.UpdatePublic()
 	})
 }
 
@@ -557,7 +511,7 @@ func (ctccb *CodingTestCaseCreateBulk) ExecX(ctx context.Context) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.CodingTestCaseUpsert) {
-//			SetInput(v+v).
+//			SetPoints(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -630,34 +584,6 @@ func (u *CodingTestCaseUpsertBulk) Update(set func(*CodingTestCaseUpsert)) *Codi
 	return u
 }
 
-// SetInput sets the "input" field.
-func (u *CodingTestCaseUpsertBulk) SetInput(v string) *CodingTestCaseUpsertBulk {
-	return u.Update(func(s *CodingTestCaseUpsert) {
-		s.SetInput(v)
-	})
-}
-
-// UpdateInput sets the "input" field to the value that was provided on create.
-func (u *CodingTestCaseUpsertBulk) UpdateInput() *CodingTestCaseUpsertBulk {
-	return u.Update(func(s *CodingTestCaseUpsert) {
-		s.UpdateInput()
-	})
-}
-
-// SetOutput sets the "output" field.
-func (u *CodingTestCaseUpsertBulk) SetOutput(v string) *CodingTestCaseUpsertBulk {
-	return u.Update(func(s *CodingTestCaseUpsert) {
-		s.SetOutput(v)
-	})
-}
-
-// UpdateOutput sets the "output" field to the value that was provided on create.
-func (u *CodingTestCaseUpsertBulk) UpdateOutput() *CodingTestCaseUpsertBulk {
-	return u.Update(func(s *CodingTestCaseUpsert) {
-		s.UpdateOutput()
-	})
-}
-
 // SetPoints sets the "points" field.
 func (u *CodingTestCaseUpsertBulk) SetPoints(v int) *CodingTestCaseUpsertBulk {
 	return u.Update(func(s *CodingTestCaseUpsert) {
@@ -672,17 +598,17 @@ func (u *CodingTestCaseUpsertBulk) UpdatePoints() *CodingTestCaseUpsertBulk {
 	})
 }
 
-// SetVisible sets the "visible" field.
-func (u *CodingTestCaseUpsertBulk) SetVisible(v bool) *CodingTestCaseUpsertBulk {
+// SetPublic sets the "public" field.
+func (u *CodingTestCaseUpsertBulk) SetPublic(v bool) *CodingTestCaseUpsertBulk {
 	return u.Update(func(s *CodingTestCaseUpsert) {
-		s.SetVisible(v)
+		s.SetPublic(v)
 	})
 }
 
-// UpdateVisible sets the "visible" field to the value that was provided on create.
-func (u *CodingTestCaseUpsertBulk) UpdateVisible() *CodingTestCaseUpsertBulk {
+// UpdatePublic sets the "public" field to the value that was provided on create.
+func (u *CodingTestCaseUpsertBulk) UpdatePublic() *CodingTestCaseUpsertBulk {
 	return u.Update(func(s *CodingTestCaseUpsert) {
-		s.UpdateVisible()
+		s.UpdatePublic()
 	})
 }
 
