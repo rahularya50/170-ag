@@ -5,7 +5,6 @@ package generated
 import (
 	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/codingproblem"
-	"170-ag/ent/generated/codingproblemstaffdata"
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/codingsubmissionstaffdata"
 	"170-ag/ent/generated/codingtestcase"
@@ -20,7 +19,7 @@ import (
 
 // schemaGraph holds a representation of ent/schema at runtime.
 var schemaGraph = func() *sqlgraph.Schema {
-	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 7)}
+	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 6)}
 	graph.Nodes[0] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   codingdraft.Table,
@@ -53,20 +52,6 @@ var schemaGraph = func() *sqlgraph.Schema {
 	}
 	graph.Nodes[2] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
-			Table:   codingproblemstaffdata.Table,
-			Columns: codingproblemstaffdata.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
-				Column: codingproblemstaffdata.FieldID,
-			},
-		},
-		Type: "CodingProblemStaffData",
-		Fields: map[string]*sqlgraph.FieldSpec{
-			codingproblemstaffdata.FieldInput: {Type: field.TypeString, Column: codingproblemstaffdata.FieldInput},
-		},
-	}
-	graph.Nodes[3] = &sqlgraph.Node{
-		NodeSpec: sqlgraph.NodeSpec{
 			Table:   codingsubmission.Table,
 			Columns: codingsubmission.Columns,
 			ID: &sqlgraph.FieldSpec{
@@ -80,7 +65,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			codingsubmission.FieldStatus: {Type: field.TypeEnum, Column: codingsubmission.FieldStatus},
 		},
 	}
-	graph.Nodes[4] = &sqlgraph.Node{
+	graph.Nodes[3] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   codingsubmissionstaffdata.Table,
 			Columns: codingsubmissionstaffdata.Columns,
@@ -98,7 +83,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			codingsubmissionstaffdata.FieldExitError:   {Type: field.TypeString, Column: codingsubmissionstaffdata.FieldExitError},
 		},
 	}
-	graph.Nodes[5] = &sqlgraph.Node{
+	graph.Nodes[4] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   codingtestcase.Table,
 			Columns: codingtestcase.Columns,
@@ -115,7 +100,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			codingtestcase.FieldVisible: {Type: field.TypeBool, Column: codingtestcase.FieldVisible},
 		},
 	}
-	graph.Nodes[6] = &sqlgraph.Node{
+	graph.Nodes[5] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   user.Table,
 			Columns: user.Columns,
@@ -441,50 +426,6 @@ func (f *CodingProblemFilter) WhereHasSubmissionsWith(preds ...predicate.CodingS
 }
 
 // addPredicate implements the predicateAdder interface.
-func (cpsdq *CodingProblemStaffDataQuery) addPredicate(pred func(s *sql.Selector)) {
-	cpsdq.predicates = append(cpsdq.predicates, pred)
-}
-
-// Filter returns a Filter implementation to apply filters on the CodingProblemStaffDataQuery builder.
-func (cpsdq *CodingProblemStaffDataQuery) Filter() *CodingProblemStaffDataFilter {
-	return &CodingProblemStaffDataFilter{cpsdq}
-}
-
-// addPredicate implements the predicateAdder interface.
-func (m *CodingProblemStaffDataMutation) addPredicate(pred func(s *sql.Selector)) {
-	m.predicates = append(m.predicates, pred)
-}
-
-// Filter returns an entql.Where implementation to apply filters on the CodingProblemStaffDataMutation builder.
-func (m *CodingProblemStaffDataMutation) Filter() *CodingProblemStaffDataFilter {
-	return &CodingProblemStaffDataFilter{m}
-}
-
-// CodingProblemStaffDataFilter provides a generic filtering capability at runtime for CodingProblemStaffDataQuery.
-type CodingProblemStaffDataFilter struct {
-	predicateAdder
-}
-
-// Where applies the entql predicate on the query filter.
-func (f *CodingProblemStaffDataFilter) Where(p entql.P) {
-	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[2].Type, p, s); err != nil {
-			s.AddError(err)
-		}
-	})
-}
-
-// WhereID applies the entql int predicate on the id field.
-func (f *CodingProblemStaffDataFilter) WhereID(p entql.IntP) {
-	f.Where(p.Field(codingproblemstaffdata.FieldID))
-}
-
-// WhereInput applies the entql string predicate on the input field.
-func (f *CodingProblemStaffDataFilter) WhereInput(p entql.StringP) {
-	f.Where(p.Field(codingproblemstaffdata.FieldInput))
-}
-
-// addPredicate implements the predicateAdder interface.
 func (csq *CodingSubmissionQuery) addPredicate(pred func(s *sql.Selector)) {
 	csq.predicates = append(csq.predicates, pred)
 }
@@ -512,7 +453,7 @@ type CodingSubmissionFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *CodingSubmissionFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[3].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[2].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -603,7 +544,7 @@ type CodingSubmissionStaffDataFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *CodingSubmissionStaffDataFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[4].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[3].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -681,7 +622,7 @@ type CodingTestCaseFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *CodingTestCaseFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[5].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[4].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -754,7 +695,7 @@ type UserFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *UserFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[6].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[5].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})

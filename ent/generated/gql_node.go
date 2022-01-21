@@ -5,7 +5,6 @@ package generated
 import (
 	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/codingproblem"
-	"170-ag/ent/generated/codingproblemstaffdata"
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/codingsubmissionstaffdata"
 	"170-ag/ent/generated/codingtestcase"
@@ -152,25 +151,6 @@ func (cp *CodingProblem) Node(ctx context.Context) (node *Node, err error) {
 		Scan(ctx, &node.Edges[2].IDs)
 	if err != nil {
 		return nil, err
-	}
-	return node, nil
-}
-
-func (cpsd *CodingProblemStaffData) Node(ctx context.Context) (node *Node, err error) {
-	node = &Node{
-		ID:     cpsd.ID,
-		Type:   "CodingProblemStaffData",
-		Fields: make([]*Field, 1),
-		Edges:  make([]*Edge, 0),
-	}
-	var buf []byte
-	if buf, err = json.Marshal(cpsd.Input); err != nil {
-		return nil, err
-	}
-	node.Fields[0] = &Field{
-		Type:  "string",
-		Name:  "input",
-		Value: string(buf),
 	}
 	return node, nil
 }
@@ -476,15 +456,6 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 			return nil, err
 		}
 		return n, nil
-	case codingproblemstaffdata.Table:
-		n, err := c.CodingProblemStaffData.Query().
-			Where(codingproblemstaffdata.ID(id)).
-			CollectFields(ctx, "CodingProblemStaffData").
-			Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
 	case codingsubmission.Table:
 		n, err := c.CodingSubmission.Query().
 			Where(codingsubmission.ID(id)).
@@ -611,19 +582,6 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		nodes, err := c.CodingProblem.Query().
 			Where(codingproblem.IDIn(ids...)).
 			CollectFields(ctx, "CodingProblem").
-			All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, node := range nodes {
-			for _, noder := range idmap[node.ID] {
-				*noder = node
-			}
-		}
-	case codingproblemstaffdata.Table:
-		nodes, err := c.CodingProblemStaffData.Query().
-			Where(codingproblemstaffdata.IDIn(ids...)).
-			CollectFields(ctx, "CodingProblemStaffData").
 			All(ctx)
 		if err != nil {
 			return nil, err

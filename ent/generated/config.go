@@ -26,7 +26,6 @@ type config struct {
 type hooks struct {
 	CodingDraft               []ent.Hook
 	CodingProblem             []ent.Hook
-	CodingProblemStaffData    []ent.Hook
 	CodingSubmission          []ent.Hook
 	CodingSubmissionStaffData []ent.Hook
 	CodingTestCase            []ent.Hook

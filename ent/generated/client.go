@@ -11,7 +11,6 @@ import (
 
 	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/codingproblem"
-	"170-ag/ent/generated/codingproblemstaffdata"
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/codingsubmissionstaffdata"
 	"170-ag/ent/generated/codingtestcase"
@@ -31,8 +30,6 @@ type Client struct {
 	CodingDraft *CodingDraftClient
 	// CodingProblem is the client for interacting with the CodingProblem builders.
 	CodingProblem *CodingProblemClient
-	// CodingProblemStaffData is the client for interacting with the CodingProblemStaffData builders.
-	CodingProblemStaffData *CodingProblemStaffDataClient
 	// CodingSubmission is the client for interacting with the CodingSubmission builders.
 	CodingSubmission *CodingSubmissionClient
 	// CodingSubmissionStaffData is the client for interacting with the CodingSubmissionStaffData builders.
@@ -58,7 +55,6 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.CodingDraft = NewCodingDraftClient(c.config)
 	c.CodingProblem = NewCodingProblemClient(c.config)
-	c.CodingProblemStaffData = NewCodingProblemStaffDataClient(c.config)
 	c.CodingSubmission = NewCodingSubmissionClient(c.config)
 	c.CodingSubmissionStaffData = NewCodingSubmissionStaffDataClient(c.config)
 	c.CodingTestCase = NewCodingTestCaseClient(c.config)
@@ -98,7 +94,6 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		config:                    cfg,
 		CodingDraft:               NewCodingDraftClient(cfg),
 		CodingProblem:             NewCodingProblemClient(cfg),
-		CodingProblemStaffData:    NewCodingProblemStaffDataClient(cfg),
 		CodingSubmission:          NewCodingSubmissionClient(cfg),
 		CodingSubmissionStaffData: NewCodingSubmissionStaffDataClient(cfg),
 		CodingTestCase:            NewCodingTestCaseClient(cfg),
@@ -123,7 +118,6 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		config:                    cfg,
 		CodingDraft:               NewCodingDraftClient(cfg),
 		CodingProblem:             NewCodingProblemClient(cfg),
-		CodingProblemStaffData:    NewCodingProblemStaffDataClient(cfg),
 		CodingSubmission:          NewCodingSubmissionClient(cfg),
 		CodingSubmissionStaffData: NewCodingSubmissionStaffDataClient(cfg),
 		CodingTestCase:            NewCodingTestCaseClient(cfg),
@@ -159,7 +153,6 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	c.CodingDraft.Use(hooks...)
 	c.CodingProblem.Use(hooks...)
-	c.CodingProblemStaffData.Use(hooks...)
 	c.CodingSubmission.Use(hooks...)
 	c.CodingSubmissionStaffData.Use(hooks...)
 	c.CodingTestCase.Use(hooks...)
@@ -426,96 +419,6 @@ func (c *CodingProblemClient) QuerySubmissions(cp *CodingProblem) *CodingSubmiss
 func (c *CodingProblemClient) Hooks() []Hook {
 	hooks := c.hooks.CodingProblem
 	return append(hooks[:len(hooks):len(hooks)], codingproblem.Hooks[:]...)
-}
-
-// CodingProblemStaffDataClient is a client for the CodingProblemStaffData schema.
-type CodingProblemStaffDataClient struct {
-	config
-}
-
-// NewCodingProblemStaffDataClient returns a client for the CodingProblemStaffData from the given config.
-func NewCodingProblemStaffDataClient(c config) *CodingProblemStaffDataClient {
-	return &CodingProblemStaffDataClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `codingproblemstaffdata.Hooks(f(g(h())))`.
-func (c *CodingProblemStaffDataClient) Use(hooks ...Hook) {
-	c.hooks.CodingProblemStaffData = append(c.hooks.CodingProblemStaffData, hooks...)
-}
-
-// Create returns a create builder for CodingProblemStaffData.
-func (c *CodingProblemStaffDataClient) Create() *CodingProblemStaffDataCreate {
-	mutation := newCodingProblemStaffDataMutation(c.config, OpCreate)
-	return &CodingProblemStaffDataCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of CodingProblemStaffData entities.
-func (c *CodingProblemStaffDataClient) CreateBulk(builders ...*CodingProblemStaffDataCreate) *CodingProblemStaffDataCreateBulk {
-	return &CodingProblemStaffDataCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for CodingProblemStaffData.
-func (c *CodingProblemStaffDataClient) Update() *CodingProblemStaffDataUpdate {
-	mutation := newCodingProblemStaffDataMutation(c.config, OpUpdate)
-	return &CodingProblemStaffDataUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *CodingProblemStaffDataClient) UpdateOne(cpsd *CodingProblemStaffData) *CodingProblemStaffDataUpdateOne {
-	mutation := newCodingProblemStaffDataMutation(c.config, OpUpdateOne, withCodingProblemStaffData(cpsd))
-	return &CodingProblemStaffDataUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *CodingProblemStaffDataClient) UpdateOneID(id int) *CodingProblemStaffDataUpdateOne {
-	mutation := newCodingProblemStaffDataMutation(c.config, OpUpdateOne, withCodingProblemStaffDataID(id))
-	return &CodingProblemStaffDataUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for CodingProblemStaffData.
-func (c *CodingProblemStaffDataClient) Delete() *CodingProblemStaffDataDelete {
-	mutation := newCodingProblemStaffDataMutation(c.config, OpDelete)
-	return &CodingProblemStaffDataDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a delete builder for the given entity.
-func (c *CodingProblemStaffDataClient) DeleteOne(cpsd *CodingProblemStaffData) *CodingProblemStaffDataDeleteOne {
-	return c.DeleteOneID(cpsd.ID)
-}
-
-// DeleteOneID returns a delete builder for the given id.
-func (c *CodingProblemStaffDataClient) DeleteOneID(id int) *CodingProblemStaffDataDeleteOne {
-	builder := c.Delete().Where(codingproblemstaffdata.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &CodingProblemStaffDataDeleteOne{builder}
-}
-
-// Query returns a query builder for CodingProblemStaffData.
-func (c *CodingProblemStaffDataClient) Query() *CodingProblemStaffDataQuery {
-	return &CodingProblemStaffDataQuery{
-		config: c.config,
-	}
-}
-
-// Get returns a CodingProblemStaffData entity by its id.
-func (c *CodingProblemStaffDataClient) Get(ctx context.Context, id int) (*CodingProblemStaffData, error) {
-	return c.Query().Where(codingproblemstaffdata.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *CodingProblemStaffDataClient) GetX(ctx context.Context, id int) *CodingProblemStaffData {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// Hooks returns the client hooks.
-func (c *CodingProblemStaffDataClient) Hooks() []Hook {
-	return c.hooks.CodingProblemStaffData
 }
 
 // CodingSubmissionClient is a client for the CodingSubmission schema.

@@ -61,18 +61,6 @@ func (cp *CodingProblemQuery) collectField(ctx *graphql.OperationContext, field 
 }
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
-func (cpsd *CodingProblemStaffDataQuery) CollectFields(ctx context.Context, satisfies ...string) *CodingProblemStaffDataQuery {
-	if fc := graphql.GetFieldContext(ctx); fc != nil {
-		cpsd = cpsd.collectField(graphql.GetOperationContext(ctx), fc.Field, satisfies...)
-	}
-	return cpsd
-}
-
-func (cpsd *CodingProblemStaffDataQuery) collectField(ctx *graphql.OperationContext, field graphql.CollectedField, satisfies ...string) *CodingProblemStaffDataQuery {
-	return cpsd
-}
-
-// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
 func (cs *CodingSubmissionQuery) CollectFields(ctx context.Context, satisfies ...string) *CodingSubmissionQuery {
 	if fc := graphql.GetFieldContext(ctx); fc != nil {
 		cs = cs.collectField(graphql.GetOperationContext(ctx), fc.Field, satisfies...)

@@ -55,17 +55,6 @@ var (
 		Columns:    CodingProblemsColumns,
 		PrimaryKey: []*schema.Column{CodingProblemsColumns[0]},
 	}
-	// CodingProblemStaffDataColumns holds the columns for the "coding_problem_staff_data" table.
-	CodingProblemStaffDataColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "input", Type: field.TypeString, Size: 2147483647},
-	}
-	// CodingProblemStaffDataTable holds the schema information for the "coding_problem_staff_data" table.
-	CodingProblemStaffDataTable = &schema.Table{
-		Name:       "coding_problem_staff_data",
-		Columns:    CodingProblemStaffDataColumns,
-		PrimaryKey: []*schema.Column{CodingProblemStaffDataColumns[0]},
-	}
 	// CodingSubmissionsColumns holds the columns for the "coding_submissions" table.
 	CodingSubmissionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -203,7 +192,6 @@ var (
 	Tables = []*schema.Table{
 		CodingDraftsTable,
 		CodingProblemsTable,
-		CodingProblemStaffDataTable,
 		CodingSubmissionsTable,
 		CodingSubmissionStaffDataTable,
 		CodingTestCasesTable,

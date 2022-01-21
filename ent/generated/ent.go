@@ -5,7 +5,6 @@ package generated
 import (
 	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/codingproblem"
-	"170-ag/ent/generated/codingproblemstaffdata"
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/codingsubmissionstaffdata"
 	"170-ag/ent/generated/codingtestcase"
@@ -37,7 +36,6 @@ func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
 		codingdraft.Table:               codingdraft.ValidColumn,
 		codingproblem.Table:             codingproblem.ValidColumn,
-		codingproblemstaffdata.Table:    codingproblemstaffdata.ValidColumn,
 		codingsubmission.Table:          codingsubmission.ValidColumn,
 		codingsubmissionstaffdata.Table: codingsubmissionstaffdata.ValidColumn,
 		codingtestcase.Table:            codingtestcase.ValidColumn,

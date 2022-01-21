@@ -12,9 +12,6 @@ type CodingDraft func(*sql.Selector)
 // CodingProblem is the predicate function for codingproblem builders.
 type CodingProblem func(*sql.Selector)
 
-// CodingProblemStaffData is the predicate function for codingproblemstaffdata builders.
-type CodingProblemStaffData func(*sql.Selector)
-
 // CodingSubmission is the predicate function for codingsubmission builders.
 type CodingSubmission func(*sql.Selector)
 

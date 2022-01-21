@@ -212,30 +212,6 @@ func (f CodingProblemMutationRuleFunc) EvalMutation(ctx context.Context, m gener
 	return Denyf("generated/privacy: unexpected mutation type %T, expect *generated.CodingProblemMutation", m)
 }
 
-// The CodingProblemStaffDataQueryRuleFunc type is an adapter to allow the use of ordinary
-// functions as a query rule.
-type CodingProblemStaffDataQueryRuleFunc func(context.Context, *generated.CodingProblemStaffDataQuery) error
-
-// EvalQuery return f(ctx, q).
-func (f CodingProblemStaffDataQueryRuleFunc) EvalQuery(ctx context.Context, q generated.Query) error {
-	if q, ok := q.(*generated.CodingProblemStaffDataQuery); ok {
-		return f(ctx, q)
-	}
-	return Denyf("generated/privacy: unexpected query type %T, expect *generated.CodingProblemStaffDataQuery", q)
-}
-
-// The CodingProblemStaffDataMutationRuleFunc type is an adapter to allow the use of ordinary
-// functions as a mutation rule.
-type CodingProblemStaffDataMutationRuleFunc func(context.Context, *generated.CodingProblemStaffDataMutation) error
-
-// EvalMutation calls f(ctx, m).
-func (f CodingProblemStaffDataMutationRuleFunc) EvalMutation(ctx context.Context, m generated.Mutation) error {
-	if m, ok := m.(*generated.CodingProblemStaffDataMutation); ok {
-		return f(ctx, m)
-	}
-	return Denyf("generated/privacy: unexpected mutation type %T, expect *generated.CodingProblemStaffDataMutation", m)
-}
-
 // The CodingSubmissionQueryRuleFunc type is an adapter to allow the use of ordinary
 // functions as a query rule.
 type CodingSubmissionQueryRuleFunc func(context.Context, *generated.CodingSubmissionQuery) error
@@ -371,8 +347,6 @@ func queryFilter(q generated.Query) (Filter, error) {
 		return q.Filter(), nil
 	case *generated.CodingProblemQuery:
 		return q.Filter(), nil
-	case *generated.CodingProblemStaffDataQuery:
-		return q.Filter(), nil
 	case *generated.CodingSubmissionQuery:
 		return q.Filter(), nil
 	case *generated.CodingSubmissionStaffDataQuery:
@@ -391,8 +365,6 @@ func mutationFilter(m generated.Mutation) (Filter, error) {
 	case *generated.CodingDraftMutation:
 		return m.Filter(), nil
 	case *generated.CodingProblemMutation:
-		return m.Filter(), nil
-	case *generated.CodingProblemStaffDataMutation:
 		return m.Filter(), nil
 	case *generated.CodingSubmissionMutation:
 		return m.Filter(), nil
