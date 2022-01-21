@@ -346,10 +346,10 @@ func (cpu *CodingProblemUpdate) sqlSave(ctx context.Context) (n int, err error) 
 	}
 	if cpu.mutation.TestCasesCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   codingproblem.TestCasesTable,
-			Columns: codingproblem.TestCasesPrimaryKey,
+			Columns: []string{codingproblem.TestCasesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -362,10 +362,10 @@ func (cpu *CodingProblemUpdate) sqlSave(ctx context.Context) (n int, err error) 
 	}
 	if nodes := cpu.mutation.RemovedTestCasesIDs(); len(nodes) > 0 && !cpu.mutation.TestCasesCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   codingproblem.TestCasesTable,
-			Columns: codingproblem.TestCasesPrimaryKey,
+			Columns: []string{codingproblem.TestCasesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -381,10 +381,10 @@ func (cpu *CodingProblemUpdate) sqlSave(ctx context.Context) (n int, err error) 
 	}
 	if nodes := cpu.mutation.TestCasesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   codingproblem.TestCasesTable,
-			Columns: codingproblem.TestCasesPrimaryKey,
+			Columns: []string{codingproblem.TestCasesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -812,10 +812,10 @@ func (cpuo *CodingProblemUpdateOne) sqlSave(ctx context.Context) (_node *CodingP
 	}
 	if cpuo.mutation.TestCasesCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   codingproblem.TestCasesTable,
-			Columns: codingproblem.TestCasesPrimaryKey,
+			Columns: []string{codingproblem.TestCasesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -828,10 +828,10 @@ func (cpuo *CodingProblemUpdateOne) sqlSave(ctx context.Context) (_node *CodingP
 	}
 	if nodes := cpuo.mutation.RemovedTestCasesIDs(); len(nodes) > 0 && !cpuo.mutation.TestCasesCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   codingproblem.TestCasesTable,
-			Columns: codingproblem.TestCasesPrimaryKey,
+			Columns: []string{codingproblem.TestCasesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -847,10 +847,10 @@ func (cpuo *CodingProblemUpdateOne) sqlSave(ctx context.Context) (_node *CodingP
 	}
 	if nodes := cpuo.mutation.TestCasesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   codingproblem.TestCasesTable,
-			Columns: codingproblem.TestCasesPrimaryKey,
+			Columns: []string{codingproblem.TestCasesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

@@ -32,11 +32,13 @@ const (
 	DraftsInverseTable = "coding_drafts"
 	// DraftsColumn is the table column denoting the drafts relation/edge.
 	DraftsColumn = "coding_draft_coding_problem"
-	// TestCasesTable is the table that holds the test_cases relation/edge. The primary key declared below.
-	TestCasesTable = "coding_problem_test_cases"
+	// TestCasesTable is the table that holds the test_cases relation/edge.
+	TestCasesTable = "coding_test_cases"
 	// TestCasesInverseTable is the table name for the CodingTestCase entity.
 	// It exists in this package in order to avoid circular dependency with the "codingtestcase" package.
 	TestCasesInverseTable = "coding_test_cases"
+	// TestCasesColumn is the table column denoting the test_cases relation/edge.
+	TestCasesColumn = "coding_problem_test_cases"
 	// SubmissionsTable is the table that holds the submissions relation/edge.
 	SubmissionsTable = "coding_submissions"
 	// SubmissionsInverseTable is the table name for the CodingSubmission entity.
@@ -53,12 +55,6 @@ var Columns = []string{
 	FieldStatement,
 	FieldReleased,
 }
-
-var (
-	// TestCasesPrimaryKey and TestCasesColumn2 are the table columns denoting the
-	// primary key for the test_cases relation (M2M).
-	TestCasesPrimaryKey = []string{"coding_problem_id", "coding_test_case_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {

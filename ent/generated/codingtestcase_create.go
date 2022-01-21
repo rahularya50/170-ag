@@ -46,19 +46,15 @@ func (ctcc *CodingTestCaseCreate) SetVisible(b bool) *CodingTestCaseCreate {
 	return ctcc
 }
 
-// AddCodingProblemIDs adds the "coding_problem" edge to the CodingProblem entity by IDs.
-func (ctcc *CodingTestCaseCreate) AddCodingProblemIDs(ids ...int) *CodingTestCaseCreate {
-	ctcc.mutation.AddCodingProblemIDs(ids...)
+// SetCodingProblemID sets the "coding_problem" edge to the CodingProblem entity by ID.
+func (ctcc *CodingTestCaseCreate) SetCodingProblemID(id int) *CodingTestCaseCreate {
+	ctcc.mutation.SetCodingProblemID(id)
 	return ctcc
 }
 
-// AddCodingProblem adds the "coding_problem" edges to the CodingProblem entity.
-func (ctcc *CodingTestCaseCreate) AddCodingProblem(c ...*CodingProblem) *CodingTestCaseCreate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return ctcc.AddCodingProblemIDs(ids...)
+// SetCodingProblem sets the "coding_problem" edge to the CodingProblem entity.
+func (ctcc *CodingTestCaseCreate) SetCodingProblem(c *CodingProblem) *CodingTestCaseCreate {
+	return ctcc.SetCodingProblemID(c.ID)
 }
 
 // Mutation returns the CodingTestCaseMutation object of the builder.
@@ -148,6 +144,9 @@ func (ctcc *CodingTestCaseCreate) check() error {
 	if _, ok := ctcc.mutation.Visible(); !ok {
 		return &ValidationError{Name: "visible", err: errors.New(`generated: missing required field "visible"`)}
 	}
+	if _, ok := ctcc.mutation.CodingProblemID(); !ok {
+		return &ValidationError{Name: "coding_problem", err: errors.New("generated: missing required edge \"coding_problem\"")}
+	}
 	return nil
 }
 
@@ -210,10 +209,10 @@ func (ctcc *CodingTestCaseCreate) createSpec() (*CodingTestCase, *sqlgraph.Creat
 	}
 	if nodes := ctcc.mutation.CodingProblemIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   codingtestcase.CodingProblemTable,
-			Columns: codingtestcase.CodingProblemPrimaryKey,
+			Columns: []string{codingtestcase.CodingProblemColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -225,6 +224,7 @@ func (ctcc *CodingTestCaseCreate) createSpec() (*CodingTestCase, *sqlgraph.Creat
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.coding_problem_test_cases = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

@@ -7,6 +7,7 @@ import (
 	"170-ag/ent/generated/codingtestcase"
 	"170-ag/ent/generated/predicate"
 	"context"
+	"errors"
 	"fmt"
 
 	"entgo.io/ent/dialect/sql"
@@ -58,19 +59,15 @@ func (ctcu *CodingTestCaseUpdate) SetVisible(b bool) *CodingTestCaseUpdate {
 	return ctcu
 }
 
-// AddCodingProblemIDs adds the "coding_problem" edge to the CodingProblem entity by IDs.
-func (ctcu *CodingTestCaseUpdate) AddCodingProblemIDs(ids ...int) *CodingTestCaseUpdate {
-	ctcu.mutation.AddCodingProblemIDs(ids...)
+// SetCodingProblemID sets the "coding_problem" edge to the CodingProblem entity by ID.
+func (ctcu *CodingTestCaseUpdate) SetCodingProblemID(id int) *CodingTestCaseUpdate {
+	ctcu.mutation.SetCodingProblemID(id)
 	return ctcu
 }
 
-// AddCodingProblem adds the "coding_problem" edges to the CodingProblem entity.
-func (ctcu *CodingTestCaseUpdate) AddCodingProblem(c ...*CodingProblem) *CodingTestCaseUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return ctcu.AddCodingProblemIDs(ids...)
+// SetCodingProblem sets the "coding_problem" edge to the CodingProblem entity.
+func (ctcu *CodingTestCaseUpdate) SetCodingProblem(c *CodingProblem) *CodingTestCaseUpdate {
+	return ctcu.SetCodingProblemID(c.ID)
 }
 
 // Mutation returns the CodingTestCaseMutation object of the builder.
@@ -78,25 +75,10 @@ func (ctcu *CodingTestCaseUpdate) Mutation() *CodingTestCaseMutation {
 	return ctcu.mutation
 }
 
-// ClearCodingProblem clears all "coding_problem" edges to the CodingProblem entity.
+// ClearCodingProblem clears the "coding_problem" edge to the CodingProblem entity.
 func (ctcu *CodingTestCaseUpdate) ClearCodingProblem() *CodingTestCaseUpdate {
 	ctcu.mutation.ClearCodingProblem()
 	return ctcu
-}
-
-// RemoveCodingProblemIDs removes the "coding_problem" edge to CodingProblem entities by IDs.
-func (ctcu *CodingTestCaseUpdate) RemoveCodingProblemIDs(ids ...int) *CodingTestCaseUpdate {
-	ctcu.mutation.RemoveCodingProblemIDs(ids...)
-	return ctcu
-}
-
-// RemoveCodingProblem removes "coding_problem" edges to CodingProblem entities.
-func (ctcu *CodingTestCaseUpdate) RemoveCodingProblem(c ...*CodingProblem) *CodingTestCaseUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return ctcu.RemoveCodingProblemIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -166,6 +148,9 @@ func (ctcu *CodingTestCaseUpdate) check() error {
 			return &ValidationError{Name: "points", err: fmt.Errorf("generated: validator failed for field \"points\": %w", err)}
 		}
 	}
+	if _, ok := ctcu.mutation.CodingProblemID(); ctcu.mutation.CodingProblemCleared() && !ok {
+		return errors.New("generated: clearing a required unique edge \"coding_problem\"")
+	}
 	return nil
 }
 
@@ -224,10 +209,10 @@ func (ctcu *CodingTestCaseUpdate) sqlSave(ctx context.Context) (n int, err error
 	}
 	if ctcu.mutation.CodingProblemCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   codingtestcase.CodingProblemTable,
-			Columns: codingtestcase.CodingProblemPrimaryKey,
+			Columns: []string{codingtestcase.CodingProblemColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -235,34 +220,15 @@ func (ctcu *CodingTestCaseUpdate) sqlSave(ctx context.Context) (n int, err error
 					Column: codingproblem.FieldID,
 				},
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ctcu.mutation.RemovedCodingProblemIDs(); len(nodes) > 0 && !ctcu.mutation.CodingProblemCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   codingtestcase.CodingProblemTable,
-			Columns: codingtestcase.CodingProblemPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: codingproblem.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := ctcu.mutation.CodingProblemIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   codingtestcase.CodingProblemTable,
-			Columns: codingtestcase.CodingProblemPrimaryKey,
+			Columns: []string{codingtestcase.CodingProblemColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -326,19 +292,15 @@ func (ctcuo *CodingTestCaseUpdateOne) SetVisible(b bool) *CodingTestCaseUpdateOn
 	return ctcuo
 }
 
-// AddCodingProblemIDs adds the "coding_problem" edge to the CodingProblem entity by IDs.
-func (ctcuo *CodingTestCaseUpdateOne) AddCodingProblemIDs(ids ...int) *CodingTestCaseUpdateOne {
-	ctcuo.mutation.AddCodingProblemIDs(ids...)
+// SetCodingProblemID sets the "coding_problem" edge to the CodingProblem entity by ID.
+func (ctcuo *CodingTestCaseUpdateOne) SetCodingProblemID(id int) *CodingTestCaseUpdateOne {
+	ctcuo.mutation.SetCodingProblemID(id)
 	return ctcuo
 }
 
-// AddCodingProblem adds the "coding_problem" edges to the CodingProblem entity.
-func (ctcuo *CodingTestCaseUpdateOne) AddCodingProblem(c ...*CodingProblem) *CodingTestCaseUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return ctcuo.AddCodingProblemIDs(ids...)
+// SetCodingProblem sets the "coding_problem" edge to the CodingProblem entity.
+func (ctcuo *CodingTestCaseUpdateOne) SetCodingProblem(c *CodingProblem) *CodingTestCaseUpdateOne {
+	return ctcuo.SetCodingProblemID(c.ID)
 }
 
 // Mutation returns the CodingTestCaseMutation object of the builder.
@@ -346,25 +308,10 @@ func (ctcuo *CodingTestCaseUpdateOne) Mutation() *CodingTestCaseMutation {
 	return ctcuo.mutation
 }
 
-// ClearCodingProblem clears all "coding_problem" edges to the CodingProblem entity.
+// ClearCodingProblem clears the "coding_problem" edge to the CodingProblem entity.
 func (ctcuo *CodingTestCaseUpdateOne) ClearCodingProblem() *CodingTestCaseUpdateOne {
 	ctcuo.mutation.ClearCodingProblem()
 	return ctcuo
-}
-
-// RemoveCodingProblemIDs removes the "coding_problem" edge to CodingProblem entities by IDs.
-func (ctcuo *CodingTestCaseUpdateOne) RemoveCodingProblemIDs(ids ...int) *CodingTestCaseUpdateOne {
-	ctcuo.mutation.RemoveCodingProblemIDs(ids...)
-	return ctcuo
-}
-
-// RemoveCodingProblem removes "coding_problem" edges to CodingProblem entities.
-func (ctcuo *CodingTestCaseUpdateOne) RemoveCodingProblem(c ...*CodingProblem) *CodingTestCaseUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return ctcuo.RemoveCodingProblemIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -441,6 +388,9 @@ func (ctcuo *CodingTestCaseUpdateOne) check() error {
 			return &ValidationError{Name: "points", err: fmt.Errorf("generated: validator failed for field \"points\": %w", err)}
 		}
 	}
+	if _, ok := ctcuo.mutation.CodingProblemID(); ctcuo.mutation.CodingProblemCleared() && !ok {
+		return errors.New("generated: clearing a required unique edge \"coding_problem\"")
+	}
 	return nil
 }
 
@@ -516,10 +466,10 @@ func (ctcuo *CodingTestCaseUpdateOne) sqlSave(ctx context.Context) (_node *Codin
 	}
 	if ctcuo.mutation.CodingProblemCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   codingtestcase.CodingProblemTable,
-			Columns: codingtestcase.CodingProblemPrimaryKey,
+			Columns: []string{codingtestcase.CodingProblemColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -527,34 +477,15 @@ func (ctcuo *CodingTestCaseUpdateOne) sqlSave(ctx context.Context) (_node *Codin
 					Column: codingproblem.FieldID,
 				},
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ctcuo.mutation.RemovedCodingProblemIDs(); len(nodes) > 0 && !ctcuo.mutation.CodingProblemCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   codingtestcase.CodingProblemTable,
-			Columns: codingtestcase.CodingProblemPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: codingproblem.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := ctcuo.mutation.CodingProblemIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   codingtestcase.CodingProblemTable,
-			Columns: codingtestcase.CodingProblemPrimaryKey,
+			Columns: []string{codingtestcase.CodingProblemColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

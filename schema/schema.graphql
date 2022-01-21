@@ -74,7 +74,7 @@ type CodingProblem implements Node {
     before: Cursor
     last: Int
   ): CodingSubmissionConnection!
-  staff_data: CodingProblemStaffData
+  test_cases: [CodingTestCase]!
 }
 
 type CodingProblemConnection {
@@ -94,9 +94,11 @@ input CodingProblemInput {
   released: Boolean!
 }
 
-type CodingProblemStaffData implements Node {
+type CodingTestCase implements Node {
   id: ID!
+  points: Int!
   input: String!
+  output: String!
   coding_problem: CodingProblem!
 }
 

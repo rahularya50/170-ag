@@ -104,7 +104,7 @@ func (cpq *CodingProblemQuery) QueryTestCases() *CodingTestCaseQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(codingproblem.Table, codingproblem.FieldID, selector),
 			sqlgraph.To(codingtestcase.Table, codingtestcase.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, codingproblem.TestCasesTable, codingproblem.TestCasesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, codingproblem.TestCasesTable, codingproblem.TestCasesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cpq.driver.Dialect(), step)
 		return fromU, nil
@@ -485,66 +485,30 @@ func (cpq *CodingProblemQuery) sqlAll(ctx context.Context) ([]*CodingProblem, er
 
 	if query := cpq.withTestCases; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		ids := make(map[int]*CodingProblem, len(nodes))
-		for _, node := range nodes {
-			ids[node.ID] = node
-			fks = append(fks, node.ID)
-			node.Edges.TestCases = []*CodingTestCase{}
+		nodeids := make(map[int]*CodingProblem)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+			nodes[i].Edges.TestCases = []*CodingTestCase{}
 		}
-		var (
-			edgeids []int
-			edges   = make(map[int][]*CodingProblem)
-		)
-		_spec := &sqlgraph.EdgeQuerySpec{
-			Edge: &sqlgraph.EdgeSpec{
-				Inverse: false,
-				Table:   codingproblem.TestCasesTable,
-				Columns: codingproblem.TestCasesPrimaryKey,
-			},
-			Predicate: func(s *sql.Selector) {
-				s.Where(sql.InValues(codingproblem.TestCasesPrimaryKey[0], fks...))
-			},
-			ScanValues: func() [2]interface{} {
-				return [2]interface{}{new(sql.NullInt64), new(sql.NullInt64)}
-			},
-			Assign: func(out, in interface{}) error {
-				eout, ok := out.(*sql.NullInt64)
-				if !ok || eout == nil {
-					return fmt.Errorf("unexpected id value for edge-out")
-				}
-				ein, ok := in.(*sql.NullInt64)
-				if !ok || ein == nil {
-					return fmt.Errorf("unexpected id value for edge-in")
-				}
-				outValue := int(eout.Int64)
-				inValue := int(ein.Int64)
-				node, ok := ids[outValue]
-				if !ok {
-					return fmt.Errorf("unexpected node id in edges: %v", outValue)
-				}
-				if _, ok := edges[inValue]; !ok {
-					edgeids = append(edgeids, inValue)
-				}
-				edges[inValue] = append(edges[inValue], node)
-				return nil
-			},
-		}
-		if err := sqlgraph.QueryEdges(ctx, cpq.driver, _spec); err != nil {
-			return nil, fmt.Errorf(`query edges "test_cases": %w`, err)
-		}
-		query.Where(codingtestcase.IDIn(edgeids...))
+		query.withFKs = true
+		query.Where(predicate.CodingTestCase(func(s *sql.Selector) {
+			s.Where(sql.InValues(codingproblem.TestCasesColumn, fks...))
+		}))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			nodes, ok := edges[n.ID]
+			fk := n.coding_problem_test_cases
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "coding_problem_test_cases" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected "test_cases" node returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "coding_problem_test_cases" returned %v for node %v`, *fk, n.ID)
 			}
-			for i := range nodes {
-				nodes[i].Edges.TestCases = append(nodes[i].Edges.TestCases, n)
-			}
+			node.Edges.TestCases = append(node.Edges.TestCases, n)
 		}
 	}
 

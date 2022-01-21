@@ -391,7 +391,7 @@ func (c *CodingProblemClient) QueryTestCases(cp *CodingProblem) *CodingTestCaseQ
 		step := sqlgraph.NewStep(
 			sqlgraph.From(codingproblem.Table, codingproblem.FieldID, id),
 			sqlgraph.To(codingtestcase.Table, codingtestcase.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, codingproblem.TestCasesTable, codingproblem.TestCasesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, codingproblem.TestCasesTable, codingproblem.TestCasesColumn),
 		)
 		fromV = sqlgraph.Neighbors(cp.driver.Dialect(), step)
 		return fromV, nil
@@ -760,7 +760,7 @@ func (c *CodingTestCaseClient) QueryCodingProblem(ctc *CodingTestCase) *CodingPr
 		step := sqlgraph.NewStep(
 			sqlgraph.From(codingtestcase.Table, codingtestcase.FieldID, id),
 			sqlgraph.To(codingproblem.Table, codingproblem.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, codingtestcase.CodingProblemTable, codingtestcase.CodingProblemPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, codingtestcase.CodingProblemTable, codingtestcase.CodingProblemColumn),
 		)
 		fromV = sqlgraph.Neighbors(ctc.driver.Dialect(), step)
 		return fromV, nil

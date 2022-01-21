@@ -438,7 +438,7 @@ func HasCodingProblem() predicate.CodingTestCase {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(CodingProblemTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, CodingProblemTable, CodingProblemPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, CodingProblemTable, CodingProblemColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -450,7 +450,7 @@ func HasCodingProblemWith(preds ...predicate.CodingProblem) predicate.CodingTest
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(CodingProblemInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, CodingProblemTable, CodingProblemPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, CodingProblemTable, CodingProblemColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

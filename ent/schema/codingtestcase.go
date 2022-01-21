@@ -31,7 +31,9 @@ func (CodingTestCase) Fields() []ent.Field {
 func (CodingTestCase) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("coding_problem", CodingProblem.Type).
+			Unique().
 			Ref("test_cases").
+			Required().
 			Annotations(entgql.Bind()),
 	}
 }

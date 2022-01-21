@@ -383,7 +383,7 @@ func HasTestCases() predicate.CodingProblem {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(TestCasesTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, TestCasesTable, TestCasesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, TestCasesTable, TestCasesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -395,7 +395,7 @@ func HasTestCasesWith(preds ...predicate.CodingTestCase) predicate.CodingProblem
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(TestCasesInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, TestCasesTable, TestCasesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, TestCasesTable, TestCasesColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

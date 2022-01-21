@@ -3,6 +3,7 @@
 package generated
 
 import (
+	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/codingtestcase"
 	"fmt"
 	"strings"
@@ -25,22 +26,28 @@ type CodingTestCase struct {
 	Visible bool `json:"visible,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CodingTestCaseQuery when eager-loading is set.
-	Edges CodingTestCaseEdges `json:"edges"`
+	Edges                     CodingTestCaseEdges `json:"edges"`
+	coding_problem_test_cases *int
 }
 
 // CodingTestCaseEdges holds the relations/edges for other nodes in the graph.
 type CodingTestCaseEdges struct {
 	// CodingProblem holds the value of the coding_problem edge.
-	CodingProblem []*CodingProblem `json:"coding_problem,omitempty"`
+	CodingProblem *CodingProblem `json:"coding_problem,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 }
 
 // CodingProblemOrErr returns the CodingProblem value or an error if the edge
-// was not loaded in eager-loading.
-func (e CodingTestCaseEdges) CodingProblemOrErr() ([]*CodingProblem, error) {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e CodingTestCaseEdges) CodingProblemOrErr() (*CodingProblem, error) {
 	if e.loadedTypes[0] {
+		if e.CodingProblem == nil {
+			// The edge coding_problem was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: codingproblem.Label}
+		}
 		return e.CodingProblem, nil
 	}
 	return nil, &NotLoadedError{edge: "coding_problem"}
@@ -57,6 +64,8 @@ func (*CodingTestCase) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullInt64)
 		case codingtestcase.FieldInput, codingtestcase.FieldOutput:
 			values[i] = new(sql.NullString)
+		case codingtestcase.ForeignKeys[0]: // coding_problem_test_cases
+			values[i] = new(sql.NullInt64)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type CodingTestCase", columns[i])
 		}
@@ -101,6 +110,13 @@ func (ctc *CodingTestCase) assignValues(columns []string, values []interface{}) 
 				return fmt.Errorf("unexpected type %T for field visible", values[i])
 			} else if value.Valid {
 				ctc.Visible = value.Bool
+			}
+		case codingtestcase.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field coding_problem_test_cases", value)
+			} else if value.Valid {
+				ctc.coding_problem_test_cases = new(int)
+				*ctc.coding_problem_test_cases = int(value.Int64)
 			}
 		}
 	}

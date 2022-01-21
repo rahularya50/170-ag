@@ -53,7 +53,7 @@ func allowCodingProblemQueryIfReleased() privacy.CodingProblemQueryRuleFunc {
 		}
 		for _, problem := range problems {
 			if !problem.Released {
-				return privacy.Deny
+				return privacy.Skip
 			}
 		}
 		return privacy.Allow

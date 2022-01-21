@@ -76,10 +76,10 @@ func (cssd *CodingSubmissionStaffData) CodingSubmission(ctx context.Context) (*C
 	return result, err
 }
 
-func (ctc *CodingTestCase) CodingProblem(ctx context.Context) ([]*CodingProblem, error) {
+func (ctc *CodingTestCase) CodingProblem(ctx context.Context) (*CodingProblem, error) {
 	result, err := ctc.Edges.CodingProblemOrErr()
 	if IsNotLoaded(err) {
-		result, err = ctc.QueryCodingProblem().All(ctx)
+		result, err = ctc.QueryCodingProblem().Only(ctx)
 	}
 	return result, err
 }

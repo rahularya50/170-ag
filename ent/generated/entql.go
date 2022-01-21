@@ -155,10 +155,10 @@ var schemaGraph = func() *sqlgraph.Schema {
 	graph.MustAddE(
 		"test_cases",
 		&sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   codingproblem.TestCasesTable,
-			Columns: codingproblem.TestCasesPrimaryKey,
+			Columns: []string{codingproblem.TestCasesColumn},
 			Bidi:    false,
 		},
 		"CodingProblem",
@@ -227,10 +227,10 @@ var schemaGraph = func() *sqlgraph.Schema {
 	graph.MustAddE(
 		"coding_problem",
 		&sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   codingtestcase.CodingProblemTable,
-			Columns: codingtestcase.CodingProblemPrimaryKey,
+			Columns: []string{codingtestcase.CodingProblemColumn},
 			Bidi:    false,
 		},
 		"CodingTestCase",

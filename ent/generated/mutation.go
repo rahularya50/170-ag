@@ -2351,8 +2351,7 @@ type CodingTestCaseMutation struct {
 	addpoints             *int
 	visible               *bool
 	clearedFields         map[string]struct{}
-	coding_problem        map[int]struct{}
-	removedcoding_problem map[int]struct{}
+	coding_problem        *int
 	clearedcoding_problem bool
 	done                  bool
 	oldValue              func(context.Context) (*CodingTestCase, error)
@@ -2602,14 +2601,9 @@ func (m *CodingTestCaseMutation) ResetVisible() {
 	m.visible = nil
 }
 
-// AddCodingProblemIDs adds the "coding_problem" edge to the CodingProblem entity by ids.
-func (m *CodingTestCaseMutation) AddCodingProblemIDs(ids ...int) {
-	if m.coding_problem == nil {
-		m.coding_problem = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.coding_problem[ids[i]] = struct{}{}
-	}
+// SetCodingProblemID sets the "coding_problem" edge to the CodingProblem entity by id.
+func (m *CodingTestCaseMutation) SetCodingProblemID(id int) {
+	m.coding_problem = &id
 }
 
 // ClearCodingProblem clears the "coding_problem" edge to the CodingProblem entity.
@@ -2622,29 +2616,20 @@ func (m *CodingTestCaseMutation) CodingProblemCleared() bool {
 	return m.clearedcoding_problem
 }
 
-// RemoveCodingProblemIDs removes the "coding_problem" edge to the CodingProblem entity by IDs.
-func (m *CodingTestCaseMutation) RemoveCodingProblemIDs(ids ...int) {
-	if m.removedcoding_problem == nil {
-		m.removedcoding_problem = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.coding_problem, ids[i])
-		m.removedcoding_problem[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedCodingProblem returns the removed IDs of the "coding_problem" edge to the CodingProblem entity.
-func (m *CodingTestCaseMutation) RemovedCodingProblemIDs() (ids []int) {
-	for id := range m.removedcoding_problem {
-		ids = append(ids, id)
+// CodingProblemID returns the "coding_problem" edge ID in the mutation.
+func (m *CodingTestCaseMutation) CodingProblemID() (id int, exists bool) {
+	if m.coding_problem != nil {
+		return *m.coding_problem, true
 	}
 	return
 }
 
 // CodingProblemIDs returns the "coding_problem" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CodingProblemID instead. It exists only for internal usage by the builders.
 func (m *CodingTestCaseMutation) CodingProblemIDs() (ids []int) {
-	for id := range m.coding_problem {
-		ids = append(ids, id)
+	if id := m.coding_problem; id != nil {
+		ids = append(ids, *id)
 	}
 	return
 }
@@ -2653,7 +2638,6 @@ func (m *CodingTestCaseMutation) CodingProblemIDs() (ids []int) {
 func (m *CodingTestCaseMutation) ResetCodingProblem() {
 	m.coding_problem = nil
 	m.clearedcoding_problem = false
-	m.removedcoding_problem = nil
 }
 
 // Where appends a list predicates to the CodingTestCaseMutation builder.
@@ -2852,11 +2836,9 @@ func (m *CodingTestCaseMutation) AddedEdges() []string {
 func (m *CodingTestCaseMutation) AddedIDs(name string) []ent.Value {
 	switch name {
 	case codingtestcase.EdgeCodingProblem:
-		ids := make([]ent.Value, 0, len(m.coding_problem))
-		for id := range m.coding_problem {
-			ids = append(ids, id)
+		if id := m.coding_problem; id != nil {
+			return []ent.Value{*id}
 		}
-		return ids
 	}
 	return nil
 }
@@ -2864,9 +2846,6 @@ func (m *CodingTestCaseMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *CodingTestCaseMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.removedcoding_problem != nil {
-		edges = append(edges, codingtestcase.EdgeCodingProblem)
-	}
 	return edges
 }
 
@@ -2874,12 +2853,6 @@ func (m *CodingTestCaseMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *CodingTestCaseMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case codingtestcase.EdgeCodingProblem:
-		ids := make([]ent.Value, 0, len(m.removedcoding_problem))
-		for id := range m.removedcoding_problem {
-			ids = append(ids, id)
-		}
-		return ids
 	}
 	return nil
 }
@@ -2907,6 +2880,9 @@ func (m *CodingTestCaseMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *CodingTestCaseMutation) ClearEdge(name string) error {
 	switch name {
+	case codingtestcase.EdgeCodingProblem:
+		m.ClearCodingProblem()
+		return nil
 	}
 	return fmt.Errorf("unknown CodingTestCase unique edge %s", name)
 }

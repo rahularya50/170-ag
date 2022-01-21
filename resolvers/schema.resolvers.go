@@ -50,35 +50,12 @@ func (r *mutationResolver) NewUser(ctx context.Context, name *string) (*ent.User
 }
 
 func (r *mutationResolver) NewProblem(ctx context.Context, input *model.CodingProblemInput) (*ent.CodingProblem, error) {
-	tx, err := r.client.Tx(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer tx.Rollback()
-
-	problem, err := tx.CodingProblem.
+	return r.client.CodingProblem.
 		Create().
 		SetName(input.Name).
 		SetStatement(input.Statement).
 		SetReleased(input.Released).
 		Save(ctx)
-	if err != nil {
-		return nil, err
-	}
-	err = tx.CodingProblemStaffData.Create().
-		SetCodingProblem(problem).
-		SetInput("").
-		Exec(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		return nil, err
-	}
-
-	return problem.Unwrap(), nil
 }
 
 func (r *mutationResolver) SaveDraft(ctx context.Context, input *model.CodingDraftInput) (*ent.CodingDraft, error) {
@@ -122,17 +99,17 @@ func (r *mutationResolver) CreateSubmission(ctx context.Context, input *model.Co
 
 	submission_ctx := privacyrules.NewContextWithAccessToken(ctx, privacyrules.SubmissionEnqueuingAccessToken)
 
-	problem_data, err := tx.CodingProblem.Query().
+	test_cases, err := tx.CodingProblem.Query().
 		Where(codingproblem.ID(input.ProblemID)).
-		QueryStaffData().
-		Only(submission_ctx)
+		QueryTestCases().
+		All(submission_ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	err = tx.CodingSubmissionStaffData.Create().
 		SetCodingSubmission(submission).
-		SetInput(problem_data.Input).
+		SetInput(test_cases[0].Input). // TODO: concat test cases
 		Exec(submission_ctx)
 	if err != nil {
 		return nil, err
