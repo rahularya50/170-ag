@@ -47,10 +47,6 @@ func (cp *CodingProblemQuery) collectField(ctx *graphql.OperationContext, field 
 			cp = cp.WithDrafts(func(query *CodingDraftQuery) {
 				query.collectField(ctx, field)
 			})
-		case "staff_data":
-			cp = cp.WithStaffData(func(query *CodingProblemStaffDataQuery) {
-				query.collectField(ctx, field)
-			})
 		case "submissions":
 			cp = cp.WithSubmissions(func(query *CodingSubmissionQuery) {
 				query.collectField(ctx, field)
@@ -73,14 +69,6 @@ func (cpsd *CodingProblemStaffDataQuery) CollectFields(ctx context.Context, sati
 }
 
 func (cpsd *CodingProblemStaffDataQuery) collectField(ctx *graphql.OperationContext, field graphql.CollectedField, satisfies ...string) *CodingProblemStaffDataQuery {
-	for _, field := range graphql.CollectFields(ctx, field.Selections, satisfies) {
-		switch field.Name {
-		case "coding_problem":
-			cpsd = cpsd.WithCodingProblem(func(query *CodingProblemQuery) {
-				query.collectField(ctx, field)
-			})
-		}
-	}
 	return cpsd
 }
 

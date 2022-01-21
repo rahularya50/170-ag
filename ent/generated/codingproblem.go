@@ -4,7 +4,6 @@ package generated
 
 import (
 	"170-ag/ent/generated/codingproblem"
-	"170-ag/ent/generated/codingproblemstaffdata"
 	"fmt"
 	"strings"
 
@@ -24,23 +23,20 @@ type CodingProblem struct {
 	Released bool `json:"released,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CodingProblemQuery when eager-loading is set.
-	Edges                                    CodingProblemEdges `json:"edges"`
-	coding_problem_staff_data_coding_problem *int
+	Edges CodingProblemEdges `json:"edges"`
 }
 
 // CodingProblemEdges holds the relations/edges for other nodes in the graph.
 type CodingProblemEdges struct {
 	// Drafts holds the value of the drafts edge.
 	Drafts []*CodingDraft `json:"drafts,omitempty"`
-	// StaffData holds the value of the staff_data edge.
-	StaffData *CodingProblemStaffData `json:"staff_data,omitempty"`
 	// TestCases holds the value of the test_cases edge.
 	TestCases []*CodingTestCase `json:"test_cases,omitempty"`
 	// Submissions holds the value of the submissions edge.
 	Submissions []*CodingSubmission `json:"submissions,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [3]bool
 }
 
 // DraftsOrErr returns the Drafts value or an error if the edge
@@ -52,24 +48,10 @@ func (e CodingProblemEdges) DraftsOrErr() ([]*CodingDraft, error) {
 	return nil, &NotLoadedError{edge: "drafts"}
 }
 
-// StaffDataOrErr returns the StaffData value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e CodingProblemEdges) StaffDataOrErr() (*CodingProblemStaffData, error) {
-	if e.loadedTypes[1] {
-		if e.StaffData == nil {
-			// The edge staff_data was loaded in eager-loading,
-			// but was not found.
-			return nil, &NotFoundError{label: codingproblemstaffdata.Label}
-		}
-		return e.StaffData, nil
-	}
-	return nil, &NotLoadedError{edge: "staff_data"}
-}
-
 // TestCasesOrErr returns the TestCases value or an error if the edge
 // was not loaded in eager-loading.
 func (e CodingProblemEdges) TestCasesOrErr() ([]*CodingTestCase, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[1] {
 		return e.TestCases, nil
 	}
 	return nil, &NotLoadedError{edge: "test_cases"}
@@ -78,7 +60,7 @@ func (e CodingProblemEdges) TestCasesOrErr() ([]*CodingTestCase, error) {
 // SubmissionsOrErr returns the Submissions value or an error if the edge
 // was not loaded in eager-loading.
 func (e CodingProblemEdges) SubmissionsOrErr() ([]*CodingSubmission, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[2] {
 		return e.Submissions, nil
 	}
 	return nil, &NotLoadedError{edge: "submissions"}
@@ -95,8 +77,6 @@ func (*CodingProblem) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullInt64)
 		case codingproblem.FieldName, codingproblem.FieldStatement:
 			values[i] = new(sql.NullString)
-		case codingproblem.ForeignKeys[0]: // coding_problem_staff_data_coding_problem
-			values[i] = new(sql.NullInt64)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type CodingProblem", columns[i])
 		}
@@ -136,13 +116,6 @@ func (cp *CodingProblem) assignValues(columns []string, values []interface{}) er
 			} else if value.Valid {
 				cp.Released = value.Bool
 			}
-		case codingproblem.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field coding_problem_staff_data_coding_problem", value)
-			} else if value.Valid {
-				cp.coding_problem_staff_data_coding_problem = new(int)
-				*cp.coding_problem_staff_data_coding_problem = int(value.Int64)
-			}
 		}
 	}
 	return nil
@@ -151,11 +124,6 @@ func (cp *CodingProblem) assignValues(columns []string, values []interface{}) er
 // QueryDrafts queries the "drafts" edge of the CodingProblem entity.
 func (cp *CodingProblem) QueryDrafts() *CodingDraftQuery {
 	return (&CodingProblemClient{config: cp.config}).QueryDrafts(cp)
-}
-
-// QueryStaffData queries the "staff_data" edge of the CodingProblem entity.
-func (cp *CodingProblem) QueryStaffData() *CodingProblemStaffDataQuery {
-	return (&CodingProblemClient{config: cp.config}).QueryStaffData(cp)
 }
 
 // QueryTestCases queries the "test_cases" edge of the CodingProblem entity.

@@ -390,22 +390,6 @@ func (c *CodingProblemClient) QueryDrafts(cp *CodingProblem) *CodingDraftQuery {
 	return query
 }
 
-// QueryStaffData queries the staff_data edge of a CodingProblem.
-func (c *CodingProblemClient) QueryStaffData(cp *CodingProblem) *CodingProblemStaffDataQuery {
-	query := &CodingProblemStaffDataQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
-		id := cp.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(codingproblem.Table, codingproblem.FieldID, id),
-			sqlgraph.To(codingproblemstaffdata.Table, codingproblemstaffdata.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, codingproblem.StaffDataTable, codingproblem.StaffDataColumn),
-		)
-		fromV = sqlgraph.Neighbors(cp.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // QueryTestCases queries the test_cases edge of a CodingProblem.
 func (c *CodingProblemClient) QueryTestCases(cp *CodingProblem) *CodingTestCaseQuery {
 	query := &CodingTestCaseQuery{config: c.config}
@@ -527,22 +511,6 @@ func (c *CodingProblemStaffDataClient) GetX(ctx context.Context, id int) *Coding
 		panic(err)
 	}
 	return obj
-}
-
-// QueryCodingProblem queries the coding_problem edge of a CodingProblemStaffData.
-func (c *CodingProblemStaffDataClient) QueryCodingProblem(cpsd *CodingProblemStaffData) *CodingProblemQuery {
-	query := &CodingProblemQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
-		id := cpsd.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(codingproblemstaffdata.Table, codingproblemstaffdata.FieldID, id),
-			sqlgraph.To(codingproblem.Table, codingproblem.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, codingproblemstaffdata.CodingProblemTable, codingproblemstaffdata.CodingProblemColumn),
-		)
-		fromV = sqlgraph.Neighbors(cpsd.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
 }
 
 // Hooks returns the client hooks.

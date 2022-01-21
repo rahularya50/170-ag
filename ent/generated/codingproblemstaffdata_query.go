@@ -3,11 +3,9 @@
 package generated
 
 import (
-	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/codingproblemstaffdata"
 	"170-ag/ent/generated/predicate"
 	"context"
-	"database/sql/driver"
 	"errors"
 	"fmt"
 	"math"
@@ -26,8 +24,6 @@ type CodingProblemStaffDataQuery struct {
 	order      []OrderFunc
 	fields     []string
 	predicates []predicate.CodingProblemStaffData
-	// eager-loading edges.
-	withCodingProblem *CodingProblemQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -62,28 +58,6 @@ func (cpsdq *CodingProblemStaffDataQuery) Unique(unique bool) *CodingProblemStaf
 func (cpsdq *CodingProblemStaffDataQuery) Order(o ...OrderFunc) *CodingProblemStaffDataQuery {
 	cpsdq.order = append(cpsdq.order, o...)
 	return cpsdq
-}
-
-// QueryCodingProblem chains the current query on the "coding_problem" edge.
-func (cpsdq *CodingProblemStaffDataQuery) QueryCodingProblem() *CodingProblemQuery {
-	query := &CodingProblemQuery{config: cpsdq.config}
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := cpsdq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := cpsdq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(codingproblemstaffdata.Table, codingproblemstaffdata.FieldID, selector),
-			sqlgraph.To(codingproblem.Table, codingproblem.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, codingproblemstaffdata.CodingProblemTable, codingproblemstaffdata.CodingProblemColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(cpsdq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
 }
 
 // First returns the first CodingProblemStaffData entity from the query.
@@ -262,27 +236,15 @@ func (cpsdq *CodingProblemStaffDataQuery) Clone() *CodingProblemStaffDataQuery {
 		return nil
 	}
 	return &CodingProblemStaffDataQuery{
-		config:            cpsdq.config,
-		limit:             cpsdq.limit,
-		offset:            cpsdq.offset,
-		order:             append([]OrderFunc{}, cpsdq.order...),
-		predicates:        append([]predicate.CodingProblemStaffData{}, cpsdq.predicates...),
-		withCodingProblem: cpsdq.withCodingProblem.Clone(),
+		config:     cpsdq.config,
+		limit:      cpsdq.limit,
+		offset:     cpsdq.offset,
+		order:      append([]OrderFunc{}, cpsdq.order...),
+		predicates: append([]predicate.CodingProblemStaffData{}, cpsdq.predicates...),
 		// clone intermediate query.
 		sql:  cpsdq.sql.Clone(),
 		path: cpsdq.path,
 	}
-}
-
-// WithCodingProblem tells the query-builder to eager-load the nodes that are connected to
-// the "coding_problem" edge. The optional arguments are used to configure the query builder of the edge.
-func (cpsdq *CodingProblemStaffDataQuery) WithCodingProblem(opts ...func(*CodingProblemQuery)) *CodingProblemStaffDataQuery {
-	query := &CodingProblemQuery{config: cpsdq.config}
-	for _, opt := range opts {
-		opt(query)
-	}
-	cpsdq.withCodingProblem = query
-	return cpsdq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -348,11 +310,8 @@ func (cpsdq *CodingProblemStaffDataQuery) prepareQuery(ctx context.Context) erro
 
 func (cpsdq *CodingProblemStaffDataQuery) sqlAll(ctx context.Context) ([]*CodingProblemStaffData, error) {
 	var (
-		nodes       = []*CodingProblemStaffData{}
-		_spec       = cpsdq.querySpec()
-		loadedTypes = [1]bool{
-			cpsdq.withCodingProblem != nil,
-		}
+		nodes = []*CodingProblemStaffData{}
+		_spec = cpsdq.querySpec()
 	)
 	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
 		node := &CodingProblemStaffData{config: cpsdq.config}
@@ -364,7 +323,6 @@ func (cpsdq *CodingProblemStaffDataQuery) sqlAll(ctx context.Context) ([]*Coding
 			return fmt.Errorf("generated: Assign called without calling ScanValues")
 		}
 		node := nodes[len(nodes)-1]
-		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	if err := sqlgraph.QueryNodes(ctx, cpsdq.driver, _spec); err != nil {
@@ -373,35 +331,6 @@ func (cpsdq *CodingProblemStaffDataQuery) sqlAll(ctx context.Context) ([]*Coding
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-
-	if query := cpsdq.withCodingProblem; query != nil {
-		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[int]*CodingProblemStaffData)
-		for i := range nodes {
-			fks = append(fks, nodes[i].ID)
-			nodeids[nodes[i].ID] = nodes[i]
-		}
-		query.withFKs = true
-		query.Where(predicate.CodingProblem(func(s *sql.Selector) {
-			s.Where(sql.InValues(codingproblemstaffdata.CodingProblemColumn, fks...))
-		}))
-		neighbors, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, n := range neighbors {
-			fk := n.coding_problem_staff_data_coding_problem
-			if fk == nil {
-				return nil, fmt.Errorf(`foreign-key "coding_problem_staff_data_coding_problem" is nil for node %v`, n.ID)
-			}
-			node, ok := nodeids[*fk]
-			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "coding_problem_staff_data_coding_problem" returned %v for node %v`, *fk, n.ID)
-			}
-			node.Edges.CodingProblem = n
-		}
-	}
-
 	return nodes, nil
 }
 

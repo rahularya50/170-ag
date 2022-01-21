@@ -9,17 +9,8 @@ const (
 	FieldID = "id"
 	// FieldInput holds the string denoting the input field in the database.
 	FieldInput = "input"
-	// EdgeCodingProblem holds the string denoting the coding_problem edge name in mutations.
-	EdgeCodingProblem = "coding_problem"
 	// Table holds the table name of the codingproblemstaffdata in the database.
 	Table = "coding_problem_staff_data"
-	// CodingProblemTable is the table that holds the coding_problem relation/edge.
-	CodingProblemTable = "coding_problems"
-	// CodingProblemInverseTable is the table name for the CodingProblem entity.
-	// It exists in this package in order to avoid circular dependency with the "codingproblem" package.
-	CodingProblemInverseTable = "coding_problems"
-	// CodingProblemColumn is the table column denoting the coding_problem relation/edge.
-	CodingProblemColumn = "coding_problem_staff_data_coding_problem"
 )
 
 // Columns holds all SQL columns for codingproblemstaffdata fields.

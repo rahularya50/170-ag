@@ -5,7 +5,6 @@ package generated
 import (
 	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/codingproblem"
-	"170-ag/ent/generated/codingproblemstaffdata"
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/codingtestcase"
 	"context"
@@ -72,25 +71,6 @@ func (cpc *CodingProblemCreate) AddDrafts(c ...*CodingDraft) *CodingProblemCreat
 		ids[i] = c[i].ID
 	}
 	return cpc.AddDraftIDs(ids...)
-}
-
-// SetStaffDataID sets the "staff_data" edge to the CodingProblemStaffData entity by ID.
-func (cpc *CodingProblemCreate) SetStaffDataID(id int) *CodingProblemCreate {
-	cpc.mutation.SetStaffDataID(id)
-	return cpc
-}
-
-// SetNillableStaffDataID sets the "staff_data" edge to the CodingProblemStaffData entity by ID if the given value is not nil.
-func (cpc *CodingProblemCreate) SetNillableStaffDataID(id *int) *CodingProblemCreate {
-	if id != nil {
-		cpc = cpc.SetStaffDataID(*id)
-	}
-	return cpc
-}
-
-// SetStaffData sets the "staff_data" edge to the CodingProblemStaffData entity.
-func (cpc *CodingProblemCreate) SetStaffData(c *CodingProblemStaffData) *CodingProblemCreate {
-	return cpc.SetStaffDataID(c.ID)
 }
 
 // AddTestCaseIDs adds the "test_cases" edge to the CodingTestCase entity by IDs.
@@ -297,26 +277,6 @@ func (cpc *CodingProblemCreate) createSpec() (*CodingProblem, *sqlgraph.CreateSp
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := cpc.mutation.StaffDataIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: true,
-			Table:   codingproblem.StaffDataTable,
-			Columns: []string{codingproblem.StaffDataColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: codingproblemstaffdata.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.coding_problem_staff_data_coding_problem = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := cpc.mutation.TestCasesIDs(); len(nodes) > 0 {

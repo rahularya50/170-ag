@@ -377,34 +377,6 @@ func HasDraftsWith(preds ...predicate.CodingDraft) predicate.CodingProblem {
 	})
 }
 
-// HasStaffData applies the HasEdge predicate on the "staff_data" edge.
-func HasStaffData() predicate.CodingProblem {
-	return predicate.CodingProblem(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(StaffDataTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, StaffDataTable, StaffDataColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasStaffDataWith applies the HasEdge predicate on the "staff_data" edge with a given conditions (other predicates).
-func HasStaffDataWith(preds ...predicate.CodingProblemStaffData) predicate.CodingProblem {
-	return predicate.CodingProblem(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(StaffDataInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, StaffDataTable, StaffDataColumn),
-		)
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // HasTestCases applies the HasEdge predicate on the "test_cases" edge.
 func HasTestCases() predicate.CodingProblem {
 	return predicate.CodingProblem(func(s *sql.Selector) {

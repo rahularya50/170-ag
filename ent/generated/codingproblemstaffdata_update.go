@@ -3,11 +3,9 @@
 package generated
 
 import (
-	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/codingproblemstaffdata"
 	"170-ag/ent/generated/predicate"
 	"context"
-	"errors"
 	"fmt"
 
 	"entgo.io/ent/dialect/sql"
@@ -34,26 +32,9 @@ func (cpsdu *CodingProblemStaffDataUpdate) SetInput(s string) *CodingProblemStaf
 	return cpsdu
 }
 
-// SetCodingProblemID sets the "coding_problem" edge to the CodingProblem entity by ID.
-func (cpsdu *CodingProblemStaffDataUpdate) SetCodingProblemID(id int) *CodingProblemStaffDataUpdate {
-	cpsdu.mutation.SetCodingProblemID(id)
-	return cpsdu
-}
-
-// SetCodingProblem sets the "coding_problem" edge to the CodingProblem entity.
-func (cpsdu *CodingProblemStaffDataUpdate) SetCodingProblem(c *CodingProblem) *CodingProblemStaffDataUpdate {
-	return cpsdu.SetCodingProblemID(c.ID)
-}
-
 // Mutation returns the CodingProblemStaffDataMutation object of the builder.
 func (cpsdu *CodingProblemStaffDataUpdate) Mutation() *CodingProblemStaffDataMutation {
 	return cpsdu.mutation
-}
-
-// ClearCodingProblem clears the "coding_problem" edge to the CodingProblem entity.
-func (cpsdu *CodingProblemStaffDataUpdate) ClearCodingProblem() *CodingProblemStaffDataUpdate {
-	cpsdu.mutation.ClearCodingProblem()
-	return cpsdu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -63,18 +44,12 @@ func (cpsdu *CodingProblemStaffDataUpdate) Save(ctx context.Context) (int, error
 		affected int
 	)
 	if len(cpsdu.hooks) == 0 {
-		if err = cpsdu.check(); err != nil {
-			return 0, err
-		}
 		affected, err = cpsdu.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*CodingProblemStaffDataMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = cpsdu.check(); err != nil {
-				return 0, err
 			}
 			cpsdu.mutation = mutation
 			affected, err = cpsdu.sqlSave(ctx)
@@ -116,14 +91,6 @@ func (cpsdu *CodingProblemStaffDataUpdate) ExecX(ctx context.Context) {
 	}
 }
 
-// check runs all checks and user-defined validators on the builder.
-func (cpsdu *CodingProblemStaffDataUpdate) check() error {
-	if _, ok := cpsdu.mutation.CodingProblemID(); cpsdu.mutation.CodingProblemCleared() && !ok {
-		return errors.New("generated: clearing a required unique edge \"coding_problem\"")
-	}
-	return nil
-}
-
 func (cpsdu *CodingProblemStaffDataUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
@@ -148,41 +115,6 @@ func (cpsdu *CodingProblemStaffDataUpdate) sqlSave(ctx context.Context) (n int, 
 			Value:  value,
 			Column: codingproblemstaffdata.FieldInput,
 		})
-	}
-	if cpsdu.mutation.CodingProblemCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   codingproblemstaffdata.CodingProblemTable,
-			Columns: []string{codingproblemstaffdata.CodingProblemColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: codingproblem.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cpsdu.mutation.CodingProblemIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   codingproblemstaffdata.CodingProblemTable,
-			Columns: []string{codingproblemstaffdata.CodingProblemColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: codingproblem.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, cpsdu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -209,26 +141,9 @@ func (cpsduo *CodingProblemStaffDataUpdateOne) SetInput(s string) *CodingProblem
 	return cpsduo
 }
 
-// SetCodingProblemID sets the "coding_problem" edge to the CodingProblem entity by ID.
-func (cpsduo *CodingProblemStaffDataUpdateOne) SetCodingProblemID(id int) *CodingProblemStaffDataUpdateOne {
-	cpsduo.mutation.SetCodingProblemID(id)
-	return cpsduo
-}
-
-// SetCodingProblem sets the "coding_problem" edge to the CodingProblem entity.
-func (cpsduo *CodingProblemStaffDataUpdateOne) SetCodingProblem(c *CodingProblem) *CodingProblemStaffDataUpdateOne {
-	return cpsduo.SetCodingProblemID(c.ID)
-}
-
 // Mutation returns the CodingProblemStaffDataMutation object of the builder.
 func (cpsduo *CodingProblemStaffDataUpdateOne) Mutation() *CodingProblemStaffDataMutation {
 	return cpsduo.mutation
-}
-
-// ClearCodingProblem clears the "coding_problem" edge to the CodingProblem entity.
-func (cpsduo *CodingProblemStaffDataUpdateOne) ClearCodingProblem() *CodingProblemStaffDataUpdateOne {
-	cpsduo.mutation.ClearCodingProblem()
-	return cpsduo
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -245,18 +160,12 @@ func (cpsduo *CodingProblemStaffDataUpdateOne) Save(ctx context.Context) (*Codin
 		node *CodingProblemStaffData
 	)
 	if len(cpsduo.hooks) == 0 {
-		if err = cpsduo.check(); err != nil {
-			return nil, err
-		}
 		node, err = cpsduo.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*CodingProblemStaffDataMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = cpsduo.check(); err != nil {
-				return nil, err
 			}
 			cpsduo.mutation = mutation
 			node, err = cpsduo.sqlSave(ctx)
@@ -296,14 +205,6 @@ func (cpsduo *CodingProblemStaffDataUpdateOne) ExecX(ctx context.Context) {
 	if err := cpsduo.Exec(ctx); err != nil {
 		panic(err)
 	}
-}
-
-// check runs all checks and user-defined validators on the builder.
-func (cpsduo *CodingProblemStaffDataUpdateOne) check() error {
-	if _, ok := cpsduo.mutation.CodingProblemID(); cpsduo.mutation.CodingProblemCleared() && !ok {
-		return errors.New("generated: clearing a required unique edge \"coding_problem\"")
-	}
-	return nil
 }
 
 func (cpsduo *CodingProblemStaffDataUpdateOne) sqlSave(ctx context.Context) (_node *CodingProblemStaffData, err error) {
@@ -347,41 +248,6 @@ func (cpsduo *CodingProblemStaffDataUpdateOne) sqlSave(ctx context.Context) (_no
 			Value:  value,
 			Column: codingproblemstaffdata.FieldInput,
 		})
-	}
-	if cpsduo.mutation.CodingProblemCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   codingproblemstaffdata.CodingProblemTable,
-			Columns: []string{codingproblemstaffdata.CodingProblemColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: codingproblem.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cpsduo.mutation.CodingProblemIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   codingproblemstaffdata.CodingProblemTable,
-			Columns: []string{codingproblemstaffdata.CodingProblemColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: codingproblem.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &CodingProblemStaffData{config: cpsduo.config}
 	_spec.Assign = _node.assignValues

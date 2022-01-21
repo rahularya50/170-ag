@@ -3,7 +3,6 @@
 package generated
 
 import (
-	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/codingproblemstaffdata"
 	"fmt"
 	"strings"
@@ -18,32 +17,6 @@ type CodingProblemStaffData struct {
 	ID int `json:"id,omitempty"`
 	// Input holds the value of the "input" field.
 	Input string `json:"input,omitempty"`
-	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the CodingProblemStaffDataQuery when eager-loading is set.
-	Edges CodingProblemStaffDataEdges `json:"edges"`
-}
-
-// CodingProblemStaffDataEdges holds the relations/edges for other nodes in the graph.
-type CodingProblemStaffDataEdges struct {
-	// CodingProblem holds the value of the coding_problem edge.
-	CodingProblem *CodingProblem `json:"coding_problem,omitempty"`
-	// loadedTypes holds the information for reporting if a
-	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
-}
-
-// CodingProblemOrErr returns the CodingProblem value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e CodingProblemStaffDataEdges) CodingProblemOrErr() (*CodingProblem, error) {
-	if e.loadedTypes[0] {
-		if e.CodingProblem == nil {
-			// The edge coding_problem was loaded in eager-loading,
-			// but was not found.
-			return nil, &NotFoundError{label: codingproblem.Label}
-		}
-		return e.CodingProblem, nil
-	}
-	return nil, &NotLoadedError{edge: "coding_problem"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -85,11 +58,6 @@ func (cpsd *CodingProblemStaffData) assignValues(columns []string, values []inte
 		}
 	}
 	return nil
-}
-
-// QueryCodingProblem queries the "coding_problem" edge of the CodingProblemStaffData entity.
-func (cpsd *CodingProblemStaffData) QueryCodingProblem() *CodingProblemQuery {
-	return (&CodingProblemStaffDataClient{config: cpsd.config}).QueryCodingProblem(cpsd)
 }
 
 // Update returns a builder for updating this CodingProblemStaffData.

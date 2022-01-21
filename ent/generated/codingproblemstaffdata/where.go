@@ -6,7 +6,6 @@ import (
 	"170-ag/ent/generated/predicate"
 
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // ID filters vertices based on their ID field.
@@ -207,34 +206,6 @@ func InputEqualFold(v string) predicate.CodingProblemStaffData {
 func InputContainsFold(v string) predicate.CodingProblemStaffData {
 	return predicate.CodingProblemStaffData(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldInput), v))
-	})
-}
-
-// HasCodingProblem applies the HasEdge predicate on the "coding_problem" edge.
-func HasCodingProblem() predicate.CodingProblemStaffData {
-	return predicate.CodingProblemStaffData(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(CodingProblemTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, CodingProblemTable, CodingProblemColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasCodingProblemWith applies the HasEdge predicate on the "coding_problem" edge with a given conditions (other predicates).
-func HasCodingProblemWith(preds ...predicate.CodingProblem) predicate.CodingProblemStaffData {
-	return predicate.CodingProblemStaffData(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(CodingProblemInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, CodingProblemTable, CodingProblemColumn),
-		)
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
 	})
 }
 

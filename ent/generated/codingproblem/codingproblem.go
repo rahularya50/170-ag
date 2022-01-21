@@ -19,8 +19,6 @@ const (
 	FieldReleased = "released"
 	// EdgeDrafts holds the string denoting the drafts edge name in mutations.
 	EdgeDrafts = "drafts"
-	// EdgeStaffData holds the string denoting the staff_data edge name in mutations.
-	EdgeStaffData = "staff_data"
 	// EdgeTestCases holds the string denoting the test_cases edge name in mutations.
 	EdgeTestCases = "test_cases"
 	// EdgeSubmissions holds the string denoting the submissions edge name in mutations.
@@ -34,13 +32,6 @@ const (
 	DraftsInverseTable = "coding_drafts"
 	// DraftsColumn is the table column denoting the drafts relation/edge.
 	DraftsColumn = "coding_draft_coding_problem"
-	// StaffDataTable is the table that holds the staff_data relation/edge.
-	StaffDataTable = "coding_problems"
-	// StaffDataInverseTable is the table name for the CodingProblemStaffData entity.
-	// It exists in this package in order to avoid circular dependency with the "codingproblemstaffdata" package.
-	StaffDataInverseTable = "coding_problem_staff_data"
-	// StaffDataColumn is the table column denoting the staff_data relation/edge.
-	StaffDataColumn = "coding_problem_staff_data_coding_problem"
 	// TestCasesTable is the table that holds the test_cases relation/edge. The primary key declared below.
 	TestCasesTable = "coding_problem_test_cases"
 	// TestCasesInverseTable is the table name for the CodingTestCase entity.
@@ -63,12 +54,6 @@ var Columns = []string{
 	FieldReleased,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "coding_problems"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"coding_problem_staff_data_coding_problem",
-}
-
 var (
 	// TestCasesPrimaryKey and TestCasesColumn2 are the table columns denoting the
 	// primary key for the test_cases relation (M2M).
@@ -79,11 +64,6 @@ var (
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}

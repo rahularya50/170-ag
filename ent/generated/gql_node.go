@@ -96,7 +96,7 @@ func (cp *CodingProblem) Node(ctx context.Context) (node *Node, err error) {
 		ID:     cp.ID,
 		Type:   "CodingProblem",
 		Fields: make([]*Field, 3),
-		Edges:  make([]*Edge, 4),
+		Edges:  make([]*Edge, 3),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(cp.Name); err != nil {
@@ -134,32 +134,22 @@ func (cp *CodingProblem) Node(ctx context.Context) (node *Node, err error) {
 		return nil, err
 	}
 	node.Edges[1] = &Edge{
-		Type: "CodingProblemStaffData",
-		Name: "staff_data",
-	}
-	err = cp.QueryStaffData().
-		Select(codingproblemstaffdata.FieldID).
-		Scan(ctx, &node.Edges[1].IDs)
-	if err != nil {
-		return nil, err
-	}
-	node.Edges[2] = &Edge{
 		Type: "CodingTestCase",
 		Name: "test_cases",
 	}
 	err = cp.QueryTestCases().
 		Select(codingtestcase.FieldID).
-		Scan(ctx, &node.Edges[2].IDs)
+		Scan(ctx, &node.Edges[1].IDs)
 	if err != nil {
 		return nil, err
 	}
-	node.Edges[3] = &Edge{
+	node.Edges[2] = &Edge{
 		Type: "CodingSubmission",
 		Name: "submissions",
 	}
 	err = cp.QuerySubmissions().
 		Select(codingsubmission.FieldID).
-		Scan(ctx, &node.Edges[3].IDs)
+		Scan(ctx, &node.Edges[2].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -171,7 +161,7 @@ func (cpsd *CodingProblemStaffData) Node(ctx context.Context) (node *Node, err e
 		ID:     cpsd.ID,
 		Type:   "CodingProblemStaffData",
 		Fields: make([]*Field, 1),
-		Edges:  make([]*Edge, 1),
+		Edges:  make([]*Edge, 0),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(cpsd.Input); err != nil {
@@ -181,16 +171,6 @@ func (cpsd *CodingProblemStaffData) Node(ctx context.Context) (node *Node, err e
 		Type:  "string",
 		Name:  "input",
 		Value: string(buf),
-	}
-	node.Edges[0] = &Edge{
-		Type: "CodingProblem",
-		Name: "coding_problem",
-	}
-	err = cpsd.QueryCodingProblem().
-		Select(codingproblem.FieldID).
-		Scan(ctx, &node.Edges[0].IDs)
-	if err != nil {
-		return nil, err
 	}
 	return node, nil
 }

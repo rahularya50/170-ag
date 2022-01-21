@@ -33,10 +33,6 @@ func (CodingProblem) Edges() []ent.Edge {
 		edge.From("drafts", CodingDraft.Type).
 			Ref("coding_problem").
 			Annotations(entgql.Bind()),
-		edge.From("staff_data", CodingProblemStaffData.Type).
-			Ref("coding_problem").
-			Unique().
-			Annotations(entgql.Bind()),
 		edge.To("test_cases", CodingTestCase.Type).
 			Annotations(
 				entgql.Bind(),

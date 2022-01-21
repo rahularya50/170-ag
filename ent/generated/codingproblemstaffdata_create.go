@@ -3,7 +3,6 @@
 package generated
 
 import (
-	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/codingproblemstaffdata"
 	"context"
 	"errors"
@@ -26,17 +25,6 @@ type CodingProblemStaffDataCreate struct {
 func (cpsdc *CodingProblemStaffDataCreate) SetInput(s string) *CodingProblemStaffDataCreate {
 	cpsdc.mutation.SetInput(s)
 	return cpsdc
-}
-
-// SetCodingProblemID sets the "coding_problem" edge to the CodingProblem entity by ID.
-func (cpsdc *CodingProblemStaffDataCreate) SetCodingProblemID(id int) *CodingProblemStaffDataCreate {
-	cpsdc.mutation.SetCodingProblemID(id)
-	return cpsdc
-}
-
-// SetCodingProblem sets the "coding_problem" edge to the CodingProblem entity.
-func (cpsdc *CodingProblemStaffDataCreate) SetCodingProblem(c *CodingProblem) *CodingProblemStaffDataCreate {
-	return cpsdc.SetCodingProblemID(c.ID)
 }
 
 // Mutation returns the CodingProblemStaffDataMutation object of the builder.
@@ -112,9 +100,6 @@ func (cpsdc *CodingProblemStaffDataCreate) check() error {
 	if _, ok := cpsdc.mutation.Input(); !ok {
 		return &ValidationError{Name: "input", err: errors.New(`generated: missing required field "input"`)}
 	}
-	if _, ok := cpsdc.mutation.CodingProblemID(); !ok {
-		return &ValidationError{Name: "coding_problem", err: errors.New("generated: missing required edge \"coding_problem\"")}
-	}
 	return nil
 }
 
@@ -150,25 +135,6 @@ func (cpsdc *CodingProblemStaffDataCreate) createSpec() (*CodingProblemStaffData
 			Column: codingproblemstaffdata.FieldInput,
 		})
 		_node.Input = value
-	}
-	if nodes := cpsdc.mutation.CodingProblemIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   codingproblemstaffdata.CodingProblemTable,
-			Columns: []string{codingproblemstaffdata.CodingProblemColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: codingproblem.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

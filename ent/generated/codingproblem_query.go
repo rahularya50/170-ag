@@ -5,7 +5,6 @@ package generated
 import (
 	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/codingproblem"
-	"170-ag/ent/generated/codingproblemstaffdata"
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/codingtestcase"
 	"170-ag/ent/generated/predicate"
@@ -31,10 +30,8 @@ type CodingProblemQuery struct {
 	predicates []predicate.CodingProblem
 	// eager-loading edges.
 	withDrafts      *CodingDraftQuery
-	withStaffData   *CodingProblemStaffDataQuery
 	withTestCases   *CodingTestCaseQuery
 	withSubmissions *CodingSubmissionQuery
-	withFKs         bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -86,28 +83,6 @@ func (cpq *CodingProblemQuery) QueryDrafts() *CodingDraftQuery {
 			sqlgraph.From(codingproblem.Table, codingproblem.FieldID, selector),
 			sqlgraph.To(codingdraft.Table, codingdraft.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, codingproblem.DraftsTable, codingproblem.DraftsColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(cpq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryStaffData chains the current query on the "staff_data" edge.
-func (cpq *CodingProblemQuery) QueryStaffData() *CodingProblemStaffDataQuery {
-	query := &CodingProblemStaffDataQuery{config: cpq.config}
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := cpq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := cpq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(codingproblem.Table, codingproblem.FieldID, selector),
-			sqlgraph.To(codingproblemstaffdata.Table, codingproblemstaffdata.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, codingproblem.StaffDataTable, codingproblem.StaffDataColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cpq.driver.Dialect(), step)
 		return fromU, nil
@@ -341,7 +316,6 @@ func (cpq *CodingProblemQuery) Clone() *CodingProblemQuery {
 		order:           append([]OrderFunc{}, cpq.order...),
 		predicates:      append([]predicate.CodingProblem{}, cpq.predicates...),
 		withDrafts:      cpq.withDrafts.Clone(),
-		withStaffData:   cpq.withStaffData.Clone(),
 		withTestCases:   cpq.withTestCases.Clone(),
 		withSubmissions: cpq.withSubmissions.Clone(),
 		// clone intermediate query.
@@ -358,17 +332,6 @@ func (cpq *CodingProblemQuery) WithDrafts(opts ...func(*CodingDraftQuery)) *Codi
 		opt(query)
 	}
 	cpq.withDrafts = query
-	return cpq
-}
-
-// WithStaffData tells the query-builder to eager-load the nodes that are connected to
-// the "staff_data" edge. The optional arguments are used to configure the query builder of the edge.
-func (cpq *CodingProblemQuery) WithStaffData(opts ...func(*CodingProblemStaffDataQuery)) *CodingProblemQuery {
-	query := &CodingProblemStaffDataQuery{config: cpq.config}
-	for _, opt := range opts {
-		opt(query)
-	}
-	cpq.withStaffData = query
 	return cpq
 }
 
@@ -464,21 +427,13 @@ func (cpq *CodingProblemQuery) prepareQuery(ctx context.Context) error {
 func (cpq *CodingProblemQuery) sqlAll(ctx context.Context) ([]*CodingProblem, error) {
 	var (
 		nodes       = []*CodingProblem{}
-		withFKs     = cpq.withFKs
 		_spec       = cpq.querySpec()
-		loadedTypes = [4]bool{
+		loadedTypes = [3]bool{
 			cpq.withDrafts != nil,
-			cpq.withStaffData != nil,
 			cpq.withTestCases != nil,
 			cpq.withSubmissions != nil,
 		}
 	)
-	if cpq.withStaffData != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, codingproblem.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
 		node := &CodingProblem{config: cpq.config}
 		nodes = append(nodes, node)
@@ -525,35 +480,6 @@ func (cpq *CodingProblemQuery) sqlAll(ctx context.Context) ([]*CodingProblem, er
 				return nil, fmt.Errorf(`unexpected foreign-key "coding_draft_coding_problem" returned %v for node %v`, *fk, n.ID)
 			}
 			node.Edges.Drafts = append(node.Edges.Drafts, n)
-		}
-	}
-
-	if query := cpq.withStaffData; query != nil {
-		ids := make([]int, 0, len(nodes))
-		nodeids := make(map[int][]*CodingProblem)
-		for i := range nodes {
-			if nodes[i].coding_problem_staff_data_coding_problem == nil {
-				continue
-			}
-			fk := *nodes[i].coding_problem_staff_data_coding_problem
-			if _, ok := nodeids[fk]; !ok {
-				ids = append(ids, fk)
-			}
-			nodeids[fk] = append(nodeids[fk], nodes[i])
-		}
-		query.Where(codingproblemstaffdata.IDIn(ids...))
-		neighbors, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, n := range neighbors {
-			nodes, ok := nodeids[n.ID]
-			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "coding_problem_staff_data_coding_problem" returned %v`, n.ID)
-			}
-			for i := range nodes {
-				nodes[i].Edges.StaffData = n
-			}
 		}
 	}
 

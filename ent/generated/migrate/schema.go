@@ -48,21 +48,12 @@ var (
 		{Name: "name", Type: field.TypeString, Size: 128},
 		{Name: "statement", Type: field.TypeString, Size: 2147483647, Default: "This is the problem statement"},
 		{Name: "released", Type: field.TypeBool, Default: false},
-		{Name: "coding_problem_staff_data_coding_problem", Type: field.TypeInt, Unique: true, Nullable: true},
 	}
 	// CodingProblemsTable holds the schema information for the "coding_problems" table.
 	CodingProblemsTable = &schema.Table{
 		Name:       "coding_problems",
 		Columns:    CodingProblemsColumns,
 		PrimaryKey: []*schema.Column{CodingProblemsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "coding_problems_coding_problem_staff_data_coding_problem",
-				Columns:    []*schema.Column{CodingProblemsColumns[4]},
-				RefColumns: []*schema.Column{CodingProblemStaffDataColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
 	}
 	// CodingProblemStaffDataColumns holds the columns for the "coding_problem_staff_data" table.
 	CodingProblemStaffDataColumns = []*schema.Column{
@@ -224,7 +215,6 @@ var (
 func init() {
 	CodingDraftsTable.ForeignKeys[0].RefTable = UsersTable
 	CodingDraftsTable.ForeignKeys[1].RefTable = CodingProblemsTable
-	CodingProblemsTable.ForeignKeys[0].RefTable = CodingProblemStaffDataTable
 	CodingSubmissionsTable.ForeignKeys[0].RefTable = UsersTable
 	CodingSubmissionsTable.ForeignKeys[1].RefTable = CodingProblemsTable
 	CodingSubmissionsTable.ForeignKeys[2].RefTable = CodingSubmissionStaffDataTable

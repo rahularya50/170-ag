@@ -168,18 +168,6 @@ var schemaGraph = func() *sqlgraph.Schema {
 		"CodingDraft",
 	)
 	graph.MustAddE(
-		"staff_data",
-		&sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: true,
-			Table:   codingproblem.StaffDataTable,
-			Columns: []string{codingproblem.StaffDataColumn},
-			Bidi:    false,
-		},
-		"CodingProblem",
-		"CodingProblemStaffData",
-	)
-	graph.MustAddE(
 		"test_cases",
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -202,18 +190,6 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		"CodingProblem",
 		"CodingSubmission",
-	)
-	graph.MustAddE(
-		"coding_problem",
-		&sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   codingproblemstaffdata.CodingProblemTable,
-			Columns: []string{codingproblemstaffdata.CodingProblemColumn},
-			Bidi:    false,
-		},
-		"CodingProblemStaffData",
-		"CodingProblem",
 	)
 	graph.MustAddE(
 		"author",
@@ -436,20 +412,6 @@ func (f *CodingProblemFilter) WhereHasDraftsWith(preds ...predicate.CodingDraft)
 	})))
 }
 
-// WhereHasStaffData applies a predicate to check if query has an edge staff_data.
-func (f *CodingProblemFilter) WhereHasStaffData() {
-	f.Where(entql.HasEdge("staff_data"))
-}
-
-// WhereHasStaffDataWith applies a predicate to check if query has an edge staff_data with a given conditions (other predicates).
-func (f *CodingProblemFilter) WhereHasStaffDataWith(preds ...predicate.CodingProblemStaffData) {
-	f.Where(entql.HasEdgeWith("staff_data", sqlgraph.WrapFunc(func(s *sql.Selector) {
-		for _, p := range preds {
-			p(s)
-		}
-	})))
-}
-
 // WhereHasTestCases applies a predicate to check if query has an edge test_cases.
 func (f *CodingProblemFilter) WhereHasTestCases() {
 	f.Where(entql.HasEdge("test_cases"))
@@ -520,20 +482,6 @@ func (f *CodingProblemStaffDataFilter) WhereID(p entql.IntP) {
 // WhereInput applies the entql string predicate on the input field.
 func (f *CodingProblemStaffDataFilter) WhereInput(p entql.StringP) {
 	f.Where(p.Field(codingproblemstaffdata.FieldInput))
-}
-
-// WhereHasCodingProblem applies a predicate to check if query has an edge coding_problem.
-func (f *CodingProblemStaffDataFilter) WhereHasCodingProblem() {
-	f.Where(entql.HasEdge("coding_problem"))
-}
-
-// WhereHasCodingProblemWith applies a predicate to check if query has an edge coding_problem with a given conditions (other predicates).
-func (f *CodingProblemStaffDataFilter) WhereHasCodingProblemWith(preds ...predicate.CodingProblem) {
-	f.Where(entql.HasEdgeWith("coding_problem", sqlgraph.WrapFunc(func(s *sql.Selector) {
-		for _, p := range preds {
-			p(s)
-		}
-	})))
 }
 
 // addPredicate implements the predicateAdder interface.

@@ -469,8 +469,6 @@ type CodingProblemMutation struct {
 	drafts             map[int]struct{}
 	removeddrafts      map[int]struct{}
 	cleareddrafts      bool
-	staff_data         *int
-	clearedstaff_data  bool
 	test_cases         map[int]struct{}
 	removedtest_cases  map[int]struct{}
 	clearedtest_cases  bool
@@ -721,45 +719,6 @@ func (m *CodingProblemMutation) ResetDrafts() {
 	m.drafts = nil
 	m.cleareddrafts = false
 	m.removeddrafts = nil
-}
-
-// SetStaffDataID sets the "staff_data" edge to the CodingProblemStaffData entity by id.
-func (m *CodingProblemMutation) SetStaffDataID(id int) {
-	m.staff_data = &id
-}
-
-// ClearStaffData clears the "staff_data" edge to the CodingProblemStaffData entity.
-func (m *CodingProblemMutation) ClearStaffData() {
-	m.clearedstaff_data = true
-}
-
-// StaffDataCleared reports if the "staff_data" edge to the CodingProblemStaffData entity was cleared.
-func (m *CodingProblemMutation) StaffDataCleared() bool {
-	return m.clearedstaff_data
-}
-
-// StaffDataID returns the "staff_data" edge ID in the mutation.
-func (m *CodingProblemMutation) StaffDataID() (id int, exists bool) {
-	if m.staff_data != nil {
-		return *m.staff_data, true
-	}
-	return
-}
-
-// StaffDataIDs returns the "staff_data" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// StaffDataID instead. It exists only for internal usage by the builders.
-func (m *CodingProblemMutation) StaffDataIDs() (ids []int) {
-	if id := m.staff_data; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetStaffData resets all changes to the "staff_data" edge.
-func (m *CodingProblemMutation) ResetStaffData() {
-	m.staff_data = nil
-	m.clearedstaff_data = false
 }
 
 // AddTestCaseIDs adds the "test_cases" edge to the CodingTestCase entity by ids.
@@ -1022,12 +981,9 @@ func (m *CodingProblemMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *CodingProblemMutation) AddedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 3)
 	if m.drafts != nil {
 		edges = append(edges, codingproblem.EdgeDrafts)
-	}
-	if m.staff_data != nil {
-		edges = append(edges, codingproblem.EdgeStaffData)
 	}
 	if m.test_cases != nil {
 		edges = append(edges, codingproblem.EdgeTestCases)
@@ -1048,10 +1004,6 @@ func (m *CodingProblemMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case codingproblem.EdgeStaffData:
-		if id := m.staff_data; id != nil {
-			return []ent.Value{*id}
-		}
 	case codingproblem.EdgeTestCases:
 		ids := make([]ent.Value, 0, len(m.test_cases))
 		for id := range m.test_cases {
@@ -1070,7 +1022,7 @@ func (m *CodingProblemMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *CodingProblemMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 3)
 	if m.removeddrafts != nil {
 		edges = append(edges, codingproblem.EdgeDrafts)
 	}
@@ -1111,12 +1063,9 @@ func (m *CodingProblemMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *CodingProblemMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 3)
 	if m.cleareddrafts {
 		edges = append(edges, codingproblem.EdgeDrafts)
-	}
-	if m.clearedstaff_data {
-		edges = append(edges, codingproblem.EdgeStaffData)
 	}
 	if m.clearedtest_cases {
 		edges = append(edges, codingproblem.EdgeTestCases)
@@ -1133,8 +1082,6 @@ func (m *CodingProblemMutation) EdgeCleared(name string) bool {
 	switch name {
 	case codingproblem.EdgeDrafts:
 		return m.cleareddrafts
-	case codingproblem.EdgeStaffData:
-		return m.clearedstaff_data
 	case codingproblem.EdgeTestCases:
 		return m.clearedtest_cases
 	case codingproblem.EdgeSubmissions:
@@ -1147,9 +1094,6 @@ func (m *CodingProblemMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *CodingProblemMutation) ClearEdge(name string) error {
 	switch name {
-	case codingproblem.EdgeStaffData:
-		m.ClearStaffData()
-		return nil
 	}
 	return fmt.Errorf("unknown CodingProblem unique edge %s", name)
 }
@@ -1160,9 +1104,6 @@ func (m *CodingProblemMutation) ResetEdge(name string) error {
 	switch name {
 	case codingproblem.EdgeDrafts:
 		m.ResetDrafts()
-		return nil
-	case codingproblem.EdgeStaffData:
-		m.ResetStaffData()
 		return nil
 	case codingproblem.EdgeTestCases:
 		m.ResetTestCases()
@@ -1177,16 +1118,14 @@ func (m *CodingProblemMutation) ResetEdge(name string) error {
 // CodingProblemStaffDataMutation represents an operation that mutates the CodingProblemStaffData nodes in the graph.
 type CodingProblemStaffDataMutation struct {
 	config
-	op                    Op
-	typ                   string
-	id                    *int
-	input                 *string
-	clearedFields         map[string]struct{}
-	coding_problem        *int
-	clearedcoding_problem bool
-	done                  bool
-	oldValue              func(context.Context) (*CodingProblemStaffData, error)
-	predicates            []predicate.CodingProblemStaffData
+	op            Op
+	typ           string
+	id            *int
+	input         *string
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*CodingProblemStaffData, error)
+	predicates    []predicate.CodingProblemStaffData
 }
 
 var _ ent.Mutation = (*CodingProblemStaffDataMutation)(nil)
@@ -1302,45 +1241,6 @@ func (m *CodingProblemStaffDataMutation) OldInput(ctx context.Context) (v string
 // ResetInput resets all changes to the "input" field.
 func (m *CodingProblemStaffDataMutation) ResetInput() {
 	m.input = nil
-}
-
-// SetCodingProblemID sets the "coding_problem" edge to the CodingProblem entity by id.
-func (m *CodingProblemStaffDataMutation) SetCodingProblemID(id int) {
-	m.coding_problem = &id
-}
-
-// ClearCodingProblem clears the "coding_problem" edge to the CodingProblem entity.
-func (m *CodingProblemStaffDataMutation) ClearCodingProblem() {
-	m.clearedcoding_problem = true
-}
-
-// CodingProblemCleared reports if the "coding_problem" edge to the CodingProblem entity was cleared.
-func (m *CodingProblemStaffDataMutation) CodingProblemCleared() bool {
-	return m.clearedcoding_problem
-}
-
-// CodingProblemID returns the "coding_problem" edge ID in the mutation.
-func (m *CodingProblemStaffDataMutation) CodingProblemID() (id int, exists bool) {
-	if m.coding_problem != nil {
-		return *m.coding_problem, true
-	}
-	return
-}
-
-// CodingProblemIDs returns the "coding_problem" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// CodingProblemID instead. It exists only for internal usage by the builders.
-func (m *CodingProblemStaffDataMutation) CodingProblemIDs() (ids []int) {
-	if id := m.coding_problem; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetCodingProblem resets all changes to the "coding_problem" edge.
-func (m *CodingProblemStaffDataMutation) ResetCodingProblem() {
-	m.coding_problem = nil
-	m.clearedcoding_problem = false
 }
 
 // Where appends a list predicates to the CodingProblemStaffDataMutation builder.
@@ -1461,77 +1361,49 @@ func (m *CodingProblemStaffDataMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *CodingProblemStaffDataMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.coding_problem != nil {
-		edges = append(edges, codingproblemstaffdata.EdgeCodingProblem)
-	}
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *CodingProblemStaffDataMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case codingproblemstaffdata.EdgeCodingProblem:
-		if id := m.coding_problem; id != nil {
-			return []ent.Value{*id}
-		}
-	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *CodingProblemStaffDataMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *CodingProblemStaffDataMutation) RemovedIDs(name string) []ent.Value {
-	switch name {
-	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *CodingProblemStaffDataMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.clearedcoding_problem {
-		edges = append(edges, codingproblemstaffdata.EdgeCodingProblem)
-	}
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *CodingProblemStaffDataMutation) EdgeCleared(name string) bool {
-	switch name {
-	case codingproblemstaffdata.EdgeCodingProblem:
-		return m.clearedcoding_problem
-	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *CodingProblemStaffDataMutation) ClearEdge(name string) error {
-	switch name {
-	case codingproblemstaffdata.EdgeCodingProblem:
-		m.ClearCodingProblem()
-		return nil
-	}
 	return fmt.Errorf("unknown CodingProblemStaffData unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *CodingProblemStaffDataMutation) ResetEdge(name string) error {
-	switch name {
-	case codingproblemstaffdata.EdgeCodingProblem:
-		m.ResetCodingProblem()
-		return nil
-	}
 	return fmt.Errorf("unknown CodingProblemStaffData edge %s", name)
 }
 

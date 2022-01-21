@@ -5,7 +5,6 @@ package generated
 import (
 	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/codingproblem"
-	"170-ag/ent/generated/codingproblemstaffdata"
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/codingtestcase"
 	"170-ag/ent/generated/predicate"
@@ -79,25 +78,6 @@ func (cpu *CodingProblemUpdate) AddDrafts(c ...*CodingDraft) *CodingProblemUpdat
 	return cpu.AddDraftIDs(ids...)
 }
 
-// SetStaffDataID sets the "staff_data" edge to the CodingProblemStaffData entity by ID.
-func (cpu *CodingProblemUpdate) SetStaffDataID(id int) *CodingProblemUpdate {
-	cpu.mutation.SetStaffDataID(id)
-	return cpu
-}
-
-// SetNillableStaffDataID sets the "staff_data" edge to the CodingProblemStaffData entity by ID if the given value is not nil.
-func (cpu *CodingProblemUpdate) SetNillableStaffDataID(id *int) *CodingProblemUpdate {
-	if id != nil {
-		cpu = cpu.SetStaffDataID(*id)
-	}
-	return cpu
-}
-
-// SetStaffData sets the "staff_data" edge to the CodingProblemStaffData entity.
-func (cpu *CodingProblemUpdate) SetStaffData(c *CodingProblemStaffData) *CodingProblemUpdate {
-	return cpu.SetStaffDataID(c.ID)
-}
-
 // AddTestCaseIDs adds the "test_cases" edge to the CodingTestCase entity by IDs.
 func (cpu *CodingProblemUpdate) AddTestCaseIDs(ids ...int) *CodingProblemUpdate {
 	cpu.mutation.AddTestCaseIDs(ids...)
@@ -152,12 +132,6 @@ func (cpu *CodingProblemUpdate) RemoveDrafts(c ...*CodingDraft) *CodingProblemUp
 		ids[i] = c[i].ID
 	}
 	return cpu.RemoveDraftIDs(ids...)
-}
-
-// ClearStaffData clears the "staff_data" edge to the CodingProblemStaffData entity.
-func (cpu *CodingProblemUpdate) ClearStaffData() *CodingProblemUpdate {
-	cpu.mutation.ClearStaffData()
-	return cpu
 }
 
 // ClearTestCases clears all "test_cases" edges to the CodingTestCase entity.
@@ -370,41 +344,6 @@ func (cpu *CodingProblemUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cpu.mutation.StaffDataCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: true,
-			Table:   codingproblem.StaffDataTable,
-			Columns: []string{codingproblem.StaffDataColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: codingproblemstaffdata.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cpu.mutation.StaffDataIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: true,
-			Table:   codingproblem.StaffDataTable,
-			Columns: []string{codingproblem.StaffDataColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: codingproblemstaffdata.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if cpu.mutation.TestCasesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -581,25 +520,6 @@ func (cpuo *CodingProblemUpdateOne) AddDrafts(c ...*CodingDraft) *CodingProblemU
 	return cpuo.AddDraftIDs(ids...)
 }
 
-// SetStaffDataID sets the "staff_data" edge to the CodingProblemStaffData entity by ID.
-func (cpuo *CodingProblemUpdateOne) SetStaffDataID(id int) *CodingProblemUpdateOne {
-	cpuo.mutation.SetStaffDataID(id)
-	return cpuo
-}
-
-// SetNillableStaffDataID sets the "staff_data" edge to the CodingProblemStaffData entity by ID if the given value is not nil.
-func (cpuo *CodingProblemUpdateOne) SetNillableStaffDataID(id *int) *CodingProblemUpdateOne {
-	if id != nil {
-		cpuo = cpuo.SetStaffDataID(*id)
-	}
-	return cpuo
-}
-
-// SetStaffData sets the "staff_data" edge to the CodingProblemStaffData entity.
-func (cpuo *CodingProblemUpdateOne) SetStaffData(c *CodingProblemStaffData) *CodingProblemUpdateOne {
-	return cpuo.SetStaffDataID(c.ID)
-}
-
 // AddTestCaseIDs adds the "test_cases" edge to the CodingTestCase entity by IDs.
 func (cpuo *CodingProblemUpdateOne) AddTestCaseIDs(ids ...int) *CodingProblemUpdateOne {
 	cpuo.mutation.AddTestCaseIDs(ids...)
@@ -654,12 +574,6 @@ func (cpuo *CodingProblemUpdateOne) RemoveDrafts(c ...*CodingDraft) *CodingProbl
 		ids[i] = c[i].ID
 	}
 	return cpuo.RemoveDraftIDs(ids...)
-}
-
-// ClearStaffData clears the "staff_data" edge to the CodingProblemStaffData entity.
-func (cpuo *CodingProblemUpdateOne) ClearStaffData() *CodingProblemUpdateOne {
-	cpuo.mutation.ClearStaffData()
-	return cpuo
 }
 
 // ClearTestCases clears all "test_cases" edges to the CodingTestCase entity.
@@ -888,41 +802,6 @@ func (cpuo *CodingProblemUpdateOne) sqlSave(ctx context.Context) (_node *CodingP
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: codingdraft.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if cpuo.mutation.StaffDataCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: true,
-			Table:   codingproblem.StaffDataTable,
-			Columns: []string{codingproblem.StaffDataColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: codingproblemstaffdata.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cpuo.mutation.StaffDataIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: true,
-			Table:   codingproblem.StaffDataTable,
-			Columns: []string{codingproblem.StaffDataColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: codingproblemstaffdata.FieldID,
 				},
 			},
 		}

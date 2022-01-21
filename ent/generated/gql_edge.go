@@ -28,14 +28,6 @@ func (cp *CodingProblem) Drafts(ctx context.Context) ([]*CodingDraft, error) {
 	return result, err
 }
 
-func (cp *CodingProblem) StaffData(ctx context.Context) (*CodingProblemStaffData, error) {
-	result, err := cp.Edges.StaffDataOrErr()
-	if IsNotLoaded(err) {
-		result, err = cp.QueryStaffData().Only(ctx)
-	}
-	return result, MaskNotFound(err)
-}
-
 func (cp *CodingProblem) TestCases(ctx context.Context) ([]*CodingTestCase, error) {
 	result, err := cp.Edges.TestCasesOrErr()
 	if IsNotLoaded(err) {
@@ -48,14 +40,6 @@ func (cp *CodingProblem) Submissions(ctx context.Context) ([]*CodingSubmission, 
 	result, err := cp.Edges.SubmissionsOrErr()
 	if IsNotLoaded(err) {
 		result, err = cp.QuerySubmissions().All(ctx)
-	}
-	return result, err
-}
-
-func (cpsd *CodingProblemStaffData) CodingProblem(ctx context.Context) (*CodingProblem, error) {
-	result, err := cpsd.Edges.CodingProblemOrErr()
-	if IsNotLoaded(err) {
-		result, err = cpsd.QueryCodingProblem().Only(ctx)
 	}
 	return result, err
 }
