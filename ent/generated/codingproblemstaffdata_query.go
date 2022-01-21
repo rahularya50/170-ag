@@ -343,12 +343,6 @@ func (cpsdq *CodingProblemStaffDataQuery) prepareQuery(ctx context.Context) erro
 		}
 		cpsdq.sql = prev
 	}
-	if codingproblemstaffdata.Policy == nil {
-		return errors.New("generated: uninitialized codingproblemstaffdata.Policy (forgotten import generated/runtime?)")
-	}
-	if err := codingproblemstaffdata.Policy.EvalQuery(ctx, cpsdq); err != nil {
-		return err
-	}
 	return nil
 }
 

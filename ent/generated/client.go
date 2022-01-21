@@ -14,6 +14,7 @@ import (
 	"170-ag/ent/generated/codingproblemstaffdata"
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/codingsubmissionstaffdata"
+	"170-ag/ent/generated/codingtestcase"
 	"170-ag/ent/generated/user"
 
 	"entgo.io/ent/dialect"
@@ -36,6 +37,8 @@ type Client struct {
 	CodingSubmission *CodingSubmissionClient
 	// CodingSubmissionStaffData is the client for interacting with the CodingSubmissionStaffData builders.
 	CodingSubmissionStaffData *CodingSubmissionStaffDataClient
+	// CodingTestCase is the client for interacting with the CodingTestCase builders.
+	CodingTestCase *CodingTestCaseClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 	// additional fields for node api
@@ -58,6 +61,7 @@ func (c *Client) init() {
 	c.CodingProblemStaffData = NewCodingProblemStaffDataClient(c.config)
 	c.CodingSubmission = NewCodingSubmissionClient(c.config)
 	c.CodingSubmissionStaffData = NewCodingSubmissionStaffDataClient(c.config)
+	c.CodingTestCase = NewCodingTestCaseClient(c.config)
 	c.User = NewUserClient(c.config)
 }
 
@@ -97,6 +101,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		CodingProblemStaffData:    NewCodingProblemStaffDataClient(cfg),
 		CodingSubmission:          NewCodingSubmissionClient(cfg),
 		CodingSubmissionStaffData: NewCodingSubmissionStaffDataClient(cfg),
+		CodingTestCase:            NewCodingTestCaseClient(cfg),
 		User:                      NewUserClient(cfg),
 	}, nil
 }
@@ -121,6 +126,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		CodingProblemStaffData:    NewCodingProblemStaffDataClient(cfg),
 		CodingSubmission:          NewCodingSubmissionClient(cfg),
 		CodingSubmissionStaffData: NewCodingSubmissionStaffDataClient(cfg),
+		CodingTestCase:            NewCodingTestCaseClient(cfg),
 		User:                      NewUserClient(cfg),
 	}, nil
 }
@@ -156,6 +162,7 @@ func (c *Client) Use(hooks ...Hook) {
 	c.CodingProblemStaffData.Use(hooks...)
 	c.CodingSubmission.Use(hooks...)
 	c.CodingSubmissionStaffData.Use(hooks...)
+	c.CodingTestCase.Use(hooks...)
 	c.User.Use(hooks...)
 }
 
@@ -399,6 +406,22 @@ func (c *CodingProblemClient) QueryStaffData(cp *CodingProblem) *CodingProblemSt
 	return query
 }
 
+// QueryTestCases queries the test_cases edge of a CodingProblem.
+func (c *CodingProblemClient) QueryTestCases(cp *CodingProblem) *CodingTestCaseQuery {
+	query := &CodingTestCaseQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := cp.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(codingproblem.Table, codingproblem.FieldID, id),
+			sqlgraph.To(codingtestcase.Table, codingtestcase.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, codingproblem.TestCasesTable, codingproblem.TestCasesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(cp.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QuerySubmissions queries the submissions edge of a CodingProblem.
 func (c *CodingProblemClient) QuerySubmissions(cp *CodingProblem) *CodingSubmissionQuery {
 	query := &CodingSubmissionQuery{config: c.config}
@@ -524,8 +547,7 @@ func (c *CodingProblemStaffDataClient) QueryCodingProblem(cpsd *CodingProblemSta
 
 // Hooks returns the client hooks.
 func (c *CodingProblemStaffDataClient) Hooks() []Hook {
-	hooks := c.hooks.CodingProblemStaffData
-	return append(hooks[:len(hooks):len(hooks)], codingproblemstaffdata.Hooks[:]...)
+	return c.hooks.CodingProblemStaffData
 }
 
 // CodingSubmissionClient is a client for the CodingSubmission schema.
@@ -772,6 +794,113 @@ func (c *CodingSubmissionStaffDataClient) QueryCodingSubmission(cssd *CodingSubm
 func (c *CodingSubmissionStaffDataClient) Hooks() []Hook {
 	hooks := c.hooks.CodingSubmissionStaffData
 	return append(hooks[:len(hooks):len(hooks)], codingsubmissionstaffdata.Hooks[:]...)
+}
+
+// CodingTestCaseClient is a client for the CodingTestCase schema.
+type CodingTestCaseClient struct {
+	config
+}
+
+// NewCodingTestCaseClient returns a client for the CodingTestCase from the given config.
+func NewCodingTestCaseClient(c config) *CodingTestCaseClient {
+	return &CodingTestCaseClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `codingtestcase.Hooks(f(g(h())))`.
+func (c *CodingTestCaseClient) Use(hooks ...Hook) {
+	c.hooks.CodingTestCase = append(c.hooks.CodingTestCase, hooks...)
+}
+
+// Create returns a create builder for CodingTestCase.
+func (c *CodingTestCaseClient) Create() *CodingTestCaseCreate {
+	mutation := newCodingTestCaseMutation(c.config, OpCreate)
+	return &CodingTestCaseCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of CodingTestCase entities.
+func (c *CodingTestCaseClient) CreateBulk(builders ...*CodingTestCaseCreate) *CodingTestCaseCreateBulk {
+	return &CodingTestCaseCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for CodingTestCase.
+func (c *CodingTestCaseClient) Update() *CodingTestCaseUpdate {
+	mutation := newCodingTestCaseMutation(c.config, OpUpdate)
+	return &CodingTestCaseUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CodingTestCaseClient) UpdateOne(ctc *CodingTestCase) *CodingTestCaseUpdateOne {
+	mutation := newCodingTestCaseMutation(c.config, OpUpdateOne, withCodingTestCase(ctc))
+	return &CodingTestCaseUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CodingTestCaseClient) UpdateOneID(id int) *CodingTestCaseUpdateOne {
+	mutation := newCodingTestCaseMutation(c.config, OpUpdateOne, withCodingTestCaseID(id))
+	return &CodingTestCaseUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for CodingTestCase.
+func (c *CodingTestCaseClient) Delete() *CodingTestCaseDelete {
+	mutation := newCodingTestCaseMutation(c.config, OpDelete)
+	return &CodingTestCaseDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *CodingTestCaseClient) DeleteOne(ctc *CodingTestCase) *CodingTestCaseDeleteOne {
+	return c.DeleteOneID(ctc.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *CodingTestCaseClient) DeleteOneID(id int) *CodingTestCaseDeleteOne {
+	builder := c.Delete().Where(codingtestcase.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CodingTestCaseDeleteOne{builder}
+}
+
+// Query returns a query builder for CodingTestCase.
+func (c *CodingTestCaseClient) Query() *CodingTestCaseQuery {
+	return &CodingTestCaseQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a CodingTestCase entity by its id.
+func (c *CodingTestCaseClient) Get(ctx context.Context, id int) (*CodingTestCase, error) {
+	return c.Query().Where(codingtestcase.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CodingTestCaseClient) GetX(ctx context.Context, id int) *CodingTestCase {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCodingProblem queries the coding_problem edge of a CodingTestCase.
+func (c *CodingTestCaseClient) QueryCodingProblem(ctc *CodingTestCase) *CodingProblemQuery {
+	query := &CodingProblemQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := ctc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(codingtestcase.Table, codingtestcase.FieldID, id),
+			sqlgraph.To(codingproblem.Table, codingproblem.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, codingtestcase.CodingProblemTable, codingtestcase.CodingProblemPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(ctc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *CodingTestCaseClient) Hooks() []Hook {
+	hooks := c.hooks.CodingTestCase
+	return append(hooks[:len(hooks):len(hooks)], codingtestcase.Hooks[:]...)
 }
 
 // UserClient is a client for the User schema.

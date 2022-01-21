@@ -8,6 +8,7 @@ import (
 	"170-ag/ent/generated/codingproblemstaffdata"
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/codingsubmissionstaffdata"
+	"170-ag/ent/generated/codingtestcase"
 	"170-ag/ent/generated/user"
 	"errors"
 	"fmt"
@@ -39,6 +40,7 @@ func columnChecker(table string) func(string) error {
 		codingproblemstaffdata.Table:    codingproblemstaffdata.ValidColumn,
 		codingsubmission.Table:          codingsubmission.ValidColumn,
 		codingsubmissionstaffdata.Table: codingsubmissionstaffdata.ValidColumn,
+		codingtestcase.Table:            codingtestcase.ValidColumn,
 		user.Table:                      user.ValidColumn,
 	}
 	check, ok := checks[table]

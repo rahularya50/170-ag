@@ -33,7 +33,7 @@ export default function Problems(): React.Node {
         </thead>
         <tbody>
           {coding_problems.edges.map(({ node }) => (
-            <tr>
+            <tr key={node.id}>
               <td>
                 <Link to={generatePath("/problem/:id", { id: node.id })}>
                   {node.name}

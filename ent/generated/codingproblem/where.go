@@ -405,6 +405,34 @@ func HasStaffDataWith(preds ...predicate.CodingProblemStaffData) predicate.Codin
 	})
 }
 
+// HasTestCases applies the HasEdge predicate on the "test_cases" edge.
+func HasTestCases() predicate.CodingProblem {
+	return predicate.CodingProblem(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(TestCasesTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, TestCasesTable, TestCasesPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasTestCasesWith applies the HasEdge predicate on the "test_cases" edge with a given conditions (other predicates).
+func HasTestCasesWith(preds ...predicate.CodingTestCase) predicate.CodingProblem {
+	return predicate.CodingProblem(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(TestCasesInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, TestCasesTable, TestCasesPrimaryKey...),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasSubmissions applies the HasEdge predicate on the "submissions" edge.
 func HasSubmissions() predicate.CodingProblem {
 	return predicate.CodingProblem(func(s *sql.Selector) {

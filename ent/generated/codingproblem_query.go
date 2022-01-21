@@ -7,6 +7,7 @@ import (
 	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/codingproblemstaffdata"
 	"170-ag/ent/generated/codingsubmission"
+	"170-ag/ent/generated/codingtestcase"
 	"170-ag/ent/generated/predicate"
 	"context"
 	"database/sql/driver"
@@ -31,6 +32,7 @@ type CodingProblemQuery struct {
 	// eager-loading edges.
 	withDrafts      *CodingDraftQuery
 	withStaffData   *CodingProblemStaffDataQuery
+	withTestCases   *CodingTestCaseQuery
 	withSubmissions *CodingSubmissionQuery
 	withFKs         bool
 	// intermediate query (i.e. traversal path).
@@ -106,6 +108,28 @@ func (cpq *CodingProblemQuery) QueryStaffData() *CodingProblemStaffDataQuery {
 			sqlgraph.From(codingproblem.Table, codingproblem.FieldID, selector),
 			sqlgraph.To(codingproblemstaffdata.Table, codingproblemstaffdata.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, true, codingproblem.StaffDataTable, codingproblem.StaffDataColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cpq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryTestCases chains the current query on the "test_cases" edge.
+func (cpq *CodingProblemQuery) QueryTestCases() *CodingTestCaseQuery {
+	query := &CodingTestCaseQuery{config: cpq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cpq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cpq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(codingproblem.Table, codingproblem.FieldID, selector),
+			sqlgraph.To(codingtestcase.Table, codingtestcase.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, codingproblem.TestCasesTable, codingproblem.TestCasesPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(cpq.driver.Dialect(), step)
 		return fromU, nil
@@ -318,6 +342,7 @@ func (cpq *CodingProblemQuery) Clone() *CodingProblemQuery {
 		predicates:      append([]predicate.CodingProblem{}, cpq.predicates...),
 		withDrafts:      cpq.withDrafts.Clone(),
 		withStaffData:   cpq.withStaffData.Clone(),
+		withTestCases:   cpq.withTestCases.Clone(),
 		withSubmissions: cpq.withSubmissions.Clone(),
 		// clone intermediate query.
 		sql:  cpq.sql.Clone(),
@@ -344,6 +369,17 @@ func (cpq *CodingProblemQuery) WithStaffData(opts ...func(*CodingProblemStaffDat
 		opt(query)
 	}
 	cpq.withStaffData = query
+	return cpq
+}
+
+// WithTestCases tells the query-builder to eager-load the nodes that are connected to
+// the "test_cases" edge. The optional arguments are used to configure the query builder of the edge.
+func (cpq *CodingProblemQuery) WithTestCases(opts ...func(*CodingTestCaseQuery)) *CodingProblemQuery {
+	query := &CodingTestCaseQuery{config: cpq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	cpq.withTestCases = query
 	return cpq
 }
 
@@ -430,9 +466,10 @@ func (cpq *CodingProblemQuery) sqlAll(ctx context.Context) ([]*CodingProblem, er
 		nodes       = []*CodingProblem{}
 		withFKs     = cpq.withFKs
 		_spec       = cpq.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [4]bool{
 			cpq.withDrafts != nil,
 			cpq.withStaffData != nil,
+			cpq.withTestCases != nil,
 			cpq.withSubmissions != nil,
 		}
 	)
@@ -516,6 +553,71 @@ func (cpq *CodingProblemQuery) sqlAll(ctx context.Context) ([]*CodingProblem, er
 			}
 			for i := range nodes {
 				nodes[i].Edges.StaffData = n
+			}
+		}
+	}
+
+	if query := cpq.withTestCases; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		ids := make(map[int]*CodingProblem, len(nodes))
+		for _, node := range nodes {
+			ids[node.ID] = node
+			fks = append(fks, node.ID)
+			node.Edges.TestCases = []*CodingTestCase{}
+		}
+		var (
+			edgeids []int
+			edges   = make(map[int][]*CodingProblem)
+		)
+		_spec := &sqlgraph.EdgeQuerySpec{
+			Edge: &sqlgraph.EdgeSpec{
+				Inverse: false,
+				Table:   codingproblem.TestCasesTable,
+				Columns: codingproblem.TestCasesPrimaryKey,
+			},
+			Predicate: func(s *sql.Selector) {
+				s.Where(sql.InValues(codingproblem.TestCasesPrimaryKey[0], fks...))
+			},
+			ScanValues: func() [2]interface{} {
+				return [2]interface{}{new(sql.NullInt64), new(sql.NullInt64)}
+			},
+			Assign: func(out, in interface{}) error {
+				eout, ok := out.(*sql.NullInt64)
+				if !ok || eout == nil {
+					return fmt.Errorf("unexpected id value for edge-out")
+				}
+				ein, ok := in.(*sql.NullInt64)
+				if !ok || ein == nil {
+					return fmt.Errorf("unexpected id value for edge-in")
+				}
+				outValue := int(eout.Int64)
+				inValue := int(ein.Int64)
+				node, ok := ids[outValue]
+				if !ok {
+					return fmt.Errorf("unexpected node id in edges: %v", outValue)
+				}
+				if _, ok := edges[inValue]; !ok {
+					edgeids = append(edgeids, inValue)
+				}
+				edges[inValue] = append(edges[inValue], node)
+				return nil
+			},
+		}
+		if err := sqlgraph.QueryEdges(ctx, cpq.driver, _spec); err != nil {
+			return nil, fmt.Errorf(`query edges "test_cases": %w`, err)
+		}
+		query.Where(codingtestcase.IDIn(edgeids...))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			nodes, ok := edges[n.ID]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected "test_cases" node returned %v`, n.ID)
+			}
+			for i := range nodes {
+				nodes[i].Edges.TestCases = append(nodes[i].Edges.TestCases, n)
 			}
 		}
 	}

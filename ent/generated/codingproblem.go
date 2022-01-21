@@ -34,11 +34,13 @@ type CodingProblemEdges struct {
 	Drafts []*CodingDraft `json:"drafts,omitempty"`
 	// StaffData holds the value of the staff_data edge.
 	StaffData *CodingProblemStaffData `json:"staff_data,omitempty"`
+	// TestCases holds the value of the test_cases edge.
+	TestCases []*CodingTestCase `json:"test_cases,omitempty"`
 	// Submissions holds the value of the submissions edge.
 	Submissions []*CodingSubmission `json:"submissions,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 }
 
 // DraftsOrErr returns the Drafts value or an error if the edge
@@ -64,10 +66,19 @@ func (e CodingProblemEdges) StaffDataOrErr() (*CodingProblemStaffData, error) {
 	return nil, &NotLoadedError{edge: "staff_data"}
 }
 
+// TestCasesOrErr returns the TestCases value or an error if the edge
+// was not loaded in eager-loading.
+func (e CodingProblemEdges) TestCasesOrErr() ([]*CodingTestCase, error) {
+	if e.loadedTypes[2] {
+		return e.TestCases, nil
+	}
+	return nil, &NotLoadedError{edge: "test_cases"}
+}
+
 // SubmissionsOrErr returns the Submissions value or an error if the edge
 // was not loaded in eager-loading.
 func (e CodingProblemEdges) SubmissionsOrErr() ([]*CodingSubmission, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[3] {
 		return e.Submissions, nil
 	}
 	return nil, &NotLoadedError{edge: "submissions"}
@@ -145,6 +156,11 @@ func (cp *CodingProblem) QueryDrafts() *CodingDraftQuery {
 // QueryStaffData queries the "staff_data" edge of the CodingProblem entity.
 func (cp *CodingProblem) QueryStaffData() *CodingProblemStaffDataQuery {
 	return (&CodingProblemClient{config: cp.config}).QueryStaffData(cp)
+}
+
+// QueryTestCases queries the "test_cases" edge of the CodingProblem entity.
+func (cp *CodingProblem) QueryTestCases() *CodingTestCaseQuery {
+	return (&CodingProblemClient{config: cp.config}).QueryTestCases(cp)
 }
 
 // QuerySubmissions queries the "submissions" edge of the CodingProblem entity.

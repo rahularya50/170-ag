@@ -7,6 +7,7 @@ import (
 	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/codingproblemstaffdata"
 	"170-ag/ent/generated/codingsubmission"
+	"170-ag/ent/generated/codingtestcase"
 	"170-ag/ent/generated/predicate"
 	"context"
 	"fmt"
@@ -97,6 +98,21 @@ func (cpu *CodingProblemUpdate) SetStaffData(c *CodingProblemStaffData) *CodingP
 	return cpu.SetStaffDataID(c.ID)
 }
 
+// AddTestCaseIDs adds the "test_cases" edge to the CodingTestCase entity by IDs.
+func (cpu *CodingProblemUpdate) AddTestCaseIDs(ids ...int) *CodingProblemUpdate {
+	cpu.mutation.AddTestCaseIDs(ids...)
+	return cpu
+}
+
+// AddTestCases adds the "test_cases" edges to the CodingTestCase entity.
+func (cpu *CodingProblemUpdate) AddTestCases(c ...*CodingTestCase) *CodingProblemUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cpu.AddTestCaseIDs(ids...)
+}
+
 // AddSubmissionIDs adds the "submissions" edge to the CodingSubmission entity by IDs.
 func (cpu *CodingProblemUpdate) AddSubmissionIDs(ids ...int) *CodingProblemUpdate {
 	cpu.mutation.AddSubmissionIDs(ids...)
@@ -142,6 +158,27 @@ func (cpu *CodingProblemUpdate) RemoveDrafts(c ...*CodingDraft) *CodingProblemUp
 func (cpu *CodingProblemUpdate) ClearStaffData() *CodingProblemUpdate {
 	cpu.mutation.ClearStaffData()
 	return cpu
+}
+
+// ClearTestCases clears all "test_cases" edges to the CodingTestCase entity.
+func (cpu *CodingProblemUpdate) ClearTestCases() *CodingProblemUpdate {
+	cpu.mutation.ClearTestCases()
+	return cpu
+}
+
+// RemoveTestCaseIDs removes the "test_cases" edge to CodingTestCase entities by IDs.
+func (cpu *CodingProblemUpdate) RemoveTestCaseIDs(ids ...int) *CodingProblemUpdate {
+	cpu.mutation.RemoveTestCaseIDs(ids...)
+	return cpu
+}
+
+// RemoveTestCases removes "test_cases" edges to CodingTestCase entities.
+func (cpu *CodingProblemUpdate) RemoveTestCases(c ...*CodingTestCase) *CodingProblemUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cpu.RemoveTestCaseIDs(ids...)
 }
 
 // ClearSubmissions clears all "submissions" edges to the CodingSubmission entity.
@@ -368,6 +405,60 @@ func (cpu *CodingProblemUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if cpu.mutation.TestCasesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   codingproblem.TestCasesTable,
+			Columns: codingproblem.TestCasesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingtestcase.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cpu.mutation.RemovedTestCasesIDs(); len(nodes) > 0 && !cpu.mutation.TestCasesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   codingproblem.TestCasesTable,
+			Columns: codingproblem.TestCasesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingtestcase.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cpu.mutation.TestCasesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   codingproblem.TestCasesTable,
+			Columns: codingproblem.TestCasesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingtestcase.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if cpu.mutation.SubmissionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -509,6 +600,21 @@ func (cpuo *CodingProblemUpdateOne) SetStaffData(c *CodingProblemStaffData) *Cod
 	return cpuo.SetStaffDataID(c.ID)
 }
 
+// AddTestCaseIDs adds the "test_cases" edge to the CodingTestCase entity by IDs.
+func (cpuo *CodingProblemUpdateOne) AddTestCaseIDs(ids ...int) *CodingProblemUpdateOne {
+	cpuo.mutation.AddTestCaseIDs(ids...)
+	return cpuo
+}
+
+// AddTestCases adds the "test_cases" edges to the CodingTestCase entity.
+func (cpuo *CodingProblemUpdateOne) AddTestCases(c ...*CodingTestCase) *CodingProblemUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cpuo.AddTestCaseIDs(ids...)
+}
+
 // AddSubmissionIDs adds the "submissions" edge to the CodingSubmission entity by IDs.
 func (cpuo *CodingProblemUpdateOne) AddSubmissionIDs(ids ...int) *CodingProblemUpdateOne {
 	cpuo.mutation.AddSubmissionIDs(ids...)
@@ -554,6 +660,27 @@ func (cpuo *CodingProblemUpdateOne) RemoveDrafts(c ...*CodingDraft) *CodingProbl
 func (cpuo *CodingProblemUpdateOne) ClearStaffData() *CodingProblemUpdateOne {
 	cpuo.mutation.ClearStaffData()
 	return cpuo
+}
+
+// ClearTestCases clears all "test_cases" edges to the CodingTestCase entity.
+func (cpuo *CodingProblemUpdateOne) ClearTestCases() *CodingProblemUpdateOne {
+	cpuo.mutation.ClearTestCases()
+	return cpuo
+}
+
+// RemoveTestCaseIDs removes the "test_cases" edge to CodingTestCase entities by IDs.
+func (cpuo *CodingProblemUpdateOne) RemoveTestCaseIDs(ids ...int) *CodingProblemUpdateOne {
+	cpuo.mutation.RemoveTestCaseIDs(ids...)
+	return cpuo
+}
+
+// RemoveTestCases removes "test_cases" edges to CodingTestCase entities.
+func (cpuo *CodingProblemUpdateOne) RemoveTestCases(c ...*CodingTestCase) *CodingProblemUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cpuo.RemoveTestCaseIDs(ids...)
 }
 
 // ClearSubmissions clears all "submissions" edges to the CodingSubmission entity.
@@ -796,6 +923,60 @@ func (cpuo *CodingProblemUpdateOne) sqlSave(ctx context.Context) (_node *CodingP
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: codingproblemstaffdata.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cpuo.mutation.TestCasesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   codingproblem.TestCasesTable,
+			Columns: codingproblem.TestCasesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingtestcase.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cpuo.mutation.RemovedTestCasesIDs(); len(nodes) > 0 && !cpuo.mutation.TestCasesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   codingproblem.TestCasesTable,
+			Columns: codingproblem.TestCasesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingtestcase.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cpuo.mutation.TestCasesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   codingproblem.TestCasesTable,
+			Columns: codingproblem.TestCasesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingtestcase.FieldID,
 				},
 			},
 		}

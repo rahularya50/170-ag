@@ -8,6 +8,7 @@ import (
 	"170-ag/ent/generated/codingproblemstaffdata"
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/codingsubmissionstaffdata"
+	"170-ag/ent/generated/codingtestcase"
 	"170-ag/ent/generated/predicate"
 	"170-ag/ent/generated/user"
 
@@ -19,7 +20,7 @@ import (
 
 // schemaGraph holds a representation of ent/schema at runtime.
 var schemaGraph = func() *sqlgraph.Schema {
-	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 6)}
+	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 7)}
 	graph.Nodes[0] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   codingdraft.Table,
@@ -99,6 +100,23 @@ var schemaGraph = func() *sqlgraph.Schema {
 	}
 	graph.Nodes[5] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
+			Table:   codingtestcase.Table,
+			Columns: codingtestcase.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: codingtestcase.FieldID,
+			},
+		},
+		Type: "CodingTestCase",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			codingtestcase.FieldInput:   {Type: field.TypeString, Column: codingtestcase.FieldInput},
+			codingtestcase.FieldOutput:  {Type: field.TypeString, Column: codingtestcase.FieldOutput},
+			codingtestcase.FieldPoints:  {Type: field.TypeInt, Column: codingtestcase.FieldPoints},
+			codingtestcase.FieldVisible: {Type: field.TypeBool, Column: codingtestcase.FieldVisible},
+		},
+	}
+	graph.Nodes[6] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
 			Table:   user.Table,
 			Columns: user.Columns,
 			ID: &sqlgraph.FieldSpec{
@@ -160,6 +178,18 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		"CodingProblem",
 		"CodingProblemStaffData",
+	)
+	graph.MustAddE(
+		"test_cases",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   codingproblem.TestCasesTable,
+			Columns: codingproblem.TestCasesPrimaryKey,
+			Bidi:    false,
+		},
+		"CodingProblem",
+		"CodingTestCase",
 	)
 	graph.MustAddE(
 		"submissions",
@@ -232,6 +262,18 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		"CodingSubmissionStaffData",
 		"CodingSubmission",
+	)
+	graph.MustAddE(
+		"coding_problem",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   codingtestcase.CodingProblemTable,
+			Columns: codingtestcase.CodingProblemPrimaryKey,
+			Bidi:    false,
+		},
+		"CodingTestCase",
+		"CodingProblem",
 	)
 	graph.MustAddE(
 		"drafts",
@@ -402,6 +444,20 @@ func (f *CodingProblemFilter) WhereHasStaffData() {
 // WhereHasStaffDataWith applies a predicate to check if query has an edge staff_data with a given conditions (other predicates).
 func (f *CodingProblemFilter) WhereHasStaffDataWith(preds ...predicate.CodingProblemStaffData) {
 	f.Where(entql.HasEdgeWith("staff_data", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasTestCases applies a predicate to check if query has an edge test_cases.
+func (f *CodingProblemFilter) WhereHasTestCases() {
+	f.Where(entql.HasEdge("test_cases"))
+}
+
+// WhereHasTestCasesWith applies a predicate to check if query has an edge test_cases with a given conditions (other predicates).
+func (f *CodingProblemFilter) WhereHasTestCasesWith(preds ...predicate.CodingTestCase) {
+	f.Where(entql.HasEdgeWith("test_cases", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}
@@ -650,6 +706,79 @@ func (f *CodingSubmissionStaffDataFilter) WhereHasCodingSubmissionWith(preds ...
 }
 
 // addPredicate implements the predicateAdder interface.
+func (ctcq *CodingTestCaseQuery) addPredicate(pred func(s *sql.Selector)) {
+	ctcq.predicates = append(ctcq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the CodingTestCaseQuery builder.
+func (ctcq *CodingTestCaseQuery) Filter() *CodingTestCaseFilter {
+	return &CodingTestCaseFilter{ctcq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *CodingTestCaseMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the CodingTestCaseMutation builder.
+func (m *CodingTestCaseMutation) Filter() *CodingTestCaseFilter {
+	return &CodingTestCaseFilter{m}
+}
+
+// CodingTestCaseFilter provides a generic filtering capability at runtime for CodingTestCaseQuery.
+type CodingTestCaseFilter struct {
+	predicateAdder
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *CodingTestCaseFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[5].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int predicate on the id field.
+func (f *CodingTestCaseFilter) WhereID(p entql.IntP) {
+	f.Where(p.Field(codingtestcase.FieldID))
+}
+
+// WhereInput applies the entql string predicate on the input field.
+func (f *CodingTestCaseFilter) WhereInput(p entql.StringP) {
+	f.Where(p.Field(codingtestcase.FieldInput))
+}
+
+// WhereOutput applies the entql string predicate on the output field.
+func (f *CodingTestCaseFilter) WhereOutput(p entql.StringP) {
+	f.Where(p.Field(codingtestcase.FieldOutput))
+}
+
+// WherePoints applies the entql int predicate on the points field.
+func (f *CodingTestCaseFilter) WherePoints(p entql.IntP) {
+	f.Where(p.Field(codingtestcase.FieldPoints))
+}
+
+// WhereVisible applies the entql bool predicate on the visible field.
+func (f *CodingTestCaseFilter) WhereVisible(p entql.BoolP) {
+	f.Where(p.Field(codingtestcase.FieldVisible))
+}
+
+// WhereHasCodingProblem applies a predicate to check if query has an edge coding_problem.
+func (f *CodingTestCaseFilter) WhereHasCodingProblem() {
+	f.Where(entql.HasEdge("coding_problem"))
+}
+
+// WhereHasCodingProblemWith applies a predicate to check if query has an edge coding_problem with a given conditions (other predicates).
+func (f *CodingTestCaseFilter) WhereHasCodingProblemWith(preds ...predicate.CodingProblem) {
+	f.Where(entql.HasEdgeWith("coding_problem", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
 func (uq *UserQuery) addPredicate(pred func(s *sql.Selector)) {
 	uq.predicates = append(uq.predicates, pred)
 }
@@ -677,7 +806,7 @@ type UserFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *UserFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[5].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[6].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})

@@ -21,6 +21,8 @@ const (
 	EdgeDrafts = "drafts"
 	// EdgeStaffData holds the string denoting the staff_data edge name in mutations.
 	EdgeStaffData = "staff_data"
+	// EdgeTestCases holds the string denoting the test_cases edge name in mutations.
+	EdgeTestCases = "test_cases"
 	// EdgeSubmissions holds the string denoting the submissions edge name in mutations.
 	EdgeSubmissions = "submissions"
 	// Table holds the table name of the codingproblem in the database.
@@ -39,6 +41,11 @@ const (
 	StaffDataInverseTable = "coding_problem_staff_data"
 	// StaffDataColumn is the table column denoting the staff_data relation/edge.
 	StaffDataColumn = "coding_problem_staff_data_coding_problem"
+	// TestCasesTable is the table that holds the test_cases relation/edge. The primary key declared below.
+	TestCasesTable = "coding_problem_test_cases"
+	// TestCasesInverseTable is the table name for the CodingTestCase entity.
+	// It exists in this package in order to avoid circular dependency with the "codingtestcase" package.
+	TestCasesInverseTable = "coding_test_cases"
 	// SubmissionsTable is the table that holds the submissions relation/edge.
 	SubmissionsTable = "coding_submissions"
 	// SubmissionsInverseTable is the table name for the CodingSubmission entity.
@@ -61,6 +68,12 @@ var Columns = []string{
 var ForeignKeys = []string{
 	"coding_problem_staff_data_coding_problem",
 }
+
+var (
+	// TestCasesPrimaryKey and TestCasesColumn2 are the table columns denoting the
+	// primary key for the test_cases relation (M2M).
+	TestCasesPrimaryKey = []string{"coding_problem_id", "coding_test_case_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {

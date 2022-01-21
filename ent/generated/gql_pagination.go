@@ -8,6 +8,7 @@ import (
 	"170-ag/ent/generated/codingproblemstaffdata"
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/codingsubmissionstaffdata"
+	"170-ag/ent/generated/codingtestcase"
 	"170-ag/ent/generated/user"
 	"context"
 	"encoding/base64"
@@ -1369,6 +1370,233 @@ func (cssd *CodingSubmissionStaffData) ToEdge(order *CodingSubmissionStaffDataOr
 	return &CodingSubmissionStaffDataEdge{
 		Node:   cssd,
 		Cursor: order.Field.toCursor(cssd),
+	}
+}
+
+// CodingTestCaseEdge is the edge representation of CodingTestCase.
+type CodingTestCaseEdge struct {
+	Node   *CodingTestCase `json:"node"`
+	Cursor Cursor          `json:"cursor"`
+}
+
+// CodingTestCaseConnection is the connection containing edges to CodingTestCase.
+type CodingTestCaseConnection struct {
+	Edges      []*CodingTestCaseEdge `json:"edges"`
+	PageInfo   PageInfo              `json:"pageInfo"`
+	TotalCount int                   `json:"totalCount"`
+}
+
+// CodingTestCasePaginateOption enables pagination customization.
+type CodingTestCasePaginateOption func(*codingTestCasePager) error
+
+// WithCodingTestCaseOrder configures pagination ordering.
+func WithCodingTestCaseOrder(order *CodingTestCaseOrder) CodingTestCasePaginateOption {
+	if order == nil {
+		order = DefaultCodingTestCaseOrder
+	}
+	o := *order
+	return func(pager *codingTestCasePager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultCodingTestCaseOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithCodingTestCaseFilter configures pagination filter.
+func WithCodingTestCaseFilter(filter func(*CodingTestCaseQuery) (*CodingTestCaseQuery, error)) CodingTestCasePaginateOption {
+	return func(pager *codingTestCasePager) error {
+		if filter == nil {
+			return errors.New("CodingTestCaseQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type codingTestCasePager struct {
+	order  *CodingTestCaseOrder
+	filter func(*CodingTestCaseQuery) (*CodingTestCaseQuery, error)
+}
+
+func newCodingTestCasePager(opts []CodingTestCasePaginateOption) (*codingTestCasePager, error) {
+	pager := &codingTestCasePager{}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultCodingTestCaseOrder
+	}
+	return pager, nil
+}
+
+func (p *codingTestCasePager) applyFilter(query *CodingTestCaseQuery) (*CodingTestCaseQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *codingTestCasePager) toCursor(ctc *CodingTestCase) Cursor {
+	return p.order.Field.toCursor(ctc)
+}
+
+func (p *codingTestCasePager) applyCursors(query *CodingTestCaseQuery, after, before *Cursor) *CodingTestCaseQuery {
+	for _, predicate := range cursorsToPredicates(
+		p.order.Direction, after, before,
+		p.order.Field.field, DefaultCodingTestCaseOrder.Field.field,
+	) {
+		query = query.Where(predicate)
+	}
+	return query
+}
+
+func (p *codingTestCasePager) applyOrder(query *CodingTestCaseQuery, reverse bool) *CodingTestCaseQuery {
+	direction := p.order.Direction
+	if reverse {
+		direction = direction.reverse()
+	}
+	query = query.Order(direction.orderFunc(p.order.Field.field))
+	if p.order.Field != DefaultCodingTestCaseOrder.Field {
+		query = query.Order(direction.orderFunc(DefaultCodingTestCaseOrder.Field.field))
+	}
+	return query
+}
+
+// Paginate executes the query and returns a relay based cursor connection to CodingTestCase.
+func (ctc *CodingTestCaseQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...CodingTestCasePaginateOption,
+) (*CodingTestCaseConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newCodingTestCasePager(opts)
+	if err != nil {
+		return nil, err
+	}
+
+	if ctc, err = pager.applyFilter(ctc); err != nil {
+		return nil, err
+	}
+
+	conn := &CodingTestCaseConnection{Edges: []*CodingTestCaseEdge{}}
+	if !hasCollectedField(ctx, edgesField) || first != nil && *first == 0 || last != nil && *last == 0 {
+		if hasCollectedField(ctx, totalCountField) ||
+			hasCollectedField(ctx, pageInfoField) {
+			count, err := ctc.Count(ctx)
+			if err != nil {
+				return nil, err
+			}
+			conn.TotalCount = count
+			conn.PageInfo.HasNextPage = first != nil && count > 0
+			conn.PageInfo.HasPreviousPage = last != nil && count > 0
+		}
+		return conn, nil
+	}
+
+	if (after != nil || first != nil || before != nil || last != nil) && hasCollectedField(ctx, totalCountField) {
+		count, err := ctc.Clone().Count(ctx)
+		if err != nil {
+			return nil, err
+		}
+		conn.TotalCount = count
+	}
+
+	ctc = pager.applyCursors(ctc, after, before)
+	ctc = pager.applyOrder(ctc, last != nil)
+	var limit int
+	if first != nil {
+		limit = *first + 1
+	} else if last != nil {
+		limit = *last + 1
+	}
+	if limit > 0 {
+		ctc = ctc.Limit(limit)
+	}
+
+	if field := getCollectedField(ctx, edgesField, nodeField); field != nil {
+		ctc = ctc.collectField(graphql.GetOperationContext(ctx), *field)
+	}
+
+	nodes, err := ctc.All(ctx)
+	if err != nil || len(nodes) == 0 {
+		return conn, err
+	}
+
+	if len(nodes) == limit {
+		conn.PageInfo.HasNextPage = first != nil
+		conn.PageInfo.HasPreviousPage = last != nil
+		nodes = nodes[:len(nodes)-1]
+	}
+
+	var nodeAt func(int) *CodingTestCase
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *CodingTestCase {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *CodingTestCase {
+			return nodes[i]
+		}
+	}
+
+	conn.Edges = make([]*CodingTestCaseEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		conn.Edges[i] = &CodingTestCaseEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+
+	conn.PageInfo.StartCursor = &conn.Edges[0].Cursor
+	conn.PageInfo.EndCursor = &conn.Edges[len(conn.Edges)-1].Cursor
+	if conn.TotalCount == 0 {
+		conn.TotalCount = len(nodes)
+	}
+
+	return conn, nil
+}
+
+// CodingTestCaseOrderField defines the ordering field of CodingTestCase.
+type CodingTestCaseOrderField struct {
+	field    string
+	toCursor func(*CodingTestCase) Cursor
+}
+
+// CodingTestCaseOrder defines the ordering of CodingTestCase.
+type CodingTestCaseOrder struct {
+	Direction OrderDirection            `json:"direction"`
+	Field     *CodingTestCaseOrderField `json:"field"`
+}
+
+// DefaultCodingTestCaseOrder is the default ordering of CodingTestCase.
+var DefaultCodingTestCaseOrder = &CodingTestCaseOrder{
+	Direction: OrderDirectionAsc,
+	Field: &CodingTestCaseOrderField{
+		field: codingtestcase.FieldID,
+		toCursor: func(ctc *CodingTestCase) Cursor {
+			return Cursor{ID: ctc.ID}
+		},
+	},
+}
+
+// ToEdge converts CodingTestCase into CodingTestCaseEdge.
+func (ctc *CodingTestCase) ToEdge(order *CodingTestCaseOrder) *CodingTestCaseEdge {
+	if order == nil {
+		order = DefaultCodingTestCaseOrder
+	}
+	return &CodingTestCaseEdge{
+		Node:   ctc,
+		Cursor: order.Field.toCursor(ctc),
 	}
 }
 

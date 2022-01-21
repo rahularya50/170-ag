@@ -8,6 +8,7 @@ import (
 	"170-ag/ent/generated/codingproblemstaffdata"
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/codingsubmissionstaffdata"
+	"170-ag/ent/generated/codingtestcase"
 	"170-ag/ent/generated/predicate"
 	"170-ag/ent/generated/user"
 	"context"
@@ -31,6 +32,7 @@ const (
 	TypeCodingProblemStaffData    = "CodingProblemStaffData"
 	TypeCodingSubmission          = "CodingSubmission"
 	TypeCodingSubmissionStaffData = "CodingSubmissionStaffData"
+	TypeCodingTestCase            = "CodingTestCase"
 	TypeUser                      = "User"
 )
 
@@ -469,6 +471,9 @@ type CodingProblemMutation struct {
 	cleareddrafts      bool
 	staff_data         *int
 	clearedstaff_data  bool
+	test_cases         map[int]struct{}
+	removedtest_cases  map[int]struct{}
+	clearedtest_cases  bool
 	submissions        map[int]struct{}
 	removedsubmissions map[int]struct{}
 	clearedsubmissions bool
@@ -757,6 +762,60 @@ func (m *CodingProblemMutation) ResetStaffData() {
 	m.clearedstaff_data = false
 }
 
+// AddTestCaseIDs adds the "test_cases" edge to the CodingTestCase entity by ids.
+func (m *CodingProblemMutation) AddTestCaseIDs(ids ...int) {
+	if m.test_cases == nil {
+		m.test_cases = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.test_cases[ids[i]] = struct{}{}
+	}
+}
+
+// ClearTestCases clears the "test_cases" edge to the CodingTestCase entity.
+func (m *CodingProblemMutation) ClearTestCases() {
+	m.clearedtest_cases = true
+}
+
+// TestCasesCleared reports if the "test_cases" edge to the CodingTestCase entity was cleared.
+func (m *CodingProblemMutation) TestCasesCleared() bool {
+	return m.clearedtest_cases
+}
+
+// RemoveTestCaseIDs removes the "test_cases" edge to the CodingTestCase entity by IDs.
+func (m *CodingProblemMutation) RemoveTestCaseIDs(ids ...int) {
+	if m.removedtest_cases == nil {
+		m.removedtest_cases = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.test_cases, ids[i])
+		m.removedtest_cases[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedTestCases returns the removed IDs of the "test_cases" edge to the CodingTestCase entity.
+func (m *CodingProblemMutation) RemovedTestCasesIDs() (ids []int) {
+	for id := range m.removedtest_cases {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// TestCasesIDs returns the "test_cases" edge IDs in the mutation.
+func (m *CodingProblemMutation) TestCasesIDs() (ids []int) {
+	for id := range m.test_cases {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetTestCases resets all changes to the "test_cases" edge.
+func (m *CodingProblemMutation) ResetTestCases() {
+	m.test_cases = nil
+	m.clearedtest_cases = false
+	m.removedtest_cases = nil
+}
+
 // AddSubmissionIDs adds the "submissions" edge to the CodingSubmission entity by ids.
 func (m *CodingProblemMutation) AddSubmissionIDs(ids ...int) {
 	if m.submissions == nil {
@@ -963,12 +1022,15 @@ func (m *CodingProblemMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *CodingProblemMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.drafts != nil {
 		edges = append(edges, codingproblem.EdgeDrafts)
 	}
 	if m.staff_data != nil {
 		edges = append(edges, codingproblem.EdgeStaffData)
+	}
+	if m.test_cases != nil {
+		edges = append(edges, codingproblem.EdgeTestCases)
 	}
 	if m.submissions != nil {
 		edges = append(edges, codingproblem.EdgeSubmissions)
@@ -990,6 +1052,12 @@ func (m *CodingProblemMutation) AddedIDs(name string) []ent.Value {
 		if id := m.staff_data; id != nil {
 			return []ent.Value{*id}
 		}
+	case codingproblem.EdgeTestCases:
+		ids := make([]ent.Value, 0, len(m.test_cases))
+		for id := range m.test_cases {
+			ids = append(ids, id)
+		}
+		return ids
 	case codingproblem.EdgeSubmissions:
 		ids := make([]ent.Value, 0, len(m.submissions))
 		for id := range m.submissions {
@@ -1002,9 +1070,12 @@ func (m *CodingProblemMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *CodingProblemMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.removeddrafts != nil {
 		edges = append(edges, codingproblem.EdgeDrafts)
+	}
+	if m.removedtest_cases != nil {
+		edges = append(edges, codingproblem.EdgeTestCases)
 	}
 	if m.removedsubmissions != nil {
 		edges = append(edges, codingproblem.EdgeSubmissions)
@@ -1022,6 +1093,12 @@ func (m *CodingProblemMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case codingproblem.EdgeTestCases:
+		ids := make([]ent.Value, 0, len(m.removedtest_cases))
+		for id := range m.removedtest_cases {
+			ids = append(ids, id)
+		}
+		return ids
 	case codingproblem.EdgeSubmissions:
 		ids := make([]ent.Value, 0, len(m.removedsubmissions))
 		for id := range m.removedsubmissions {
@@ -1034,12 +1111,15 @@ func (m *CodingProblemMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *CodingProblemMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.cleareddrafts {
 		edges = append(edges, codingproblem.EdgeDrafts)
 	}
 	if m.clearedstaff_data {
 		edges = append(edges, codingproblem.EdgeStaffData)
+	}
+	if m.clearedtest_cases {
+		edges = append(edges, codingproblem.EdgeTestCases)
 	}
 	if m.clearedsubmissions {
 		edges = append(edges, codingproblem.EdgeSubmissions)
@@ -1055,6 +1135,8 @@ func (m *CodingProblemMutation) EdgeCleared(name string) bool {
 		return m.cleareddrafts
 	case codingproblem.EdgeStaffData:
 		return m.clearedstaff_data
+	case codingproblem.EdgeTestCases:
+		return m.clearedtest_cases
 	case codingproblem.EdgeSubmissions:
 		return m.clearedsubmissions
 	}
@@ -1081,6 +1163,9 @@ func (m *CodingProblemMutation) ResetEdge(name string) error {
 		return nil
 	case codingproblem.EdgeStaffData:
 		m.ResetStaffData()
+		return nil
+	case codingproblem.EdgeTestCases:
+		m.ResetTestCases()
 		return nil
 	case codingproblem.EdgeSubmissions:
 		m.ResetSubmissions()
@@ -2674,6 +2759,589 @@ func (m *CodingSubmissionStaffDataMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown CodingSubmissionStaffData edge %s", name)
+}
+
+// CodingTestCaseMutation represents an operation that mutates the CodingTestCase nodes in the graph.
+type CodingTestCaseMutation struct {
+	config
+	op                    Op
+	typ                   string
+	id                    *int
+	input                 *string
+	output                *string
+	points                *int
+	addpoints             *int
+	visible               *bool
+	clearedFields         map[string]struct{}
+	coding_problem        map[int]struct{}
+	removedcoding_problem map[int]struct{}
+	clearedcoding_problem bool
+	done                  bool
+	oldValue              func(context.Context) (*CodingTestCase, error)
+	predicates            []predicate.CodingTestCase
+}
+
+var _ ent.Mutation = (*CodingTestCaseMutation)(nil)
+
+// codingtestcaseOption allows management of the mutation configuration using functional options.
+type codingtestcaseOption func(*CodingTestCaseMutation)
+
+// newCodingTestCaseMutation creates new mutation for the CodingTestCase entity.
+func newCodingTestCaseMutation(c config, op Op, opts ...codingtestcaseOption) *CodingTestCaseMutation {
+	m := &CodingTestCaseMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeCodingTestCase,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withCodingTestCaseID sets the ID field of the mutation.
+func withCodingTestCaseID(id int) codingtestcaseOption {
+	return func(m *CodingTestCaseMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *CodingTestCase
+		)
+		m.oldValue = func(ctx context.Context) (*CodingTestCase, error) {
+			once.Do(func() {
+				if m.done {
+					err = fmt.Errorf("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().CodingTestCase.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withCodingTestCase sets the old CodingTestCase of the mutation.
+func withCodingTestCase(node *CodingTestCase) codingtestcaseOption {
+	return func(m *CodingTestCaseMutation) {
+		m.oldValue = func(context.Context) (*CodingTestCase, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m CodingTestCaseMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m CodingTestCaseMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, fmt.Errorf("generated: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *CodingTestCaseMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// SetInput sets the "input" field.
+func (m *CodingTestCaseMutation) SetInput(s string) {
+	m.input = &s
+}
+
+// Input returns the value of the "input" field in the mutation.
+func (m *CodingTestCaseMutation) Input() (r string, exists bool) {
+	v := m.input
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldInput returns the old "input" field's value of the CodingTestCase entity.
+// If the CodingTestCase object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CodingTestCaseMutation) OldInput(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldInput is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldInput requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldInput: %w", err)
+	}
+	return oldValue.Input, nil
+}
+
+// ResetInput resets all changes to the "input" field.
+func (m *CodingTestCaseMutation) ResetInput() {
+	m.input = nil
+}
+
+// SetOutput sets the "output" field.
+func (m *CodingTestCaseMutation) SetOutput(s string) {
+	m.output = &s
+}
+
+// Output returns the value of the "output" field in the mutation.
+func (m *CodingTestCaseMutation) Output() (r string, exists bool) {
+	v := m.output
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOutput returns the old "output" field's value of the CodingTestCase entity.
+// If the CodingTestCase object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CodingTestCaseMutation) OldOutput(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldOutput is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldOutput requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOutput: %w", err)
+	}
+	return oldValue.Output, nil
+}
+
+// ResetOutput resets all changes to the "output" field.
+func (m *CodingTestCaseMutation) ResetOutput() {
+	m.output = nil
+}
+
+// SetPoints sets the "points" field.
+func (m *CodingTestCaseMutation) SetPoints(i int) {
+	m.points = &i
+	m.addpoints = nil
+}
+
+// Points returns the value of the "points" field in the mutation.
+func (m *CodingTestCaseMutation) Points() (r int, exists bool) {
+	v := m.points
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPoints returns the old "points" field's value of the CodingTestCase entity.
+// If the CodingTestCase object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CodingTestCaseMutation) OldPoints(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldPoints is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldPoints requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPoints: %w", err)
+	}
+	return oldValue.Points, nil
+}
+
+// AddPoints adds i to the "points" field.
+func (m *CodingTestCaseMutation) AddPoints(i int) {
+	if m.addpoints != nil {
+		*m.addpoints += i
+	} else {
+		m.addpoints = &i
+	}
+}
+
+// AddedPoints returns the value that was added to the "points" field in this mutation.
+func (m *CodingTestCaseMutation) AddedPoints() (r int, exists bool) {
+	v := m.addpoints
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetPoints resets all changes to the "points" field.
+func (m *CodingTestCaseMutation) ResetPoints() {
+	m.points = nil
+	m.addpoints = nil
+}
+
+// SetVisible sets the "visible" field.
+func (m *CodingTestCaseMutation) SetVisible(b bool) {
+	m.visible = &b
+}
+
+// Visible returns the value of the "visible" field in the mutation.
+func (m *CodingTestCaseMutation) Visible() (r bool, exists bool) {
+	v := m.visible
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldVisible returns the old "visible" field's value of the CodingTestCase entity.
+// If the CodingTestCase object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CodingTestCaseMutation) OldVisible(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldVisible is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldVisible requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldVisible: %w", err)
+	}
+	return oldValue.Visible, nil
+}
+
+// ResetVisible resets all changes to the "visible" field.
+func (m *CodingTestCaseMutation) ResetVisible() {
+	m.visible = nil
+}
+
+// AddCodingProblemIDs adds the "coding_problem" edge to the CodingProblem entity by ids.
+func (m *CodingTestCaseMutation) AddCodingProblemIDs(ids ...int) {
+	if m.coding_problem == nil {
+		m.coding_problem = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.coding_problem[ids[i]] = struct{}{}
+	}
+}
+
+// ClearCodingProblem clears the "coding_problem" edge to the CodingProblem entity.
+func (m *CodingTestCaseMutation) ClearCodingProblem() {
+	m.clearedcoding_problem = true
+}
+
+// CodingProblemCleared reports if the "coding_problem" edge to the CodingProblem entity was cleared.
+func (m *CodingTestCaseMutation) CodingProblemCleared() bool {
+	return m.clearedcoding_problem
+}
+
+// RemoveCodingProblemIDs removes the "coding_problem" edge to the CodingProblem entity by IDs.
+func (m *CodingTestCaseMutation) RemoveCodingProblemIDs(ids ...int) {
+	if m.removedcoding_problem == nil {
+		m.removedcoding_problem = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.coding_problem, ids[i])
+		m.removedcoding_problem[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedCodingProblem returns the removed IDs of the "coding_problem" edge to the CodingProblem entity.
+func (m *CodingTestCaseMutation) RemovedCodingProblemIDs() (ids []int) {
+	for id := range m.removedcoding_problem {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// CodingProblemIDs returns the "coding_problem" edge IDs in the mutation.
+func (m *CodingTestCaseMutation) CodingProblemIDs() (ids []int) {
+	for id := range m.coding_problem {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetCodingProblem resets all changes to the "coding_problem" edge.
+func (m *CodingTestCaseMutation) ResetCodingProblem() {
+	m.coding_problem = nil
+	m.clearedcoding_problem = false
+	m.removedcoding_problem = nil
+}
+
+// Where appends a list predicates to the CodingTestCaseMutation builder.
+func (m *CodingTestCaseMutation) Where(ps ...predicate.CodingTestCase) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *CodingTestCaseMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (CodingTestCase).
+func (m *CodingTestCaseMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *CodingTestCaseMutation) Fields() []string {
+	fields := make([]string, 0, 4)
+	if m.input != nil {
+		fields = append(fields, codingtestcase.FieldInput)
+	}
+	if m.output != nil {
+		fields = append(fields, codingtestcase.FieldOutput)
+	}
+	if m.points != nil {
+		fields = append(fields, codingtestcase.FieldPoints)
+	}
+	if m.visible != nil {
+		fields = append(fields, codingtestcase.FieldVisible)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *CodingTestCaseMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case codingtestcase.FieldInput:
+		return m.Input()
+	case codingtestcase.FieldOutput:
+		return m.Output()
+	case codingtestcase.FieldPoints:
+		return m.Points()
+	case codingtestcase.FieldVisible:
+		return m.Visible()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *CodingTestCaseMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case codingtestcase.FieldInput:
+		return m.OldInput(ctx)
+	case codingtestcase.FieldOutput:
+		return m.OldOutput(ctx)
+	case codingtestcase.FieldPoints:
+		return m.OldPoints(ctx)
+	case codingtestcase.FieldVisible:
+		return m.OldVisible(ctx)
+	}
+	return nil, fmt.Errorf("unknown CodingTestCase field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *CodingTestCaseMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case codingtestcase.FieldInput:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetInput(v)
+		return nil
+	case codingtestcase.FieldOutput:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOutput(v)
+		return nil
+	case codingtestcase.FieldPoints:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPoints(v)
+		return nil
+	case codingtestcase.FieldVisible:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetVisible(v)
+		return nil
+	}
+	return fmt.Errorf("unknown CodingTestCase field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *CodingTestCaseMutation) AddedFields() []string {
+	var fields []string
+	if m.addpoints != nil {
+		fields = append(fields, codingtestcase.FieldPoints)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *CodingTestCaseMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case codingtestcase.FieldPoints:
+		return m.AddedPoints()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *CodingTestCaseMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case codingtestcase.FieldPoints:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddPoints(v)
+		return nil
+	}
+	return fmt.Errorf("unknown CodingTestCase numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *CodingTestCaseMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *CodingTestCaseMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *CodingTestCaseMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown CodingTestCase nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *CodingTestCaseMutation) ResetField(name string) error {
+	switch name {
+	case codingtestcase.FieldInput:
+		m.ResetInput()
+		return nil
+	case codingtestcase.FieldOutput:
+		m.ResetOutput()
+		return nil
+	case codingtestcase.FieldPoints:
+		m.ResetPoints()
+		return nil
+	case codingtestcase.FieldVisible:
+		m.ResetVisible()
+		return nil
+	}
+	return fmt.Errorf("unknown CodingTestCase field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *CodingTestCaseMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.coding_problem != nil {
+		edges = append(edges, codingtestcase.EdgeCodingProblem)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *CodingTestCaseMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case codingtestcase.EdgeCodingProblem:
+		ids := make([]ent.Value, 0, len(m.coding_problem))
+		for id := range m.coding_problem {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *CodingTestCaseMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.removedcoding_problem != nil {
+		edges = append(edges, codingtestcase.EdgeCodingProblem)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *CodingTestCaseMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case codingtestcase.EdgeCodingProblem:
+		ids := make([]ent.Value, 0, len(m.removedcoding_problem))
+		for id := range m.removedcoding_problem {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *CodingTestCaseMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedcoding_problem {
+		edges = append(edges, codingtestcase.EdgeCodingProblem)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *CodingTestCaseMutation) EdgeCleared(name string) bool {
+	switch name {
+	case codingtestcase.EdgeCodingProblem:
+		return m.clearedcoding_problem
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *CodingTestCaseMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown CodingTestCase unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *CodingTestCaseMutation) ResetEdge(name string) error {
+	switch name {
+	case codingtestcase.EdgeCodingProblem:
+		m.ResetCodingProblem()
+		return nil
+	}
+	return fmt.Errorf("unknown CodingTestCase edge %s", name)
 }
 
 // UserMutation represents an operation that mutates the User nodes in the graph.

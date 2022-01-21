@@ -73,6 +73,19 @@ func (f CodingSubmissionStaffDataFunc) Mutate(ctx context.Context, m generated.M
 	return f(ctx, mv)
 }
 
+// The CodingTestCaseFunc type is an adapter to allow the use of ordinary
+// function as CodingTestCase mutator.
+type CodingTestCaseFunc func(context.Context, *generated.CodingTestCaseMutation) (generated.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CodingTestCaseFunc) Mutate(ctx context.Context, m generated.Mutation) (generated.Value, error) {
+	mv, ok := m.(*generated.CodingTestCaseMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *generated.CodingTestCaseMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The UserFunc type is an adapter to allow the use of ordinary
 // function as User mutator.
 type UserFunc func(context.Context, *generated.UserMutation) (generated.Value, error)

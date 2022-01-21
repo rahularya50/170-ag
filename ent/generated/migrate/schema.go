@@ -149,6 +149,20 @@ var (
 			},
 		},
 	}
+	// CodingTestCasesColumns holds the columns for the "coding_test_cases" table.
+	CodingTestCasesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "input", Type: field.TypeString, Size: 2147483647},
+		{Name: "output", Type: field.TypeString, Size: 2147483647},
+		{Name: "points", Type: field.TypeInt},
+		{Name: "visible", Type: field.TypeBool},
+	}
+	// CodingTestCasesTable holds the schema information for the "coding_test_cases" table.
+	CodingTestCasesTable = &schema.Table{
+		Name:       "coding_test_cases",
+		Columns:    CodingTestCasesColumns,
+		PrimaryKey: []*schema.Column{CodingTestCasesColumns[0]},
+	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -169,6 +183,31 @@ var (
 			},
 		},
 	}
+	// CodingProblemTestCasesColumns holds the columns for the "coding_problem_test_cases" table.
+	CodingProblemTestCasesColumns = []*schema.Column{
+		{Name: "coding_problem_id", Type: field.TypeInt},
+		{Name: "coding_test_case_id", Type: field.TypeInt},
+	}
+	// CodingProblemTestCasesTable holds the schema information for the "coding_problem_test_cases" table.
+	CodingProblemTestCasesTable = &schema.Table{
+		Name:       "coding_problem_test_cases",
+		Columns:    CodingProblemTestCasesColumns,
+		PrimaryKey: []*schema.Column{CodingProblemTestCasesColumns[0], CodingProblemTestCasesColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "coding_problem_test_cases_coding_problem_id",
+				Columns:    []*schema.Column{CodingProblemTestCasesColumns[0]},
+				RefColumns: []*schema.Column{CodingProblemsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "coding_problem_test_cases_coding_test_case_id",
+				Columns:    []*schema.Column{CodingProblemTestCasesColumns[1]},
+				RefColumns: []*schema.Column{CodingTestCasesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		CodingDraftsTable,
@@ -176,7 +215,9 @@ var (
 		CodingProblemStaffDataTable,
 		CodingSubmissionsTable,
 		CodingSubmissionStaffDataTable,
+		CodingTestCasesTable,
 		UsersTable,
+		CodingProblemTestCasesTable,
 	}
 )
 
@@ -187,4 +228,6 @@ func init() {
 	CodingSubmissionsTable.ForeignKeys[0].RefTable = UsersTable
 	CodingSubmissionsTable.ForeignKeys[1].RefTable = CodingProblemsTable
 	CodingSubmissionsTable.ForeignKeys[2].RefTable = CodingSubmissionStaffDataTable
+	CodingProblemTestCasesTable.ForeignKeys[0].RefTable = CodingProblemsTable
+	CodingProblemTestCasesTable.ForeignKeys[1].RefTable = CodingTestCasesTable
 }

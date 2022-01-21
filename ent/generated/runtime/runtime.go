@@ -5,9 +5,9 @@ package runtime
 import (
 	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/codingproblem"
-	"170-ag/ent/generated/codingproblemstaffdata"
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/codingsubmissionstaffdata"
+	"170-ag/ent/generated/codingtestcase"
 	"170-ag/ent/generated/user"
 	"170-ag/ent/schema"
 	"context"
@@ -68,15 +68,6 @@ func init() {
 	codingproblemDescReleased := codingproblemFields[2].Descriptor()
 	// codingproblem.DefaultReleased holds the default value on creation for the released field.
 	codingproblem.DefaultReleased = codingproblemDescReleased.Default.(bool)
-	codingproblemstaffdata.Policy = privacy.NewPolicies(schema.CodingProblemStaffData{})
-	codingproblemstaffdata.Hooks[0] = func(next ent.Mutator) ent.Mutator {
-		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-			if err := codingproblemstaffdata.Policy.EvalMutation(ctx, m); err != nil {
-				return nil, err
-			}
-			return next.Mutate(ctx, m)
-		})
-	}
 	codingsubmission.Policy = privacy.NewPolicies(schema.CodingSubmission{})
 	codingsubmission.Hooks[0] = func(next ent.Mutator) ent.Mutator {
 		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
@@ -111,6 +102,21 @@ func init() {
 	codingsubmissionstaffdataDescExitError := codingsubmissionstaffdataFields[4].Descriptor()
 	// codingsubmissionstaffdata.ExitErrorValidator is a validator for the "exit_error" field. It is called by the builders before save.
 	codingsubmissionstaffdata.ExitErrorValidator = codingsubmissionstaffdataDescExitError.Validators[0].(func(string) error)
+	codingtestcase.Policy = privacy.NewPolicies(schema.CodingTestCase{})
+	codingtestcase.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := codingtestcase.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	codingtestcaseFields := schema.CodingTestCase{}.Fields()
+	_ = codingtestcaseFields
+	// codingtestcaseDescPoints is the schema descriptor for points field.
+	codingtestcaseDescPoints := codingtestcaseFields[2].Descriptor()
+	// codingtestcase.PointsValidator is a validator for the "points" field. It is called by the builders before save.
+	codingtestcase.PointsValidator = codingtestcaseDescPoints.Validators[0].(func(int) error)
 	user.Policy = privacy.NewPolicies(schema.User{})
 	user.Hooks[0] = func(next ent.Mutator) ent.Mutator {
 		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {

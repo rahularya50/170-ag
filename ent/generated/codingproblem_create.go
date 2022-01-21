@@ -7,6 +7,7 @@ import (
 	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/codingproblemstaffdata"
 	"170-ag/ent/generated/codingsubmission"
+	"170-ag/ent/generated/codingtestcase"
 	"context"
 	"errors"
 	"fmt"
@@ -90,6 +91,21 @@ func (cpc *CodingProblemCreate) SetNillableStaffDataID(id *int) *CodingProblemCr
 // SetStaffData sets the "staff_data" edge to the CodingProblemStaffData entity.
 func (cpc *CodingProblemCreate) SetStaffData(c *CodingProblemStaffData) *CodingProblemCreate {
 	return cpc.SetStaffDataID(c.ID)
+}
+
+// AddTestCaseIDs adds the "test_cases" edge to the CodingTestCase entity by IDs.
+func (cpc *CodingProblemCreate) AddTestCaseIDs(ids ...int) *CodingProblemCreate {
+	cpc.mutation.AddTestCaseIDs(ids...)
+	return cpc
+}
+
+// AddTestCases adds the "test_cases" edges to the CodingTestCase entity.
+func (cpc *CodingProblemCreate) AddTestCases(c ...*CodingTestCase) *CodingProblemCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cpc.AddTestCaseIDs(ids...)
 }
 
 // AddSubmissionIDs adds the "submissions" edge to the CodingSubmission entity by IDs.
@@ -301,6 +317,25 @@ func (cpc *CodingProblemCreate) createSpec() (*CodingProblem, *sqlgraph.CreateSp
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.coding_problem_staff_data_coding_problem = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cpc.mutation.TestCasesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   codingproblem.TestCasesTable,
+			Columns: codingproblem.TestCasesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingtestcase.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := cpc.mutation.SubmissionsIDs(); len(nodes) > 0 {

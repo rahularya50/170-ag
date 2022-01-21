@@ -22,6 +22,8 @@ type Tx struct {
 	CodingSubmission *CodingSubmissionClient
 	// CodingSubmissionStaffData is the client for interacting with the CodingSubmissionStaffData builders.
 	CodingSubmissionStaffData *CodingSubmissionStaffDataClient
+	// CodingTestCase is the client for interacting with the CodingTestCase builders.
+	CodingTestCase *CodingTestCaseClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 
@@ -164,6 +166,7 @@ func (tx *Tx) init() {
 	tx.CodingProblemStaffData = NewCodingProblemStaffDataClient(tx.config)
 	tx.CodingSubmission = NewCodingSubmissionClient(tx.config)
 	tx.CodingSubmissionStaffData = NewCodingSubmissionStaffDataClient(tx.config)
+	tx.CodingTestCase = NewCodingTestCaseClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }
 

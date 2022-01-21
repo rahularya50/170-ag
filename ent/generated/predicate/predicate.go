@@ -21,5 +21,8 @@ type CodingSubmission func(*sql.Selector)
 // CodingSubmissionStaffData is the predicate function for codingsubmissionstaffdata builders.
 type CodingSubmissionStaffData func(*sql.Selector)
 
+// CodingTestCase is the predicate function for codingtestcase builders.
+type CodingTestCase func(*sql.Selector)
+
 // User is the predicate function for user builders.
 type User func(*sql.Selector)

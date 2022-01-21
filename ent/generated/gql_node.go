@@ -8,6 +8,7 @@ import (
 	"170-ag/ent/generated/codingproblemstaffdata"
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/codingsubmissionstaffdata"
+	"170-ag/ent/generated/codingtestcase"
 	"170-ag/ent/generated/user"
 	"context"
 	"encoding/json"
@@ -95,7 +96,7 @@ func (cp *CodingProblem) Node(ctx context.Context) (node *Node, err error) {
 		ID:     cp.ID,
 		Type:   "CodingProblem",
 		Fields: make([]*Field, 3),
-		Edges:  make([]*Edge, 3),
+		Edges:  make([]*Edge, 4),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(cp.Name); err != nil {
@@ -143,12 +144,22 @@ func (cp *CodingProblem) Node(ctx context.Context) (node *Node, err error) {
 		return nil, err
 	}
 	node.Edges[2] = &Edge{
+		Type: "CodingTestCase",
+		Name: "test_cases",
+	}
+	err = cp.QueryTestCases().
+		Select(codingtestcase.FieldID).
+		Scan(ctx, &node.Edges[2].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[3] = &Edge{
 		Type: "CodingSubmission",
 		Name: "submissions",
 	}
 	err = cp.QuerySubmissions().
 		Select(codingsubmission.FieldID).
-		Scan(ctx, &node.Edges[2].IDs)
+		Scan(ctx, &node.Edges[3].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -295,6 +306,59 @@ func (cssd *CodingSubmissionStaffData) Node(ctx context.Context) (node *Node, er
 	}
 	err = cssd.QueryCodingSubmission().
 		Select(codingsubmission.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	return node, nil
+}
+
+func (ctc *CodingTestCase) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     ctc.ID,
+		Type:   "CodingTestCase",
+		Fields: make([]*Field, 4),
+		Edges:  make([]*Edge, 1),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(ctc.Input); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "string",
+		Name:  "input",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(ctc.Output); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "string",
+		Name:  "output",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(ctc.Points); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "int",
+		Name:  "points",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(ctc.Visible); err != nil {
+		return nil, err
+	}
+	node.Fields[3] = &Field{
+		Type:  "bool",
+		Name:  "visible",
+		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "CodingProblem",
+		Name: "coding_problem",
+	}
+	err = ctc.QueryCodingProblem().
+		Select(codingproblem.FieldID).
 		Scan(ctx, &node.Edges[0].IDs)
 	if err != nil {
 		return nil, err
@@ -459,6 +523,15 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 			return nil, err
 		}
 		return n, nil
+	case codingtestcase.Table:
+		n, err := c.CodingTestCase.Query().
+			Where(codingtestcase.ID(id)).
+			CollectFields(ctx, "CodingTestCase").
+			Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
 	case user.Table:
 		n, err := c.User.Query().
 			Where(user.ID(id)).
@@ -597,6 +670,19 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		nodes, err := c.CodingSubmissionStaffData.Query().
 			Where(codingsubmissionstaffdata.IDIn(ids...)).
 			CollectFields(ctx, "CodingSubmissionStaffData").
+			All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case codingtestcase.Table:
+		nodes, err := c.CodingTestCase.Query().
+			Where(codingtestcase.IDIn(ids...)).
+			CollectFields(ctx, "CodingTestCase").
 			All(ctx)
 		if err != nil {
 			return nil, err

@@ -8,6 +8,7 @@ import (
 
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
@@ -29,9 +30,21 @@ func (CodingProblem) Fields() []ent.Field {
 // Edges of the CodingProblem.
 func (CodingProblem) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("drafts", CodingDraft.Type).Ref("coding_problem").Annotations(entgql.Bind()),
-		edge.From("staff_data", CodingProblemStaffData.Type).Ref("coding_problem").Unique().Annotations(entgql.Bind()),
-		edge.From("submissions", CodingSubmission.Type).Ref("coding_problem").Annotations(entgql.Bind()),
+		edge.From("drafts", CodingDraft.Type).
+			Ref("coding_problem").
+			Annotations(entgql.Bind()),
+		edge.From("staff_data", CodingProblemStaffData.Type).
+			Ref("coding_problem").
+			Unique().
+			Annotations(entgql.Bind()),
+		edge.To("test_cases", CodingTestCase.Type).
+			Annotations(
+				entgql.Bind(),
+				entsql.Annotation{OnDelete: entsql.Cascade},
+			),
+		edge.From("submissions", CodingSubmission.Type).
+			Ref("coding_problem").
+			Annotations(entgql.Bind()),
 	}
 }
 
