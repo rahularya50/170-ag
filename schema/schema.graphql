@@ -14,6 +14,8 @@ directive @goField(
   name: String
 ) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 
+directive @refetchable(queryName: String) on FRAGMENT_DEFINITION
+
 interface Node {
   id: ID!
 }
@@ -67,13 +69,13 @@ type CodingProblem implements Node {
     first: Int
     before: Cursor
     last: Int
-  ): CodingSubmissionConnection
+  ): CodingSubmissionConnection!
   all_submissions(
     after: Cursor
     first: Int
     before: Cursor
     last: Int
-  ): CodingSubmissionConnection
+  ): CodingSubmissionConnection!
   staff_data: CodingProblemStaffData
 }
 

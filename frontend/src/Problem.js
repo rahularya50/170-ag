@@ -7,6 +7,7 @@ import { Navigate, useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { Col, Container, Row } from "react-bootstrap";
 import ProblemEditor from "./ProblemEditor";
+import ProblemSubmissions from "./ProblemSubmissions";
 
 export default function Problems(): React.Node {
   const { id } = useParams();
@@ -17,6 +18,7 @@ export default function Problems(): React.Node {
         coding_problem(id: $id) {
           name
           statement
+          ...ProblemSubmissions_problem
           ...ProblemEditor_problem
         }
       }
@@ -35,6 +37,7 @@ export default function Problems(): React.Node {
           <h3>{coding_problem.name}</h3>
           <p>{coding_problem.statement}</p>{" "}
           <Link to="/problems/">(Back to all problems)</Link>
+          <ProblemSubmissions problem={coding_problem} />
         </Col>
         <Col>
           <ProblemEditor problem={coding_problem} />

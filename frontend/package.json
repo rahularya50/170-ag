@@ -18,7 +18,8 @@
     "react-router-dom": "^6.2.1",
     "react-scripts": "5.0.0",
     "relay-compiler": "^13.0.0",
-    "relay-runtime": "^13.0.0"
+    "relay-runtime": "^13.0.0",
+    "use-interval": "^1.4.0"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -54,7 +54,9 @@ export default function ProblemEditor(props: Props): React.Node {
       graphql`
         mutation ProblemEditorSubmitMutation($input: CodingSubmissionInput!) {
           create_submission(input: $input) {
-            __typename
+            coding_problem {
+              ...ProblemSubmissions_problem
+            }
           }
         }
       `
