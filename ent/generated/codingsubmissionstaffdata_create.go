@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -20,6 +21,34 @@ type CodingSubmissionStaffDataCreate struct {
 	mutation *CodingSubmissionStaffDataMutation
 	hooks    []Hook
 	conflict []sql.ConflictOption
+}
+
+// SetCreateTime sets the "create_time" field.
+func (cssdc *CodingSubmissionStaffDataCreate) SetCreateTime(t time.Time) *CodingSubmissionStaffDataCreate {
+	cssdc.mutation.SetCreateTime(t)
+	return cssdc
+}
+
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (cssdc *CodingSubmissionStaffDataCreate) SetNillableCreateTime(t *time.Time) *CodingSubmissionStaffDataCreate {
+	if t != nil {
+		cssdc.SetCreateTime(*t)
+	}
+	return cssdc
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (cssdc *CodingSubmissionStaffDataCreate) SetUpdateTime(t time.Time) *CodingSubmissionStaffDataCreate {
+	cssdc.mutation.SetUpdateTime(t)
+	return cssdc
+}
+
+// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
+func (cssdc *CodingSubmissionStaffDataCreate) SetNillableUpdateTime(t *time.Time) *CodingSubmissionStaffDataCreate {
+	if t != nil {
+		cssdc.SetUpdateTime(*t)
+	}
+	return cssdc
 }
 
 // SetExecutionID sets the "execution_id" field.
@@ -106,6 +135,9 @@ func (cssdc *CodingSubmissionStaffDataCreate) Save(ctx context.Context) (*Coding
 		err  error
 		node *CodingSubmissionStaffData
 	)
+	if err := cssdc.defaults(); err != nil {
+		return nil, err
+	}
 	if len(cssdc.hooks) == 0 {
 		if err = cssdc.check(); err != nil {
 			return nil, err
@@ -163,8 +195,33 @@ func (cssdc *CodingSubmissionStaffDataCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (cssdc *CodingSubmissionStaffDataCreate) defaults() error {
+	if _, ok := cssdc.mutation.CreateTime(); !ok {
+		if codingsubmissionstaffdata.DefaultCreateTime == nil {
+			return fmt.Errorf("generated: uninitialized codingsubmissionstaffdata.DefaultCreateTime (forgotten import generated/runtime?)")
+		}
+		v := codingsubmissionstaffdata.DefaultCreateTime()
+		cssdc.mutation.SetCreateTime(v)
+	}
+	if _, ok := cssdc.mutation.UpdateTime(); !ok {
+		if codingsubmissionstaffdata.DefaultUpdateTime == nil {
+			return fmt.Errorf("generated: uninitialized codingsubmissionstaffdata.DefaultUpdateTime (forgotten import generated/runtime?)")
+		}
+		v := codingsubmissionstaffdata.DefaultUpdateTime()
+		cssdc.mutation.SetUpdateTime(v)
+	}
+	return nil
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (cssdc *CodingSubmissionStaffDataCreate) check() error {
+	if _, ok := cssdc.mutation.CreateTime(); !ok {
+		return &ValidationError{Name: "create_time", err: errors.New(`generated: missing required field "CodingSubmissionStaffData.create_time"`)}
+	}
+	if _, ok := cssdc.mutation.UpdateTime(); !ok {
+		return &ValidationError{Name: "update_time", err: errors.New(`generated: missing required field "CodingSubmissionStaffData.update_time"`)}
+	}
 	if _, ok := cssdc.mutation.Input(); !ok {
 		return &ValidationError{Name: "input", err: errors.New(`generated: missing required field "CodingSubmissionStaffData.input"`)}
 	}
@@ -214,6 +271,22 @@ func (cssdc *CodingSubmissionStaffDataCreate) createSpec() (*CodingSubmissionSta
 		}
 	)
 	_spec.OnConflict = cssdc.conflict
+	if value, ok := cssdc.mutation.CreateTime(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: codingsubmissionstaffdata.FieldCreateTime,
+		})
+		_node.CreateTime = value
+	}
+	if value, ok := cssdc.mutation.UpdateTime(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: codingsubmissionstaffdata.FieldUpdateTime,
+		})
+		_node.UpdateTime = value
+	}
 	if value, ok := cssdc.mutation.ExecutionID(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt64,
@@ -280,7 +353,7 @@ func (cssdc *CodingSubmissionStaffDataCreate) createSpec() (*CodingSubmissionSta
 // of the `INSERT` statement. For example:
 //
 //	client.CodingSubmissionStaffData.Create().
-//		SetExecutionID(v).
+//		SetCreateTime(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
@@ -289,7 +362,7 @@ func (cssdc *CodingSubmissionStaffDataCreate) createSpec() (*CodingSubmissionSta
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.CodingSubmissionStaffDataUpsert) {
-//			SetExecutionID(v+v).
+//			SetCreateTime(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -326,6 +399,30 @@ type (
 		*sql.UpdateSet
 	}
 )
+
+// SetCreateTime sets the "create_time" field.
+func (u *CodingSubmissionStaffDataUpsert) SetCreateTime(v time.Time) *CodingSubmissionStaffDataUpsert {
+	u.Set(codingsubmissionstaffdata.FieldCreateTime, v)
+	return u
+}
+
+// UpdateCreateTime sets the "create_time" field to the value that was provided on create.
+func (u *CodingSubmissionStaffDataUpsert) UpdateCreateTime() *CodingSubmissionStaffDataUpsert {
+	u.SetExcluded(codingsubmissionstaffdata.FieldCreateTime)
+	return u
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (u *CodingSubmissionStaffDataUpsert) SetUpdateTime(v time.Time) *CodingSubmissionStaffDataUpsert {
+	u.Set(codingsubmissionstaffdata.FieldUpdateTime, v)
+	return u
+}
+
+// UpdateUpdateTime sets the "update_time" field to the value that was provided on create.
+func (u *CodingSubmissionStaffDataUpsert) UpdateUpdateTime() *CodingSubmissionStaffDataUpsert {
+	u.SetExcluded(codingsubmissionstaffdata.FieldUpdateTime)
+	return u
+}
 
 // SetExecutionID sets the "execution_id" field.
 func (u *CodingSubmissionStaffDataUpsert) SetExecutionID(v int64) *CodingSubmissionStaffDataUpsert {
@@ -428,6 +525,11 @@ func (u *CodingSubmissionStaffDataUpsert) ClearExitError() *CodingSubmissionStaf
 //
 func (u *CodingSubmissionStaffDataUpsertOne) UpdateNewValues() *CodingSubmissionStaffDataUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.CreateTime(); exists {
+			s.SetIgnore(codingsubmissionstaffdata.FieldCreateTime)
+		}
+	}))
 	return u
 }
 
@@ -457,6 +559,34 @@ func (u *CodingSubmissionStaffDataUpsertOne) Update(set func(*CodingSubmissionSt
 		set(&CodingSubmissionStaffDataUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetCreateTime sets the "create_time" field.
+func (u *CodingSubmissionStaffDataUpsertOne) SetCreateTime(v time.Time) *CodingSubmissionStaffDataUpsertOne {
+	return u.Update(func(s *CodingSubmissionStaffDataUpsert) {
+		s.SetCreateTime(v)
+	})
+}
+
+// UpdateCreateTime sets the "create_time" field to the value that was provided on create.
+func (u *CodingSubmissionStaffDataUpsertOne) UpdateCreateTime() *CodingSubmissionStaffDataUpsertOne {
+	return u.Update(func(s *CodingSubmissionStaffDataUpsert) {
+		s.UpdateCreateTime()
+	})
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (u *CodingSubmissionStaffDataUpsertOne) SetUpdateTime(v time.Time) *CodingSubmissionStaffDataUpsertOne {
+	return u.Update(func(s *CodingSubmissionStaffDataUpsert) {
+		s.SetUpdateTime(v)
+	})
+}
+
+// UpdateUpdateTime sets the "update_time" field to the value that was provided on create.
+func (u *CodingSubmissionStaffDataUpsertOne) UpdateUpdateTime() *CodingSubmissionStaffDataUpsertOne {
+	return u.Update(func(s *CodingSubmissionStaffDataUpsert) {
+		s.UpdateUpdateTime()
+	})
 }
 
 // SetExecutionID sets the "execution_id" field.
@@ -612,6 +742,7 @@ func (cssdcb *CodingSubmissionStaffDataCreateBulk) Save(ctx context.Context) ([]
 	for i := range cssdcb.builders {
 		func(i int, root context.Context) {
 			builder := cssdcb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*CodingSubmissionStaffDataMutation)
 				if !ok {
@@ -694,7 +825,7 @@ func (cssdcb *CodingSubmissionStaffDataCreateBulk) ExecX(ctx context.Context) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.CodingSubmissionStaffDataUpsert) {
-//			SetExecutionID(v+v).
+//			SetCreateTime(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -736,6 +867,13 @@ type CodingSubmissionStaffDataUpsertBulk struct {
 //
 func (u *CodingSubmissionStaffDataUpsertBulk) UpdateNewValues() *CodingSubmissionStaffDataUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.CreateTime(); exists {
+				s.SetIgnore(codingsubmissionstaffdata.FieldCreateTime)
+			}
+		}
+	}))
 	return u
 }
 
@@ -765,6 +903,34 @@ func (u *CodingSubmissionStaffDataUpsertBulk) Update(set func(*CodingSubmissionS
 		set(&CodingSubmissionStaffDataUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetCreateTime sets the "create_time" field.
+func (u *CodingSubmissionStaffDataUpsertBulk) SetCreateTime(v time.Time) *CodingSubmissionStaffDataUpsertBulk {
+	return u.Update(func(s *CodingSubmissionStaffDataUpsert) {
+		s.SetCreateTime(v)
+	})
+}
+
+// UpdateCreateTime sets the "create_time" field to the value that was provided on create.
+func (u *CodingSubmissionStaffDataUpsertBulk) UpdateCreateTime() *CodingSubmissionStaffDataUpsertBulk {
+	return u.Update(func(s *CodingSubmissionStaffDataUpsert) {
+		s.UpdateCreateTime()
+	})
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (u *CodingSubmissionStaffDataUpsertBulk) SetUpdateTime(v time.Time) *CodingSubmissionStaffDataUpsertBulk {
+	return u.Update(func(s *CodingSubmissionStaffDataUpsert) {
+		s.SetUpdateTime(v)
+	})
+}
+
+// UpdateUpdateTime sets the "update_time" field to the value that was provided on create.
+func (u *CodingSubmissionStaffDataUpsertBulk) UpdateUpdateTime() *CodingSubmissionStaffDataUpsertBulk {
+	return u.Update(func(s *CodingSubmissionStaffDataUpsert) {
+		s.UpdateUpdateTime()
+	})
 }
 
 // SetExecutionID sets the "execution_id" field.

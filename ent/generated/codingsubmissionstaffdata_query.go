@@ -291,12 +291,12 @@ func (cssdq *CodingSubmissionStaffDataQuery) WithCodingSubmission(opts ...func(*
 // Example:
 //
 //	var v []struct {
-//		ExecutionID int64 `json:"execution_id,omitempty"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.CodingSubmissionStaffData.Query().
-//		GroupBy(codingsubmissionstaffdata.FieldExecutionID).
+//		GroupBy(codingsubmissionstaffdata.FieldCreateTime).
 //		Aggregate(generated.Count()).
 //		Scan(ctx, &v)
 //
@@ -318,11 +318,11 @@ func (cssdq *CodingSubmissionStaffDataQuery) GroupBy(field string, fields ...str
 // Example:
 //
 //	var v []struct {
-//		ExecutionID int64 `json:"execution_id,omitempty"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //	}
 //
 //	client.CodingSubmissionStaffData.Query().
-//		Select(codingsubmissionstaffdata.FieldExecutionID).
+//		Select(codingsubmissionstaffdata.FieldCreateTime).
 //		Scan(ctx, &v)
 //
 func (cssdq *CodingSubmissionStaffDataQuery) Select(fields ...string) *CodingSubmissionStaffDataSelect {

@@ -3,6 +3,8 @@
 package codingsubmissionstaffdata
 
 import (
+	"time"
+
 	"entgo.io/ent"
 )
 
@@ -11,6 +13,10 @@ const (
 	Label = "coding_submission_staff_data"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldCreateTime holds the string denoting the create_time field in the database.
+	FieldCreateTime = "create_time"
+	// FieldUpdateTime holds the string denoting the update_time field in the database.
+	FieldUpdateTime = "update_time"
 	// FieldExecutionID holds the string denoting the execution_id field in the database.
 	FieldExecutionID = "execution_id"
 	// FieldInput holds the string denoting the input field in the database.
@@ -37,6 +43,8 @@ const (
 // Columns holds all SQL columns for codingsubmissionstaffdata fields.
 var Columns = []string{
 	FieldID,
+	FieldCreateTime,
+	FieldUpdateTime,
 	FieldExecutionID,
 	FieldInput,
 	FieldOutput,
@@ -63,6 +71,12 @@ func ValidColumn(column string) bool {
 var (
 	Hooks  [1]ent.Hook
 	Policy ent.Policy
+	// DefaultCreateTime holds the default value on creation for the "create_time" field.
+	DefaultCreateTime func() time.Time
+	// DefaultUpdateTime holds the default value on creation for the "update_time" field.
+	DefaultUpdateTime func() time.Time
+	// UpdateDefaultUpdateTime holds the default value on update for the "update_time" field.
+	UpdateDefaultUpdateTime func() time.Time
 	// OutputValidator is a validator for the "output" field. It is called by the builders before save.
 	OutputValidator func(string) error
 	// StderrValidator is a validator for the "stderr" field. It is called by the builders before save.

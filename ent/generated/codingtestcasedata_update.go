@@ -9,6 +9,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -25,6 +26,12 @@ type CodingTestCaseDataUpdate struct {
 // Where appends a list predicates to the CodingTestCaseDataUpdate builder.
 func (ctcdu *CodingTestCaseDataUpdate) Where(ps ...predicate.CodingTestCaseData) *CodingTestCaseDataUpdate {
 	ctcdu.mutation.Where(ps...)
+	return ctcdu
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (ctcdu *CodingTestCaseDataUpdate) SetUpdateTime(t time.Time) *CodingTestCaseDataUpdate {
+	ctcdu.mutation.SetUpdateTime(t)
 	return ctcdu
 }
 
@@ -84,6 +91,9 @@ func (ctcdu *CodingTestCaseDataUpdate) Save(ctx context.Context) (int, error) {
 		err      error
 		affected int
 	)
+	if err := ctcdu.defaults(); err != nil {
+		return 0, err
+	}
 	if len(ctcdu.hooks) == 0 {
 		if err = ctcdu.check(); err != nil {
 			return 0, err
@@ -138,6 +148,18 @@ func (ctcdu *CodingTestCaseDataUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (ctcdu *CodingTestCaseDataUpdate) defaults() error {
+	if _, ok := ctcdu.mutation.UpdateTime(); !ok {
+		if codingtestcasedata.UpdateDefaultUpdateTime == nil {
+			return fmt.Errorf("generated: uninitialized codingtestcasedata.UpdateDefaultUpdateTime (forgotten import generated/runtime?)")
+		}
+		v := codingtestcasedata.UpdateDefaultUpdateTime()
+		ctcdu.mutation.SetUpdateTime(v)
+	}
+	return nil
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (ctcdu *CodingTestCaseDataUpdate) check() error {
 	if _, ok := ctcdu.mutation.TestCaseID(); ctcdu.mutation.TestCaseCleared() && !ok {
@@ -163,6 +185,13 @@ func (ctcdu *CodingTestCaseDataUpdate) sqlSave(ctx context.Context) (n int, err 
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := ctcdu.mutation.UpdateTime(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: codingtestcasedata.FieldUpdateTime,
+		})
 	}
 	if value, ok := ctcdu.mutation.Input(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
@@ -232,6 +261,12 @@ type CodingTestCaseDataUpdateOne struct {
 	mutation *CodingTestCaseDataMutation
 }
 
+// SetUpdateTime sets the "update_time" field.
+func (ctcduo *CodingTestCaseDataUpdateOne) SetUpdateTime(t time.Time) *CodingTestCaseDataUpdateOne {
+	ctcduo.mutation.SetUpdateTime(t)
+	return ctcduo
+}
+
 // SetInput sets the "input" field.
 func (ctcduo *CodingTestCaseDataUpdateOne) SetInput(s string) *CodingTestCaseDataUpdateOne {
 	ctcduo.mutation.SetInput(s)
@@ -295,6 +330,9 @@ func (ctcduo *CodingTestCaseDataUpdateOne) Save(ctx context.Context) (*CodingTes
 		err  error
 		node *CodingTestCaseData
 	)
+	if err := ctcduo.defaults(); err != nil {
+		return nil, err
+	}
 	if len(ctcduo.hooks) == 0 {
 		if err = ctcduo.check(); err != nil {
 			return nil, err
@@ -349,6 +387,18 @@ func (ctcduo *CodingTestCaseDataUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (ctcduo *CodingTestCaseDataUpdateOne) defaults() error {
+	if _, ok := ctcduo.mutation.UpdateTime(); !ok {
+		if codingtestcasedata.UpdateDefaultUpdateTime == nil {
+			return fmt.Errorf("generated: uninitialized codingtestcasedata.UpdateDefaultUpdateTime (forgotten import generated/runtime?)")
+		}
+		v := codingtestcasedata.UpdateDefaultUpdateTime()
+		ctcduo.mutation.SetUpdateTime(v)
+	}
+	return nil
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (ctcduo *CodingTestCaseDataUpdateOne) check() error {
 	if _, ok := ctcduo.mutation.TestCaseID(); ctcduo.mutation.TestCaseCleared() && !ok {
@@ -391,6 +441,13 @@ func (ctcduo *CodingTestCaseDataUpdateOne) sqlSave(ctx context.Context) (_node *
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := ctcduo.mutation.UpdateTime(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: codingtestcasedata.FieldUpdateTime,
+		})
 	}
 	if value, ok := ctcduo.mutation.Input(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{

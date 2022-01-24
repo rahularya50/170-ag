@@ -11,6 +11,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -27,6 +28,12 @@ type CodingSubmissionUpdate struct {
 // Where appends a list predicates to the CodingSubmissionUpdate builder.
 func (csu *CodingSubmissionUpdate) Where(ps ...predicate.CodingSubmission) *CodingSubmissionUpdate {
 	csu.mutation.Where(ps...)
+	return csu
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (csu *CodingSubmissionUpdate) SetUpdateTime(t time.Time) *CodingSubmissionUpdate {
+	csu.mutation.SetUpdateTime(t)
 	return csu
 }
 
@@ -114,6 +121,9 @@ func (csu *CodingSubmissionUpdate) Save(ctx context.Context) (int, error) {
 		err      error
 		affected int
 	)
+	if err := csu.defaults(); err != nil {
+		return 0, err
+	}
 	if len(csu.hooks) == 0 {
 		if err = csu.check(); err != nil {
 			return 0, err
@@ -168,6 +178,18 @@ func (csu *CodingSubmissionUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (csu *CodingSubmissionUpdate) defaults() error {
+	if _, ok := csu.mutation.UpdateTime(); !ok {
+		if codingsubmission.UpdateDefaultUpdateTime == nil {
+			return fmt.Errorf("generated: uninitialized codingsubmission.UpdateDefaultUpdateTime (forgotten import generated/runtime?)")
+		}
+		v := codingsubmission.UpdateDefaultUpdateTime()
+		csu.mutation.SetUpdateTime(v)
+	}
+	return nil
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (csu *CodingSubmissionUpdate) check() error {
 	if v, ok := csu.mutation.Status(); ok {
@@ -201,6 +223,13 @@ func (csu *CodingSubmissionUpdate) sqlSave(ctx context.Context) (n int, err erro
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := csu.mutation.UpdateTime(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: codingsubmission.FieldUpdateTime,
+		})
 	}
 	if value, ok := csu.mutation.Status(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
@@ -333,6 +362,12 @@ type CodingSubmissionUpdateOne struct {
 	mutation *CodingSubmissionMutation
 }
 
+// SetUpdateTime sets the "update_time" field.
+func (csuo *CodingSubmissionUpdateOne) SetUpdateTime(t time.Time) *CodingSubmissionUpdateOne {
+	csuo.mutation.SetUpdateTime(t)
+	return csuo
+}
+
 // SetStatus sets the "status" field.
 func (csuo *CodingSubmissionUpdateOne) SetStatus(c codingsubmission.Status) *CodingSubmissionUpdateOne {
 	csuo.mutation.SetStatus(c)
@@ -424,6 +459,9 @@ func (csuo *CodingSubmissionUpdateOne) Save(ctx context.Context) (*CodingSubmiss
 		err  error
 		node *CodingSubmission
 	)
+	if err := csuo.defaults(); err != nil {
+		return nil, err
+	}
 	if len(csuo.hooks) == 0 {
 		if err = csuo.check(); err != nil {
 			return nil, err
@@ -478,6 +516,18 @@ func (csuo *CodingSubmissionUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (csuo *CodingSubmissionUpdateOne) defaults() error {
+	if _, ok := csuo.mutation.UpdateTime(); !ok {
+		if codingsubmission.UpdateDefaultUpdateTime == nil {
+			return fmt.Errorf("generated: uninitialized codingsubmission.UpdateDefaultUpdateTime (forgotten import generated/runtime?)")
+		}
+		v := codingsubmission.UpdateDefaultUpdateTime()
+		csuo.mutation.SetUpdateTime(v)
+	}
+	return nil
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (csuo *CodingSubmissionUpdateOne) check() error {
 	if v, ok := csuo.mutation.Status(); ok {
@@ -528,6 +578,13 @@ func (csuo *CodingSubmissionUpdateOne) sqlSave(ctx context.Context) (_node *Codi
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := csuo.mutation.UpdateTime(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: codingsubmission.FieldUpdateTime,
+		})
 	}
 	if value, ok := csuo.mutation.Status(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{

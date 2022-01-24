@@ -110,6 +110,7 @@ func (r *mutationResolver) CreateSubmission(ctx context.Context, input model.Cod
 	test_case_data, err := tx.CodingProblem.Query().
 		Where(codingproblem.ID(input.ProblemID)).
 		QueryTestCases().
+		Order(ent.Asc(codingtestcase.FieldID)).
 		QueryData().
 		All(submission_ctx)
 	if err != nil {

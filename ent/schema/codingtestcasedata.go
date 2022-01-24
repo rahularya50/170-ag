@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/mixin"
 )
 
 // CodingTestCaseData holds the schema definition for the CodingTestCaseData entity.
@@ -33,6 +34,12 @@ func (CodingTestCaseData) Edges() []ent.Edge {
 			Unique().
 			Required().
 			Annotations(entgql.Bind()),
+	}
+}
+
+func (CodingTestCaseData) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		mixin.Time{},
 	}
 }
 

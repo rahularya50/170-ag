@@ -9,6 +9,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -25,6 +26,12 @@ type CodingSubmissionStaffDataUpdate struct {
 // Where appends a list predicates to the CodingSubmissionStaffDataUpdate builder.
 func (cssdu *CodingSubmissionStaffDataUpdate) Where(ps ...predicate.CodingSubmissionStaffData) *CodingSubmissionStaffDataUpdate {
 	cssdu.mutation.Where(ps...)
+	return cssdu
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (cssdu *CodingSubmissionStaffDataUpdate) SetUpdateTime(t time.Time) *CodingSubmissionStaffDataUpdate {
+	cssdu.mutation.SetUpdateTime(t)
 	return cssdu
 }
 
@@ -149,6 +156,9 @@ func (cssdu *CodingSubmissionStaffDataUpdate) Save(ctx context.Context) (int, er
 		err      error
 		affected int
 	)
+	if err := cssdu.defaults(); err != nil {
+		return 0, err
+	}
 	if len(cssdu.hooks) == 0 {
 		if err = cssdu.check(); err != nil {
 			return 0, err
@@ -203,6 +213,18 @@ func (cssdu *CodingSubmissionStaffDataUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (cssdu *CodingSubmissionStaffDataUpdate) defaults() error {
+	if _, ok := cssdu.mutation.UpdateTime(); !ok {
+		if codingsubmissionstaffdata.UpdateDefaultUpdateTime == nil {
+			return fmt.Errorf("generated: uninitialized codingsubmissionstaffdata.UpdateDefaultUpdateTime (forgotten import generated/runtime?)")
+		}
+		v := codingsubmissionstaffdata.UpdateDefaultUpdateTime()
+		cssdu.mutation.SetUpdateTime(v)
+	}
+	return nil
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (cssdu *CodingSubmissionStaffDataUpdate) check() error {
 	if v, ok := cssdu.mutation.Output(); ok {
@@ -243,6 +265,13 @@ func (cssdu *CodingSubmissionStaffDataUpdate) sqlSave(ctx context.Context) (n in
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := cssdu.mutation.UpdateTime(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: codingsubmissionstaffdata.FieldUpdateTime,
+		})
 	}
 	if value, ok := cssdu.mutation.ExecutionID(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
@@ -362,6 +391,12 @@ type CodingSubmissionStaffDataUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *CodingSubmissionStaffDataMutation
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (cssduo *CodingSubmissionStaffDataUpdateOne) SetUpdateTime(t time.Time) *CodingSubmissionStaffDataUpdateOne {
+	cssduo.mutation.SetUpdateTime(t)
+	return cssduo
 }
 
 // SetExecutionID sets the "execution_id" field.
@@ -492,6 +527,9 @@ func (cssduo *CodingSubmissionStaffDataUpdateOne) Save(ctx context.Context) (*Co
 		err  error
 		node *CodingSubmissionStaffData
 	)
+	if err := cssduo.defaults(); err != nil {
+		return nil, err
+	}
 	if len(cssduo.hooks) == 0 {
 		if err = cssduo.check(); err != nil {
 			return nil, err
@@ -544,6 +582,18 @@ func (cssduo *CodingSubmissionStaffDataUpdateOne) ExecX(ctx context.Context) {
 	if err := cssduo.Exec(ctx); err != nil {
 		panic(err)
 	}
+}
+
+// defaults sets the default values of the builder before save.
+func (cssduo *CodingSubmissionStaffDataUpdateOne) defaults() error {
+	if _, ok := cssduo.mutation.UpdateTime(); !ok {
+		if codingsubmissionstaffdata.UpdateDefaultUpdateTime == nil {
+			return fmt.Errorf("generated: uninitialized codingsubmissionstaffdata.UpdateDefaultUpdateTime (forgotten import generated/runtime?)")
+		}
+		v := codingsubmissionstaffdata.UpdateDefaultUpdateTime()
+		cssduo.mutation.SetUpdateTime(v)
+	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -603,6 +653,13 @@ func (cssduo *CodingSubmissionStaffDataUpdateOne) sqlSave(ctx context.Context) (
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := cssduo.mutation.UpdateTime(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: codingsubmissionstaffdata.FieldUpdateTime,
+		})
 	}
 	if value, ok := cssduo.mutation.ExecutionID(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{

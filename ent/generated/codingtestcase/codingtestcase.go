@@ -3,6 +3,8 @@
 package codingtestcase
 
 import (
+	"time"
+
 	"entgo.io/ent"
 )
 
@@ -11,6 +13,10 @@ const (
 	Label = "coding_test_case"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldCreateTime holds the string denoting the create_time field in the database.
+	FieldCreateTime = "create_time"
+	// FieldUpdateTime holds the string denoting the update_time field in the database.
+	FieldUpdateTime = "update_time"
 	// FieldPoints holds the string denoting the points field in the database.
 	FieldPoints = "points"
 	// FieldPublic holds the string denoting the public field in the database.
@@ -40,6 +46,8 @@ const (
 // Columns holds all SQL columns for codingtestcase fields.
 var Columns = []string{
 	FieldID,
+	FieldCreateTime,
+	FieldUpdateTime,
 	FieldPoints,
 	FieldPublic,
 }
@@ -75,6 +83,12 @@ func ValidColumn(column string) bool {
 var (
 	Hooks  [1]ent.Hook
 	Policy ent.Policy
+	// DefaultCreateTime holds the default value on creation for the "create_time" field.
+	DefaultCreateTime func() time.Time
+	// DefaultUpdateTime holds the default value on creation for the "update_time" field.
+	DefaultUpdateTime func() time.Time
+	// UpdateDefaultUpdateTime holds the default value on update for the "update_time" field.
+	UpdateDefaultUpdateTime func() time.Time
 	// DefaultPoints holds the default value on creation for the "points" field.
 	DefaultPoints int
 	// PointsValidator is a validator for the "points" field. It is called by the builders before save.

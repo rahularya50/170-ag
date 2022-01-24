@@ -1,11 +1,14 @@
 // @flow
+import type { ProblemsCreateMutation } from "./__generated__/ProblemsCreateMutation.graphql";
 
 import * as React from "react";
 import { useState } from "react";
 import graphql from "babel-plugin-relay/macro";
-import { useLazyLoadQuery } from "react-relay/hooks";
+import { useLazyLoadQuery, useMutation } from "react-relay/hooks";
 import { Form } from "react-bootstrap";
 import ProblemTable from "./ProblemTable";
+import LoadingButton from "./LoadingButton";
+import { useNavigate } from "react-router-dom";
 
 export default function Problems(): React.Node {
   const [includeUnreleased, setIncludeUnreleased] = useState(false);
@@ -16,11 +19,39 @@ export default function Problems(): React.Node {
         viewer {
           is_staff
         }
-        ...ProblemTable
+        ...ProblemTable @arguments(includeUnreleased: $include_unreleased)
       }
     `,
     { include_unreleased: includeUnreleased }
   );
+
+  const [createProblem, isCreatingProblem] =
+    useMutation<ProblemsCreateMutation>(
+      graphql`
+        mutation ProblemsCreateMutation($input: CodingProblemInput!) {
+          new_problem(input: $input) {
+            id
+          }
+        }
+      `
+    );
+
+  const navigate = useNavigate();
+
+  const handleCreateProblem = () => {
+    createProblem({
+      variables: {
+        input: {
+          name: "New Problem",
+          statement: "Problem Statement",
+          released: false,
+        },
+      },
+      onCompleted: (resp) => {
+        navigate(`/problem/${resp.new_problem.id}`);
+      },
+    });
+  };
 
   return (
     <>
@@ -35,9 +66,17 @@ export default function Problems(): React.Node {
           />
         </Form.Group>
       )}
-      <React.Suspense fallback={null}>
+      <React.Suspense>
         <ProblemTable query={query} />
       </React.Suspense>
+      {query.viewer?.is_staff && (
+        <LoadingButton
+          onClick={handleCreateProblem}
+          isUpdating={isCreatingProblem}
+        >
+          New Problem
+        </LoadingButton>
+      )}
     </>
   );
 }

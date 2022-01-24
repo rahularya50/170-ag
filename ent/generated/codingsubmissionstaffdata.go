@@ -7,6 +7,7 @@ import (
 	"170-ag/ent/generated/codingsubmissionstaffdata"
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 )
@@ -16,6 +17,10 @@ type CodingSubmissionStaffData struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
+	// CreateTime holds the value of the "create_time" field.
+	CreateTime time.Time `json:"create_time,omitempty"`
+	// UpdateTime holds the value of the "update_time" field.
+	UpdateTime time.Time `json:"update_time,omitempty"`
 	// ExecutionID holds the value of the "execution_id" field.
 	ExecutionID *int64 `json:"execution_id,omitempty"`
 	// Input holds the value of the "input" field.
@@ -63,6 +68,8 @@ func (*CodingSubmissionStaffData) scanValues(columns []string) ([]interface{}, e
 			values[i] = new(sql.NullInt64)
 		case codingsubmissionstaffdata.FieldInput, codingsubmissionstaffdata.FieldOutput, codingsubmissionstaffdata.FieldStderr, codingsubmissionstaffdata.FieldExitError:
 			values[i] = new(sql.NullString)
+		case codingsubmissionstaffdata.FieldCreateTime, codingsubmissionstaffdata.FieldUpdateTime:
+			values[i] = new(sql.NullTime)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type CodingSubmissionStaffData", columns[i])
 		}
@@ -84,6 +91,18 @@ func (cssd *CodingSubmissionStaffData) assignValues(columns []string, values []i
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			cssd.ID = int(value.Int64)
+		case codingsubmissionstaffdata.FieldCreateTime:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field create_time", values[i])
+			} else if value.Valid {
+				cssd.CreateTime = value.Time
+			}
+		case codingsubmissionstaffdata.FieldUpdateTime:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field update_time", values[i])
+			} else if value.Valid {
+				cssd.UpdateTime = value.Time
+			}
 		case codingsubmissionstaffdata.FieldExecutionID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field execution_id", values[i])
@@ -151,6 +170,10 @@ func (cssd *CodingSubmissionStaffData) String() string {
 	var builder strings.Builder
 	builder.WriteString("CodingSubmissionStaffData(")
 	builder.WriteString(fmt.Sprintf("id=%v", cssd.ID))
+	builder.WriteString(", create_time=")
+	builder.WriteString(cssd.CreateTime.Format(time.ANSIC))
+	builder.WriteString(", update_time=")
+	builder.WriteString(cssd.UpdateTime.Format(time.ANSIC))
 	if v := cssd.ExecutionID; v != nil {
 		builder.WriteString(", execution_id=")
 		builder.WriteString(fmt.Sprintf("%v", *v))

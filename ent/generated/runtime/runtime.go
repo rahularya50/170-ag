@@ -12,6 +12,7 @@ import (
 	"170-ag/ent/generated/user"
 	"170-ag/ent/schema"
 	"context"
+	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/privacy"
@@ -21,6 +22,7 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	codingdraftMixin := schema.CodingDraft{}.Mixin()
 	codingdraft.Policy = privacy.NewPolicies(schema.CodingDraft{})
 	codingdraft.Hooks[0] = func(next ent.Mutator) ent.Mutator {
 		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
@@ -30,6 +32,21 @@ func init() {
 			return next.Mutate(ctx, m)
 		})
 	}
+	codingdraftMixinFields0 := codingdraftMixin[0].Fields()
+	_ = codingdraftMixinFields0
+	codingdraftFields := schema.CodingDraft{}.Fields()
+	_ = codingdraftFields
+	// codingdraftDescCreateTime is the schema descriptor for create_time field.
+	codingdraftDescCreateTime := codingdraftMixinFields0[0].Descriptor()
+	// codingdraft.DefaultCreateTime holds the default value on creation for the create_time field.
+	codingdraft.DefaultCreateTime = codingdraftDescCreateTime.Default.(func() time.Time)
+	// codingdraftDescUpdateTime is the schema descriptor for update_time field.
+	codingdraftDescUpdateTime := codingdraftMixinFields0[1].Descriptor()
+	// codingdraft.DefaultUpdateTime holds the default value on creation for the update_time field.
+	codingdraft.DefaultUpdateTime = codingdraftDescUpdateTime.Default.(func() time.Time)
+	// codingdraft.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	codingdraft.UpdateDefaultUpdateTime = codingdraftDescUpdateTime.UpdateDefault.(func() time.Time)
+	codingproblemMixin := schema.CodingProblem{}.Mixin()
 	codingproblem.Policy = privacy.NewPolicies(schema.CodingProblem{})
 	codingproblem.Hooks[0] = func(next ent.Mutator) ent.Mutator {
 		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
@@ -39,8 +56,20 @@ func init() {
 			return next.Mutate(ctx, m)
 		})
 	}
+	codingproblemMixinFields0 := codingproblemMixin[0].Fields()
+	_ = codingproblemMixinFields0
 	codingproblemFields := schema.CodingProblem{}.Fields()
 	_ = codingproblemFields
+	// codingproblemDescCreateTime is the schema descriptor for create_time field.
+	codingproblemDescCreateTime := codingproblemMixinFields0[0].Descriptor()
+	// codingproblem.DefaultCreateTime holds the default value on creation for the create_time field.
+	codingproblem.DefaultCreateTime = codingproblemDescCreateTime.Default.(func() time.Time)
+	// codingproblemDescUpdateTime is the schema descriptor for update_time field.
+	codingproblemDescUpdateTime := codingproblemMixinFields0[1].Descriptor()
+	// codingproblem.DefaultUpdateTime holds the default value on creation for the update_time field.
+	codingproblem.DefaultUpdateTime = codingproblemDescUpdateTime.Default.(func() time.Time)
+	// codingproblem.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	codingproblem.UpdateDefaultUpdateTime = codingproblemDescUpdateTime.UpdateDefault.(func() time.Time)
 	// codingproblemDescName is the schema descriptor for name field.
 	codingproblemDescName := codingproblemFields[0].Descriptor()
 	// codingproblem.NameValidator is a validator for the "name" field. It is called by the builders before save.
@@ -69,6 +98,7 @@ func init() {
 	codingproblemDescReleased := codingproblemFields[2].Descriptor()
 	// codingproblem.DefaultReleased holds the default value on creation for the released field.
 	codingproblem.DefaultReleased = codingproblemDescReleased.Default.(bool)
+	codingsubmissionMixin := schema.CodingSubmission{}.Mixin()
 	codingsubmission.Policy = privacy.NewPolicies(schema.CodingSubmission{})
 	codingsubmission.Hooks[0] = func(next ent.Mutator) ent.Mutator {
 		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
@@ -78,12 +108,25 @@ func init() {
 			return next.Mutate(ctx, m)
 		})
 	}
+	codingsubmissionMixinFields0 := codingsubmissionMixin[0].Fields()
+	_ = codingsubmissionMixinFields0
 	codingsubmissionFields := schema.CodingSubmission{}.Fields()
 	_ = codingsubmissionFields
+	// codingsubmissionDescCreateTime is the schema descriptor for create_time field.
+	codingsubmissionDescCreateTime := codingsubmissionMixinFields0[0].Descriptor()
+	// codingsubmission.DefaultCreateTime holds the default value on creation for the create_time field.
+	codingsubmission.DefaultCreateTime = codingsubmissionDescCreateTime.Default.(func() time.Time)
+	// codingsubmissionDescUpdateTime is the schema descriptor for update_time field.
+	codingsubmissionDescUpdateTime := codingsubmissionMixinFields0[1].Descriptor()
+	// codingsubmission.DefaultUpdateTime holds the default value on creation for the update_time field.
+	codingsubmission.DefaultUpdateTime = codingsubmissionDescUpdateTime.Default.(func() time.Time)
+	// codingsubmission.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	codingsubmission.UpdateDefaultUpdateTime = codingsubmissionDescUpdateTime.UpdateDefault.(func() time.Time)
 	// codingsubmissionDescCode is the schema descriptor for code field.
 	codingsubmissionDescCode := codingsubmissionFields[0].Descriptor()
 	// codingsubmission.CodeValidator is a validator for the "code" field. It is called by the builders before save.
 	codingsubmission.CodeValidator = codingsubmissionDescCode.Validators[0].(func(string) error)
+	codingsubmissionstaffdataMixin := schema.CodingSubmissionStaffData{}.Mixin()
 	codingsubmissionstaffdata.Policy = privacy.NewPolicies(schema.CodingSubmissionStaffData{})
 	codingsubmissionstaffdata.Hooks[0] = func(next ent.Mutator) ent.Mutator {
 		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
@@ -93,8 +136,20 @@ func init() {
 			return next.Mutate(ctx, m)
 		})
 	}
+	codingsubmissionstaffdataMixinFields0 := codingsubmissionstaffdataMixin[0].Fields()
+	_ = codingsubmissionstaffdataMixinFields0
 	codingsubmissionstaffdataFields := schema.CodingSubmissionStaffData{}.Fields()
 	_ = codingsubmissionstaffdataFields
+	// codingsubmissionstaffdataDescCreateTime is the schema descriptor for create_time field.
+	codingsubmissionstaffdataDescCreateTime := codingsubmissionstaffdataMixinFields0[0].Descriptor()
+	// codingsubmissionstaffdata.DefaultCreateTime holds the default value on creation for the create_time field.
+	codingsubmissionstaffdata.DefaultCreateTime = codingsubmissionstaffdataDescCreateTime.Default.(func() time.Time)
+	// codingsubmissionstaffdataDescUpdateTime is the schema descriptor for update_time field.
+	codingsubmissionstaffdataDescUpdateTime := codingsubmissionstaffdataMixinFields0[1].Descriptor()
+	// codingsubmissionstaffdata.DefaultUpdateTime holds the default value on creation for the update_time field.
+	codingsubmissionstaffdata.DefaultUpdateTime = codingsubmissionstaffdataDescUpdateTime.Default.(func() time.Time)
+	// codingsubmissionstaffdata.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	codingsubmissionstaffdata.UpdateDefaultUpdateTime = codingsubmissionstaffdataDescUpdateTime.UpdateDefault.(func() time.Time)
 	// codingsubmissionstaffdataDescOutput is the schema descriptor for output field.
 	codingsubmissionstaffdataDescOutput := codingsubmissionstaffdataFields[2].Descriptor()
 	// codingsubmissionstaffdata.OutputValidator is a validator for the "output" field. It is called by the builders before save.
@@ -107,6 +162,7 @@ func init() {
 	codingsubmissionstaffdataDescExitError := codingsubmissionstaffdataFields[4].Descriptor()
 	// codingsubmissionstaffdata.ExitErrorValidator is a validator for the "exit_error" field. It is called by the builders before save.
 	codingsubmissionstaffdata.ExitErrorValidator = codingsubmissionstaffdataDescExitError.Validators[0].(func(string) error)
+	codingtestcaseMixin := schema.CodingTestCase{}.Mixin()
 	codingtestcase.Policy = privacy.NewPolicies(schema.CodingTestCase{})
 	codingtestcase.Hooks[0] = func(next ent.Mutator) ent.Mutator {
 		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
@@ -116,8 +172,20 @@ func init() {
 			return next.Mutate(ctx, m)
 		})
 	}
+	codingtestcaseMixinFields0 := codingtestcaseMixin[0].Fields()
+	_ = codingtestcaseMixinFields0
 	codingtestcaseFields := schema.CodingTestCase{}.Fields()
 	_ = codingtestcaseFields
+	// codingtestcaseDescCreateTime is the schema descriptor for create_time field.
+	codingtestcaseDescCreateTime := codingtestcaseMixinFields0[0].Descriptor()
+	// codingtestcase.DefaultCreateTime holds the default value on creation for the create_time field.
+	codingtestcase.DefaultCreateTime = codingtestcaseDescCreateTime.Default.(func() time.Time)
+	// codingtestcaseDescUpdateTime is the schema descriptor for update_time field.
+	codingtestcaseDescUpdateTime := codingtestcaseMixinFields0[1].Descriptor()
+	// codingtestcase.DefaultUpdateTime holds the default value on creation for the update_time field.
+	codingtestcase.DefaultUpdateTime = codingtestcaseDescUpdateTime.Default.(func() time.Time)
+	// codingtestcase.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	codingtestcase.UpdateDefaultUpdateTime = codingtestcaseDescUpdateTime.UpdateDefault.(func() time.Time)
 	// codingtestcaseDescPoints is the schema descriptor for points field.
 	codingtestcaseDescPoints := codingtestcaseFields[0].Descriptor()
 	// codingtestcase.DefaultPoints holds the default value on creation for the points field.
@@ -128,6 +196,7 @@ func init() {
 	codingtestcaseDescPublic := codingtestcaseFields[1].Descriptor()
 	// codingtestcase.DefaultPublic holds the default value on creation for the public field.
 	codingtestcase.DefaultPublic = codingtestcaseDescPublic.Default.(bool)
+	codingtestcasedataMixin := schema.CodingTestCaseData{}.Mixin()
 	codingtestcasedata.Policy = privacy.NewPolicies(schema.CodingTestCaseData{})
 	codingtestcasedata.Hooks[0] = func(next ent.Mutator) ent.Mutator {
 		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
@@ -137,8 +206,20 @@ func init() {
 			return next.Mutate(ctx, m)
 		})
 	}
+	codingtestcasedataMixinFields0 := codingtestcasedataMixin[0].Fields()
+	_ = codingtestcasedataMixinFields0
 	codingtestcasedataFields := schema.CodingTestCaseData{}.Fields()
 	_ = codingtestcasedataFields
+	// codingtestcasedataDescCreateTime is the schema descriptor for create_time field.
+	codingtestcasedataDescCreateTime := codingtestcasedataMixinFields0[0].Descriptor()
+	// codingtestcasedata.DefaultCreateTime holds the default value on creation for the create_time field.
+	codingtestcasedata.DefaultCreateTime = codingtestcasedataDescCreateTime.Default.(func() time.Time)
+	// codingtestcasedataDescUpdateTime is the schema descriptor for update_time field.
+	codingtestcasedataDescUpdateTime := codingtestcasedataMixinFields0[1].Descriptor()
+	// codingtestcasedata.DefaultUpdateTime holds the default value on creation for the update_time field.
+	codingtestcasedata.DefaultUpdateTime = codingtestcasedataDescUpdateTime.Default.(func() time.Time)
+	// codingtestcasedata.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	codingtestcasedata.UpdateDefaultUpdateTime = codingtestcasedataDescUpdateTime.UpdateDefault.(func() time.Time)
 	// codingtestcasedataDescInput is the schema descriptor for input field.
 	codingtestcasedataDescInput := codingtestcasedataFields[0].Descriptor()
 	// codingtestcasedata.DefaultInput holds the default value on creation for the input field.
@@ -147,6 +228,7 @@ func init() {
 	codingtestcasedataDescOutput := codingtestcasedataFields[1].Descriptor()
 	// codingtestcasedata.DefaultOutput holds the default value on creation for the output field.
 	codingtestcasedata.DefaultOutput = codingtestcasedataDescOutput.Default.(string)
+	userMixin := schema.User{}.Mixin()
 	user.Policy = privacy.NewPolicies(schema.User{})
 	user.Hooks[0] = func(next ent.Mutator) ent.Mutator {
 		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
@@ -156,8 +238,20 @@ func init() {
 			return next.Mutate(ctx, m)
 		})
 	}
+	userMixinFields0 := userMixin[0].Fields()
+	_ = userMixinFields0
 	userFields := schema.User{}.Fields()
 	_ = userFields
+	// userDescCreateTime is the schema descriptor for create_time field.
+	userDescCreateTime := userMixinFields0[0].Descriptor()
+	// user.DefaultCreateTime holds the default value on creation for the create_time field.
+	user.DefaultCreateTime = userDescCreateTime.Default.(func() time.Time)
+	// userDescUpdateTime is the schema descriptor for update_time field.
+	userDescUpdateTime := userMixinFields0[1].Descriptor()
+	// user.DefaultUpdateTime holds the default value on creation for the update_time field.
+	user.DefaultUpdateTime = userDescUpdateTime.Default.(func() time.Time)
+	// user.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	user.UpdateDefaultUpdateTime = userDescUpdateTime.UpdateDefault.(func() time.Time)
 	// userDescEmail is the schema descriptor for email field.
 	userDescEmail := userFields[0].Descriptor()
 	// user.EmailValidator is a validator for the "email" field. It is called by the builders before save.

@@ -363,12 +363,12 @@ func (cpq *CodingProblemQuery) WithSubmissions(opts ...func(*CodingSubmissionQue
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.CodingProblem.Query().
-//		GroupBy(codingproblem.FieldName).
+//		GroupBy(codingproblem.FieldCreateTime).
 //		Aggregate(generated.Count()).
 //		Scan(ctx, &v)
 //
@@ -390,11 +390,11 @@ func (cpq *CodingProblemQuery) GroupBy(field string, fields ...string) *CodingPr
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //	}
 //
 //	client.CodingProblem.Query().
-//		Select(codingproblem.FieldName).
+//		Select(codingproblem.FieldCreateTime).
 //		Scan(ctx, &v)
 //
 func (cpq *CodingProblemQuery) Select(fields ...string) *CodingProblemSelect {

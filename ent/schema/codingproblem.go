@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/mixin"
 )
 
 // CodingProblem holds the schema definition for the CodingProblem entity.
@@ -41,6 +42,12 @@ func (CodingProblem) Edges() []ent.Edge {
 		edge.From("submissions", CodingSubmission.Type).
 			Ref("coding_problem").
 			Annotations(entgql.Bind()),
+	}
+}
+
+func (CodingProblem) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		mixin.Time{},
 	}
 }
 

@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -20,6 +21,34 @@ type CodingTestCaseDataCreate struct {
 	mutation *CodingTestCaseDataMutation
 	hooks    []Hook
 	conflict []sql.ConflictOption
+}
+
+// SetCreateTime sets the "create_time" field.
+func (ctcdc *CodingTestCaseDataCreate) SetCreateTime(t time.Time) *CodingTestCaseDataCreate {
+	ctcdc.mutation.SetCreateTime(t)
+	return ctcdc
+}
+
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (ctcdc *CodingTestCaseDataCreate) SetNillableCreateTime(t *time.Time) *CodingTestCaseDataCreate {
+	if t != nil {
+		ctcdc.SetCreateTime(*t)
+	}
+	return ctcdc
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (ctcdc *CodingTestCaseDataCreate) SetUpdateTime(t time.Time) *CodingTestCaseDataCreate {
+	ctcdc.mutation.SetUpdateTime(t)
+	return ctcdc
+}
+
+// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
+func (ctcdc *CodingTestCaseDataCreate) SetNillableUpdateTime(t *time.Time) *CodingTestCaseDataCreate {
+	if t != nil {
+		ctcdc.SetUpdateTime(*t)
+	}
+	return ctcdc
 }
 
 // SetInput sets the "input" field.
@@ -134,6 +163,20 @@ func (ctcdc *CodingTestCaseDataCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (ctcdc *CodingTestCaseDataCreate) defaults() error {
+	if _, ok := ctcdc.mutation.CreateTime(); !ok {
+		if codingtestcasedata.DefaultCreateTime == nil {
+			return fmt.Errorf("generated: uninitialized codingtestcasedata.DefaultCreateTime (forgotten import generated/runtime?)")
+		}
+		v := codingtestcasedata.DefaultCreateTime()
+		ctcdc.mutation.SetCreateTime(v)
+	}
+	if _, ok := ctcdc.mutation.UpdateTime(); !ok {
+		if codingtestcasedata.DefaultUpdateTime == nil {
+			return fmt.Errorf("generated: uninitialized codingtestcasedata.DefaultUpdateTime (forgotten import generated/runtime?)")
+		}
+		v := codingtestcasedata.DefaultUpdateTime()
+		ctcdc.mutation.SetUpdateTime(v)
+	}
 	if _, ok := ctcdc.mutation.Input(); !ok {
 		v := codingtestcasedata.DefaultInput
 		ctcdc.mutation.SetInput(v)
@@ -147,6 +190,12 @@ func (ctcdc *CodingTestCaseDataCreate) defaults() error {
 
 // check runs all checks and user-defined validators on the builder.
 func (ctcdc *CodingTestCaseDataCreate) check() error {
+	if _, ok := ctcdc.mutation.CreateTime(); !ok {
+		return &ValidationError{Name: "create_time", err: errors.New(`generated: missing required field "CodingTestCaseData.create_time"`)}
+	}
+	if _, ok := ctcdc.mutation.UpdateTime(); !ok {
+		return &ValidationError{Name: "update_time", err: errors.New(`generated: missing required field "CodingTestCaseData.update_time"`)}
+	}
 	if _, ok := ctcdc.mutation.Input(); !ok {
 		return &ValidationError{Name: "input", err: errors.New(`generated: missing required field "CodingTestCaseData.input"`)}
 	}
@@ -184,6 +233,22 @@ func (ctcdc *CodingTestCaseDataCreate) createSpec() (*CodingTestCaseData, *sqlgr
 		}
 	)
 	_spec.OnConflict = ctcdc.conflict
+	if value, ok := ctcdc.mutation.CreateTime(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: codingtestcasedata.FieldCreateTime,
+		})
+		_node.CreateTime = value
+	}
+	if value, ok := ctcdc.mutation.UpdateTime(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: codingtestcasedata.FieldUpdateTime,
+		})
+		_node.UpdateTime = value
+	}
 	if value, ok := ctcdc.mutation.Input(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -226,7 +291,7 @@ func (ctcdc *CodingTestCaseDataCreate) createSpec() (*CodingTestCaseData, *sqlgr
 // of the `INSERT` statement. For example:
 //
 //	client.CodingTestCaseData.Create().
-//		SetInput(v).
+//		SetCreateTime(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
@@ -235,7 +300,7 @@ func (ctcdc *CodingTestCaseDataCreate) createSpec() (*CodingTestCaseData, *sqlgr
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.CodingTestCaseDataUpsert) {
-//			SetInput(v+v).
+//			SetCreateTime(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -273,6 +338,30 @@ type (
 	}
 )
 
+// SetCreateTime sets the "create_time" field.
+func (u *CodingTestCaseDataUpsert) SetCreateTime(v time.Time) *CodingTestCaseDataUpsert {
+	u.Set(codingtestcasedata.FieldCreateTime, v)
+	return u
+}
+
+// UpdateCreateTime sets the "create_time" field to the value that was provided on create.
+func (u *CodingTestCaseDataUpsert) UpdateCreateTime() *CodingTestCaseDataUpsert {
+	u.SetExcluded(codingtestcasedata.FieldCreateTime)
+	return u
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (u *CodingTestCaseDataUpsert) SetUpdateTime(v time.Time) *CodingTestCaseDataUpsert {
+	u.Set(codingtestcasedata.FieldUpdateTime, v)
+	return u
+}
+
+// UpdateUpdateTime sets the "update_time" field to the value that was provided on create.
+func (u *CodingTestCaseDataUpsert) UpdateUpdateTime() *CodingTestCaseDataUpsert {
+	u.SetExcluded(codingtestcasedata.FieldUpdateTime)
+	return u
+}
+
 // SetInput sets the "input" field.
 func (u *CodingTestCaseDataUpsert) SetInput(v string) *CodingTestCaseDataUpsert {
 	u.Set(codingtestcasedata.FieldInput, v)
@@ -308,6 +397,11 @@ func (u *CodingTestCaseDataUpsert) UpdateOutput() *CodingTestCaseDataUpsert {
 //
 func (u *CodingTestCaseDataUpsertOne) UpdateNewValues() *CodingTestCaseDataUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.CreateTime(); exists {
+			s.SetIgnore(codingtestcasedata.FieldCreateTime)
+		}
+	}))
 	return u
 }
 
@@ -337,6 +431,34 @@ func (u *CodingTestCaseDataUpsertOne) Update(set func(*CodingTestCaseDataUpsert)
 		set(&CodingTestCaseDataUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetCreateTime sets the "create_time" field.
+func (u *CodingTestCaseDataUpsertOne) SetCreateTime(v time.Time) *CodingTestCaseDataUpsertOne {
+	return u.Update(func(s *CodingTestCaseDataUpsert) {
+		s.SetCreateTime(v)
+	})
+}
+
+// UpdateCreateTime sets the "create_time" field to the value that was provided on create.
+func (u *CodingTestCaseDataUpsertOne) UpdateCreateTime() *CodingTestCaseDataUpsertOne {
+	return u.Update(func(s *CodingTestCaseDataUpsert) {
+		s.UpdateCreateTime()
+	})
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (u *CodingTestCaseDataUpsertOne) SetUpdateTime(v time.Time) *CodingTestCaseDataUpsertOne {
+	return u.Update(func(s *CodingTestCaseDataUpsert) {
+		s.SetUpdateTime(v)
+	})
+}
+
+// UpdateUpdateTime sets the "update_time" field to the value that was provided on create.
+func (u *CodingTestCaseDataUpsertOne) UpdateUpdateTime() *CodingTestCaseDataUpsertOne {
+	return u.Update(func(s *CodingTestCaseDataUpsert) {
+		s.UpdateUpdateTime()
+	})
 }
 
 // SetInput sets the "input" field.
@@ -498,7 +620,7 @@ func (ctcdcb *CodingTestCaseDataCreateBulk) ExecX(ctx context.Context) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.CodingTestCaseDataUpsert) {
-//			SetInput(v+v).
+//			SetCreateTime(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -540,6 +662,13 @@ type CodingTestCaseDataUpsertBulk struct {
 //
 func (u *CodingTestCaseDataUpsertBulk) UpdateNewValues() *CodingTestCaseDataUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.CreateTime(); exists {
+				s.SetIgnore(codingtestcasedata.FieldCreateTime)
+			}
+		}
+	}))
 	return u
 }
 
@@ -569,6 +698,34 @@ func (u *CodingTestCaseDataUpsertBulk) Update(set func(*CodingTestCaseDataUpsert
 		set(&CodingTestCaseDataUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetCreateTime sets the "create_time" field.
+func (u *CodingTestCaseDataUpsertBulk) SetCreateTime(v time.Time) *CodingTestCaseDataUpsertBulk {
+	return u.Update(func(s *CodingTestCaseDataUpsert) {
+		s.SetCreateTime(v)
+	})
+}
+
+// UpdateCreateTime sets the "create_time" field to the value that was provided on create.
+func (u *CodingTestCaseDataUpsertBulk) UpdateCreateTime() *CodingTestCaseDataUpsertBulk {
+	return u.Update(func(s *CodingTestCaseDataUpsert) {
+		s.UpdateCreateTime()
+	})
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (u *CodingTestCaseDataUpsertBulk) SetUpdateTime(v time.Time) *CodingTestCaseDataUpsertBulk {
+	return u.Update(func(s *CodingTestCaseDataUpsert) {
+		s.SetUpdateTime(v)
+	})
+}
+
+// UpdateUpdateTime sets the "update_time" field to the value that was provided on create.
+func (u *CodingTestCaseDataUpsertBulk) UpdateUpdateTime() *CodingTestCaseDataUpsertBulk {
+	return u.Update(func(s *CodingTestCaseDataUpsert) {
+		s.UpdateUpdateTime()
+	})
 }
 
 // SetInput sets the "input" field.

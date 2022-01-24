@@ -37,7 +37,8 @@ export default function ProblemTestDataEditor(props: Props): React.Node {
         }
       }
     `,
-    { id }
+    { id },
+    { fetchPolicy: "network-only" }
   );
 
   return (

@@ -7,6 +7,7 @@ import (
 	"170-ag/ent/generated/codingtestcasedata"
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 )
@@ -16,6 +17,10 @@ type CodingTestCaseData struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
+	// CreateTime holds the value of the "create_time" field.
+	CreateTime time.Time `json:"create_time,omitempty"`
+	// UpdateTime holds the value of the "update_time" field.
+	UpdateTime time.Time `json:"update_time,omitempty"`
 	// Input holds the value of the "input" field.
 	Input string `json:"input,omitempty"`
 	// Output holds the value of the "output" field.
@@ -57,6 +62,8 @@ func (*CodingTestCaseData) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullInt64)
 		case codingtestcasedata.FieldInput, codingtestcasedata.FieldOutput:
 			values[i] = new(sql.NullString)
+		case codingtestcasedata.FieldCreateTime, codingtestcasedata.FieldUpdateTime:
+			values[i] = new(sql.NullTime)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type CodingTestCaseData", columns[i])
 		}
@@ -78,6 +85,18 @@ func (ctcd *CodingTestCaseData) assignValues(columns []string, values []interfac
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			ctcd.ID = int(value.Int64)
+		case codingtestcasedata.FieldCreateTime:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field create_time", values[i])
+			} else if value.Valid {
+				ctcd.CreateTime = value.Time
+			}
+		case codingtestcasedata.FieldUpdateTime:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field update_time", values[i])
+			} else if value.Valid {
+				ctcd.UpdateTime = value.Time
+			}
 		case codingtestcasedata.FieldInput:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field input", values[i])
@@ -123,6 +142,10 @@ func (ctcd *CodingTestCaseData) String() string {
 	var builder strings.Builder
 	builder.WriteString("CodingTestCaseData(")
 	builder.WriteString(fmt.Sprintf("id=%v", ctcd.ID))
+	builder.WriteString(", create_time=")
+	builder.WriteString(ctcd.CreateTime.Format(time.ANSIC))
+	builder.WriteString(", update_time=")
+	builder.WriteString(ctcd.UpdateTime.Format(time.ANSIC))
 	builder.WriteString(", input=")
 	builder.WriteString(ctcd.Input)
 	builder.WriteString(", output=")

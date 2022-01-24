@@ -10,6 +10,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -26,6 +27,12 @@ type CodingDraftUpdate struct {
 // Where appends a list predicates to the CodingDraftUpdate builder.
 func (cdu *CodingDraftUpdate) Where(ps ...predicate.CodingDraft) *CodingDraftUpdate {
 	cdu.mutation.Where(ps...)
+	return cdu
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (cdu *CodingDraftUpdate) SetUpdateTime(t time.Time) *CodingDraftUpdate {
+	cdu.mutation.SetUpdateTime(t)
 	return cdu
 }
 
@@ -80,6 +87,9 @@ func (cdu *CodingDraftUpdate) Save(ctx context.Context) (int, error) {
 		err      error
 		affected int
 	)
+	if err := cdu.defaults(); err != nil {
+		return 0, err
+	}
 	if len(cdu.hooks) == 0 {
 		if err = cdu.check(); err != nil {
 			return 0, err
@@ -134,6 +144,18 @@ func (cdu *CodingDraftUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (cdu *CodingDraftUpdate) defaults() error {
+	if _, ok := cdu.mutation.UpdateTime(); !ok {
+		if codingdraft.UpdateDefaultUpdateTime == nil {
+			return fmt.Errorf("generated: uninitialized codingdraft.UpdateDefaultUpdateTime (forgotten import generated/runtime?)")
+		}
+		v := codingdraft.UpdateDefaultUpdateTime()
+		cdu.mutation.SetUpdateTime(v)
+	}
+	return nil
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (cdu *CodingDraftUpdate) check() error {
 	if _, ok := cdu.mutation.AuthorID(); cdu.mutation.AuthorCleared() && !ok {
@@ -162,6 +184,13 @@ func (cdu *CodingDraftUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := cdu.mutation.UpdateTime(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: codingdraft.FieldUpdateTime,
+		})
 	}
 	if value, ok := cdu.mutation.Code(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
@@ -259,6 +288,12 @@ type CodingDraftUpdateOne struct {
 	mutation *CodingDraftMutation
 }
 
+// SetUpdateTime sets the "update_time" field.
+func (cduo *CodingDraftUpdateOne) SetUpdateTime(t time.Time) *CodingDraftUpdateOne {
+	cduo.mutation.SetUpdateTime(t)
+	return cduo
+}
+
 // SetCode sets the "code" field.
 func (cduo *CodingDraftUpdateOne) SetCode(s string) *CodingDraftUpdateOne {
 	cduo.mutation.SetCode(s)
@@ -317,6 +352,9 @@ func (cduo *CodingDraftUpdateOne) Save(ctx context.Context) (*CodingDraft, error
 		err  error
 		node *CodingDraft
 	)
+	if err := cduo.defaults(); err != nil {
+		return nil, err
+	}
 	if len(cduo.hooks) == 0 {
 		if err = cduo.check(); err != nil {
 			return nil, err
@@ -371,6 +409,18 @@ func (cduo *CodingDraftUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (cduo *CodingDraftUpdateOne) defaults() error {
+	if _, ok := cduo.mutation.UpdateTime(); !ok {
+		if codingdraft.UpdateDefaultUpdateTime == nil {
+			return fmt.Errorf("generated: uninitialized codingdraft.UpdateDefaultUpdateTime (forgotten import generated/runtime?)")
+		}
+		v := codingdraft.UpdateDefaultUpdateTime()
+		cduo.mutation.SetUpdateTime(v)
+	}
+	return nil
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (cduo *CodingDraftUpdateOne) check() error {
 	if _, ok := cduo.mutation.AuthorID(); cduo.mutation.AuthorCleared() && !ok {
@@ -416,6 +466,13 @@ func (cduo *CodingDraftUpdateOne) sqlSave(ctx context.Context) (_node *CodingDra
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := cduo.mutation.UpdateTime(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: codingdraft.FieldUpdateTime,
+		})
 	}
 	if value, ok := cduo.mutation.Code(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{

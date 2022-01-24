@@ -3,6 +3,8 @@
 package codingdraft
 
 import (
+	"time"
+
 	"entgo.io/ent"
 )
 
@@ -11,6 +13,10 @@ const (
 	Label = "coding_draft"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldCreateTime holds the string denoting the create_time field in the database.
+	FieldCreateTime = "create_time"
+	// FieldUpdateTime holds the string denoting the update_time field in the database.
+	FieldUpdateTime = "update_time"
 	// FieldCode holds the string denoting the code field in the database.
 	FieldCode = "code"
 	// EdgeAuthor holds the string denoting the author edge name in mutations.
@@ -38,6 +44,8 @@ const (
 // Columns holds all SQL columns for codingdraft fields.
 var Columns = []string{
 	FieldID,
+	FieldCreateTime,
+	FieldUpdateTime,
 	FieldCode,
 }
 
@@ -72,4 +80,10 @@ func ValidColumn(column string) bool {
 var (
 	Hooks  [1]ent.Hook
 	Policy ent.Policy
+	// DefaultCreateTime holds the default value on creation for the "create_time" field.
+	DefaultCreateTime func() time.Time
+	// DefaultUpdateTime holds the default value on creation for the "update_time" field.
+	DefaultUpdateTime func() time.Time
+	// UpdateDefaultUpdateTime holds the default value on update for the "update_time" field.
+	UpdateDefaultUpdateTime func() time.Time
 )

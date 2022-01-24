@@ -11,6 +11,8 @@ var (
 	// CodingDraftsColumns holds the columns for the "coding_drafts" table.
 	CodingDraftsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "update_time", Type: field.TypeTime},
 		{Name: "code", Type: field.TypeString, Size: 2147483647},
 		{Name: "coding_draft_author", Type: field.TypeInt, Nullable: true},
 		{Name: "coding_draft_coding_problem", Type: field.TypeInt, Nullable: true},
@@ -23,13 +25,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "coding_drafts_users_author",
-				Columns:    []*schema.Column{CodingDraftsColumns[2]},
+				Columns:    []*schema.Column{CodingDraftsColumns[4]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "coding_drafts_coding_problems_coding_problem",
-				Columns:    []*schema.Column{CodingDraftsColumns[3]},
+				Columns:    []*schema.Column{CodingDraftsColumns[5]},
 				RefColumns: []*schema.Column{CodingProblemsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -38,13 +40,15 @@ var (
 			{
 				Name:    "codingdraft_coding_draft_author_coding_draft_coding_problem",
 				Unique:  true,
-				Columns: []*schema.Column{CodingDraftsColumns[2], CodingDraftsColumns[3]},
+				Columns: []*schema.Column{CodingDraftsColumns[4], CodingDraftsColumns[5]},
 			},
 		},
 	}
 	// CodingProblemsColumns holds the columns for the "coding_problems" table.
 	CodingProblemsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "update_time", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString, Size: 128},
 		{Name: "statement", Type: field.TypeString, Size: 2147483647, Default: "This is the problem statement"},
 		{Name: "released", Type: field.TypeBool, Default: false},
@@ -58,6 +62,8 @@ var (
 	// CodingSubmissionsColumns holds the columns for the "coding_submissions" table.
 	CodingSubmissionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "update_time", Type: field.TypeTime},
 		{Name: "code", Type: field.TypeString, Size: 65535},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"QUEUED", "RUNNING", "COMPLETED"}, Default: "QUEUED"},
 		{Name: "coding_submission_author", Type: field.TypeInt, Nullable: true},
@@ -72,19 +78,19 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "coding_submissions_users_author",
-				Columns:    []*schema.Column{CodingSubmissionsColumns[3]},
+				Columns:    []*schema.Column{CodingSubmissionsColumns[5]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "coding_submissions_coding_problems_coding_problem",
-				Columns:    []*schema.Column{CodingSubmissionsColumns[4]},
+				Columns:    []*schema.Column{CodingSubmissionsColumns[6]},
 				RefColumns: []*schema.Column{CodingProblemsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "coding_submissions_coding_submission_staff_data_coding_submission",
-				Columns:    []*schema.Column{CodingSubmissionsColumns[5]},
+				Columns:    []*schema.Column{CodingSubmissionsColumns[7]},
 				RefColumns: []*schema.Column{CodingSubmissionStaffDataColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -93,23 +99,25 @@ var (
 			{
 				Name:    "codingsubmission_coding_submission_author_coding_submission_coding_problem",
 				Unique:  false,
-				Columns: []*schema.Column{CodingSubmissionsColumns[3], CodingSubmissionsColumns[4]},
+				Columns: []*schema.Column{CodingSubmissionsColumns[5], CodingSubmissionsColumns[6]},
 			},
 			{
 				Name:    "codingsubmission_coding_submission_coding_problem",
 				Unique:  false,
-				Columns: []*schema.Column{CodingSubmissionsColumns[4]},
+				Columns: []*schema.Column{CodingSubmissionsColumns[6]},
 			},
 			{
 				Name:    "codingsubmission_status",
 				Unique:  false,
-				Columns: []*schema.Column{CodingSubmissionsColumns[2]},
+				Columns: []*schema.Column{CodingSubmissionsColumns[4]},
 			},
 		},
 	}
 	// CodingSubmissionStaffDataColumns holds the columns for the "coding_submission_staff_data" table.
 	CodingSubmissionStaffDataColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "update_time", Type: field.TypeTime},
 		{Name: "execution_id", Type: field.TypeInt64, Nullable: true},
 		{Name: "input", Type: field.TypeString, Size: 2147483647},
 		{Name: "output", Type: field.TypeString, Nullable: true, Size: 65535},
@@ -125,13 +133,15 @@ var (
 			{
 				Name:    "codingsubmissionstaffdata_execution_id",
 				Unique:  false,
-				Columns: []*schema.Column{CodingSubmissionStaffDataColumns[1]},
+				Columns: []*schema.Column{CodingSubmissionStaffDataColumns[3]},
 			},
 		},
 	}
 	// CodingTestCasesColumns holds the columns for the "coding_test_cases" table.
 	CodingTestCasesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "update_time", Type: field.TypeTime},
 		{Name: "points", Type: field.TypeInt, Default: 0},
 		{Name: "public", Type: field.TypeBool, Default: false},
 		{Name: "coding_problem_test_cases", Type: field.TypeInt, Nullable: true},
@@ -145,13 +155,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "coding_test_cases_coding_problems_test_cases",
-				Columns:    []*schema.Column{CodingTestCasesColumns[3]},
+				Columns:    []*schema.Column{CodingTestCasesColumns[5]},
 				RefColumns: []*schema.Column{CodingProblemsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "coding_test_cases_coding_test_case_data_test_case",
-				Columns:    []*schema.Column{CodingTestCasesColumns[4]},
+				Columns:    []*schema.Column{CodingTestCasesColumns[6]},
 				RefColumns: []*schema.Column{CodingTestCaseDataColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -160,6 +170,8 @@ var (
 	// CodingTestCaseDataColumns holds the columns for the "coding_test_case_data" table.
 	CodingTestCaseDataColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "update_time", Type: field.TypeTime},
 		{Name: "input", Type: field.TypeString, Size: 2147483647, Default: "0\n"},
 		{Name: "output", Type: field.TypeString, Size: 2147483647, Default: ""},
 	}
@@ -172,6 +184,8 @@ var (
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "update_time", Type: field.TypeTime},
 		{Name: "email", Type: field.TypeString, Unique: true, Size: 128},
 		{Name: "name", Type: field.TypeString, Nullable: true, Size: 128},
 		{Name: "is_staff", Type: field.TypeBool, Default: false},
@@ -185,7 +199,7 @@ var (
 			{
 				Name:    "user_email",
 				Unique:  false,
-				Columns: []*schema.Column{UsersColumns[1]},
+				Columns: []*schema.Column{UsersColumns[3]},
 			},
 		},
 	}

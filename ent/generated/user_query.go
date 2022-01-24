@@ -291,12 +291,12 @@ func (uq *UserQuery) WithDrafts(opts ...func(*CodingDraftQuery)) *UserQuery {
 // Example:
 //
 //	var v []struct {
-//		Email string `json:"email,omitempty"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.User.Query().
-//		GroupBy(user.FieldEmail).
+//		GroupBy(user.FieldCreateTime).
 //		Aggregate(generated.Count()).
 //		Scan(ctx, &v)
 //
@@ -318,11 +318,11 @@ func (uq *UserQuery) GroupBy(field string, fields ...string) *UserGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Email string `json:"email,omitempty"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //	}
 //
 //	client.User.Query().
-//		Select(user.FieldEmail).
+//		Select(user.FieldCreateTime).
 //		Scan(ctx, &v)
 //
 func (uq *UserQuery) Select(fields ...string) *UserSelect {

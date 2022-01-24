@@ -8,6 +8,7 @@ import (
 	"170-ag/ent/generated/codingtestcasedata"
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 )
@@ -17,6 +18,10 @@ type CodingTestCase struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
+	// CreateTime holds the value of the "create_time" field.
+	CreateTime time.Time `json:"create_time,omitempty"`
+	// UpdateTime holds the value of the "update_time" field.
+	UpdateTime time.Time `json:"update_time,omitempty"`
 	// Points holds the value of the "points" field.
 	Points int `json:"points,omitempty"`
 	// Public holds the value of the "public" field.
@@ -76,6 +81,8 @@ func (*CodingTestCase) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullBool)
 		case codingtestcase.FieldID, codingtestcase.FieldPoints:
 			values[i] = new(sql.NullInt64)
+		case codingtestcase.FieldCreateTime, codingtestcase.FieldUpdateTime:
+			values[i] = new(sql.NullTime)
 		case codingtestcase.ForeignKeys[0]: // coding_problem_test_cases
 			values[i] = new(sql.NullInt64)
 		case codingtestcase.ForeignKeys[1]: // coding_test_case_data_test_case
@@ -101,6 +108,18 @@ func (ctc *CodingTestCase) assignValues(columns []string, values []interface{}) 
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			ctc.ID = int(value.Int64)
+		case codingtestcase.FieldCreateTime:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field create_time", values[i])
+			} else if value.Valid {
+				ctc.CreateTime = value.Time
+			}
+		case codingtestcase.FieldUpdateTime:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field update_time", values[i])
+			} else if value.Valid {
+				ctc.UpdateTime = value.Time
+			}
 		case codingtestcase.FieldPoints:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field points", values[i])
@@ -165,6 +184,10 @@ func (ctc *CodingTestCase) String() string {
 	var builder strings.Builder
 	builder.WriteString("CodingTestCase(")
 	builder.WriteString(fmt.Sprintf("id=%v", ctc.ID))
+	builder.WriteString(", create_time=")
+	builder.WriteString(ctc.CreateTime.Format(time.ANSIC))
+	builder.WriteString(", update_time=")
+	builder.WriteString(ctc.UpdateTime.Format(time.ANSIC))
 	builder.WriteString(", points=")
 	builder.WriteString(fmt.Sprintf("%v", ctc.Points))
 	builder.WriteString(", public=")

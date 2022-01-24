@@ -56,14 +56,30 @@ func (cd *CodingDraft) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     cd.ID,
 		Type:   "CodingDraft",
-		Fields: make([]*Field, 1),
+		Fields: make([]*Field, 3),
 		Edges:  make([]*Edge, 2),
 	}
 	var buf []byte
-	if buf, err = json.Marshal(cd.Code); err != nil {
+	if buf, err = json.Marshal(cd.CreateTime); err != nil {
 		return nil, err
 	}
 	node.Fields[0] = &Field{
+		Type:  "time.Time",
+		Name:  "create_time",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(cd.UpdateTime); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "time.Time",
+		Name:  "update_time",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(cd.Code); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
 		Type:  "string",
 		Name:  "code",
 		Value: string(buf),
@@ -95,14 +111,30 @@ func (cp *CodingProblem) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     cp.ID,
 		Type:   "CodingProblem",
-		Fields: make([]*Field, 3),
+		Fields: make([]*Field, 5),
 		Edges:  make([]*Edge, 3),
 	}
 	var buf []byte
-	if buf, err = json.Marshal(cp.Name); err != nil {
+	if buf, err = json.Marshal(cp.CreateTime); err != nil {
 		return nil, err
 	}
 	node.Fields[0] = &Field{
+		Type:  "time.Time",
+		Name:  "create_time",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(cp.UpdateTime); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "time.Time",
+		Name:  "update_time",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(cp.Name); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
 		Type:  "string",
 		Name:  "name",
 		Value: string(buf),
@@ -110,7 +142,7 @@ func (cp *CodingProblem) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(cp.Statement); err != nil {
 		return nil, err
 	}
-	node.Fields[1] = &Field{
+	node.Fields[3] = &Field{
 		Type:  "string",
 		Name:  "statement",
 		Value: string(buf),
@@ -118,7 +150,7 @@ func (cp *CodingProblem) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(cp.Released); err != nil {
 		return nil, err
 	}
-	node.Fields[2] = &Field{
+	node.Fields[4] = &Field{
 		Type:  "bool",
 		Name:  "released",
 		Value: string(buf),
@@ -160,14 +192,30 @@ func (cs *CodingSubmission) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     cs.ID,
 		Type:   "CodingSubmission",
-		Fields: make([]*Field, 2),
+		Fields: make([]*Field, 4),
 		Edges:  make([]*Edge, 3),
 	}
 	var buf []byte
-	if buf, err = json.Marshal(cs.Code); err != nil {
+	if buf, err = json.Marshal(cs.CreateTime); err != nil {
 		return nil, err
 	}
 	node.Fields[0] = &Field{
+		Type:  "time.Time",
+		Name:  "create_time",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(cs.UpdateTime); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "time.Time",
+		Name:  "update_time",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(cs.Code); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
 		Type:  "string",
 		Name:  "code",
 		Value: string(buf),
@@ -175,7 +223,7 @@ func (cs *CodingSubmission) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(cs.Status); err != nil {
 		return nil, err
 	}
-	node.Fields[1] = &Field{
+	node.Fields[3] = &Field{
 		Type:  "codingsubmission.Status",
 		Name:  "status",
 		Value: string(buf),
@@ -217,14 +265,30 @@ func (cssd *CodingSubmissionStaffData) Node(ctx context.Context) (node *Node, er
 	node = &Node{
 		ID:     cssd.ID,
 		Type:   "CodingSubmissionStaffData",
-		Fields: make([]*Field, 5),
+		Fields: make([]*Field, 7),
 		Edges:  make([]*Edge, 1),
 	}
 	var buf []byte
-	if buf, err = json.Marshal(cssd.ExecutionID); err != nil {
+	if buf, err = json.Marshal(cssd.CreateTime); err != nil {
 		return nil, err
 	}
 	node.Fields[0] = &Field{
+		Type:  "time.Time",
+		Name:  "create_time",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(cssd.UpdateTime); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "time.Time",
+		Name:  "update_time",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(cssd.ExecutionID); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
 		Type:  "int64",
 		Name:  "execution_id",
 		Value: string(buf),
@@ -232,7 +296,7 @@ func (cssd *CodingSubmissionStaffData) Node(ctx context.Context) (node *Node, er
 	if buf, err = json.Marshal(cssd.Input); err != nil {
 		return nil, err
 	}
-	node.Fields[1] = &Field{
+	node.Fields[3] = &Field{
 		Type:  "string",
 		Name:  "input",
 		Value: string(buf),
@@ -240,7 +304,7 @@ func (cssd *CodingSubmissionStaffData) Node(ctx context.Context) (node *Node, er
 	if buf, err = json.Marshal(cssd.Output); err != nil {
 		return nil, err
 	}
-	node.Fields[2] = &Field{
+	node.Fields[4] = &Field{
 		Type:  "string",
 		Name:  "output",
 		Value: string(buf),
@@ -248,7 +312,7 @@ func (cssd *CodingSubmissionStaffData) Node(ctx context.Context) (node *Node, er
 	if buf, err = json.Marshal(cssd.Stderr); err != nil {
 		return nil, err
 	}
-	node.Fields[3] = &Field{
+	node.Fields[5] = &Field{
 		Type:  "string",
 		Name:  "stderr",
 		Value: string(buf),
@@ -256,7 +320,7 @@ func (cssd *CodingSubmissionStaffData) Node(ctx context.Context) (node *Node, er
 	if buf, err = json.Marshal(cssd.ExitError); err != nil {
 		return nil, err
 	}
-	node.Fields[4] = &Field{
+	node.Fields[6] = &Field{
 		Type:  "string",
 		Name:  "exit_error",
 		Value: string(buf),
@@ -278,14 +342,30 @@ func (ctc *CodingTestCase) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     ctc.ID,
 		Type:   "CodingTestCase",
-		Fields: make([]*Field, 2),
+		Fields: make([]*Field, 4),
 		Edges:  make([]*Edge, 2),
 	}
 	var buf []byte
-	if buf, err = json.Marshal(ctc.Points); err != nil {
+	if buf, err = json.Marshal(ctc.CreateTime); err != nil {
 		return nil, err
 	}
 	node.Fields[0] = &Field{
+		Type:  "time.Time",
+		Name:  "create_time",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(ctc.UpdateTime); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "time.Time",
+		Name:  "update_time",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(ctc.Points); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
 		Type:  "int",
 		Name:  "points",
 		Value: string(buf),
@@ -293,7 +373,7 @@ func (ctc *CodingTestCase) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(ctc.Public); err != nil {
 		return nil, err
 	}
-	node.Fields[1] = &Field{
+	node.Fields[3] = &Field{
 		Type:  "bool",
 		Name:  "public",
 		Value: string(buf),
@@ -325,14 +405,30 @@ func (ctcd *CodingTestCaseData) Node(ctx context.Context) (node *Node, err error
 	node = &Node{
 		ID:     ctcd.ID,
 		Type:   "CodingTestCaseData",
-		Fields: make([]*Field, 2),
+		Fields: make([]*Field, 4),
 		Edges:  make([]*Edge, 1),
 	}
 	var buf []byte
-	if buf, err = json.Marshal(ctcd.Input); err != nil {
+	if buf, err = json.Marshal(ctcd.CreateTime); err != nil {
 		return nil, err
 	}
 	node.Fields[0] = &Field{
+		Type:  "time.Time",
+		Name:  "create_time",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(ctcd.UpdateTime); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "time.Time",
+		Name:  "update_time",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(ctcd.Input); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
 		Type:  "string",
 		Name:  "input",
 		Value: string(buf),
@@ -340,7 +436,7 @@ func (ctcd *CodingTestCaseData) Node(ctx context.Context) (node *Node, err error
 	if buf, err = json.Marshal(ctcd.Output); err != nil {
 		return nil, err
 	}
-	node.Fields[1] = &Field{
+	node.Fields[3] = &Field{
 		Type:  "string",
 		Name:  "output",
 		Value: string(buf),
@@ -362,14 +458,30 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     u.ID,
 		Type:   "User",
-		Fields: make([]*Field, 3),
+		Fields: make([]*Field, 5),
 		Edges:  make([]*Edge, 1),
 	}
 	var buf []byte
-	if buf, err = json.Marshal(u.Email); err != nil {
+	if buf, err = json.Marshal(u.CreateTime); err != nil {
 		return nil, err
 	}
 	node.Fields[0] = &Field{
+		Type:  "time.Time",
+		Name:  "create_time",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(u.UpdateTime); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "time.Time",
+		Name:  "update_time",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(u.Email); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
 		Type:  "string",
 		Name:  "email",
 		Value: string(buf),
@@ -377,7 +489,7 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(u.Name); err != nil {
 		return nil, err
 	}
-	node.Fields[1] = &Field{
+	node.Fields[3] = &Field{
 		Type:  "string",
 		Name:  "name",
 		Value: string(buf),
@@ -385,7 +497,7 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(u.IsStaff); err != nil {
 		return nil, err
 	}
-	node.Fields[2] = &Field{
+	node.Fields[4] = &Field{
 		Type:  "bool",
 		Name:  "is_staff",
 		Value: string(buf),

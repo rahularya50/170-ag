@@ -10,6 +10,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -22,6 +23,34 @@ type CodingProblemCreate struct {
 	mutation *CodingProblemMutation
 	hooks    []Hook
 	conflict []sql.ConflictOption
+}
+
+// SetCreateTime sets the "create_time" field.
+func (cpc *CodingProblemCreate) SetCreateTime(t time.Time) *CodingProblemCreate {
+	cpc.mutation.SetCreateTime(t)
+	return cpc
+}
+
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (cpc *CodingProblemCreate) SetNillableCreateTime(t *time.Time) *CodingProblemCreate {
+	if t != nil {
+		cpc.SetCreateTime(*t)
+	}
+	return cpc
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (cpc *CodingProblemCreate) SetUpdateTime(t time.Time) *CodingProblemCreate {
+	cpc.mutation.SetUpdateTime(t)
+	return cpc
+}
+
+// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
+func (cpc *CodingProblemCreate) SetNillableUpdateTime(t *time.Time) *CodingProblemCreate {
+	if t != nil {
+		cpc.SetUpdateTime(*t)
+	}
+	return cpc
 }
 
 // SetName sets the "name" field.
@@ -176,6 +205,20 @@ func (cpc *CodingProblemCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (cpc *CodingProblemCreate) defaults() error {
+	if _, ok := cpc.mutation.CreateTime(); !ok {
+		if codingproblem.DefaultCreateTime == nil {
+			return fmt.Errorf("generated: uninitialized codingproblem.DefaultCreateTime (forgotten import generated/runtime?)")
+		}
+		v := codingproblem.DefaultCreateTime()
+		cpc.mutation.SetCreateTime(v)
+	}
+	if _, ok := cpc.mutation.UpdateTime(); !ok {
+		if codingproblem.DefaultUpdateTime == nil {
+			return fmt.Errorf("generated: uninitialized codingproblem.DefaultUpdateTime (forgotten import generated/runtime?)")
+		}
+		v := codingproblem.DefaultUpdateTime()
+		cpc.mutation.SetUpdateTime(v)
+	}
 	if _, ok := cpc.mutation.Statement(); !ok {
 		v := codingproblem.DefaultStatement
 		cpc.mutation.SetStatement(v)
@@ -189,6 +232,12 @@ func (cpc *CodingProblemCreate) defaults() error {
 
 // check runs all checks and user-defined validators on the builder.
 func (cpc *CodingProblemCreate) check() error {
+	if _, ok := cpc.mutation.CreateTime(); !ok {
+		return &ValidationError{Name: "create_time", err: errors.New(`generated: missing required field "CodingProblem.create_time"`)}
+	}
+	if _, ok := cpc.mutation.UpdateTime(); !ok {
+		return &ValidationError{Name: "update_time", err: errors.New(`generated: missing required field "CodingProblem.update_time"`)}
+	}
 	if _, ok := cpc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`generated: missing required field "CodingProblem.name"`)}
 	}
@@ -236,6 +285,22 @@ func (cpc *CodingProblemCreate) createSpec() (*CodingProblem, *sqlgraph.CreateSp
 		}
 	)
 	_spec.OnConflict = cpc.conflict
+	if value, ok := cpc.mutation.CreateTime(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: codingproblem.FieldCreateTime,
+		})
+		_node.CreateTime = value
+	}
+	if value, ok := cpc.mutation.UpdateTime(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: codingproblem.FieldUpdateTime,
+		})
+		_node.UpdateTime = value
+	}
 	if value, ok := cpc.mutation.Name(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -324,7 +389,7 @@ func (cpc *CodingProblemCreate) createSpec() (*CodingProblem, *sqlgraph.CreateSp
 // of the `INSERT` statement. For example:
 //
 //	client.CodingProblem.Create().
-//		SetName(v).
+//		SetCreateTime(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
@@ -333,7 +398,7 @@ func (cpc *CodingProblemCreate) createSpec() (*CodingProblem, *sqlgraph.CreateSp
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.CodingProblemUpsert) {
-//			SetName(v+v).
+//			SetCreateTime(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -370,6 +435,30 @@ type (
 		*sql.UpdateSet
 	}
 )
+
+// SetCreateTime sets the "create_time" field.
+func (u *CodingProblemUpsert) SetCreateTime(v time.Time) *CodingProblemUpsert {
+	u.Set(codingproblem.FieldCreateTime, v)
+	return u
+}
+
+// UpdateCreateTime sets the "create_time" field to the value that was provided on create.
+func (u *CodingProblemUpsert) UpdateCreateTime() *CodingProblemUpsert {
+	u.SetExcluded(codingproblem.FieldCreateTime)
+	return u
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (u *CodingProblemUpsert) SetUpdateTime(v time.Time) *CodingProblemUpsert {
+	u.Set(codingproblem.FieldUpdateTime, v)
+	return u
+}
+
+// UpdateUpdateTime sets the "update_time" field to the value that was provided on create.
+func (u *CodingProblemUpsert) UpdateUpdateTime() *CodingProblemUpsert {
+	u.SetExcluded(codingproblem.FieldUpdateTime)
+	return u
+}
 
 // SetName sets the "name" field.
 func (u *CodingProblemUpsert) SetName(v string) *CodingProblemUpsert {
@@ -418,6 +507,11 @@ func (u *CodingProblemUpsert) UpdateReleased() *CodingProblemUpsert {
 //
 func (u *CodingProblemUpsertOne) UpdateNewValues() *CodingProblemUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.CreateTime(); exists {
+			s.SetIgnore(codingproblem.FieldCreateTime)
+		}
+	}))
 	return u
 }
 
@@ -447,6 +541,34 @@ func (u *CodingProblemUpsertOne) Update(set func(*CodingProblemUpsert)) *CodingP
 		set(&CodingProblemUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetCreateTime sets the "create_time" field.
+func (u *CodingProblemUpsertOne) SetCreateTime(v time.Time) *CodingProblemUpsertOne {
+	return u.Update(func(s *CodingProblemUpsert) {
+		s.SetCreateTime(v)
+	})
+}
+
+// UpdateCreateTime sets the "create_time" field to the value that was provided on create.
+func (u *CodingProblemUpsertOne) UpdateCreateTime() *CodingProblemUpsertOne {
+	return u.Update(func(s *CodingProblemUpsert) {
+		s.UpdateCreateTime()
+	})
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (u *CodingProblemUpsertOne) SetUpdateTime(v time.Time) *CodingProblemUpsertOne {
+	return u.Update(func(s *CodingProblemUpsert) {
+		s.SetUpdateTime(v)
+	})
+}
+
+// UpdateUpdateTime sets the "update_time" field to the value that was provided on create.
+func (u *CodingProblemUpsertOne) UpdateUpdateTime() *CodingProblemUpsertOne {
+	return u.Update(func(s *CodingProblemUpsert) {
+		s.UpdateUpdateTime()
+	})
 }
 
 // SetName sets the "name" field.
@@ -622,7 +744,7 @@ func (cpcb *CodingProblemCreateBulk) ExecX(ctx context.Context) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.CodingProblemUpsert) {
-//			SetName(v+v).
+//			SetCreateTime(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -664,6 +786,13 @@ type CodingProblemUpsertBulk struct {
 //
 func (u *CodingProblemUpsertBulk) UpdateNewValues() *CodingProblemUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.CreateTime(); exists {
+				s.SetIgnore(codingproblem.FieldCreateTime)
+			}
+		}
+	}))
 	return u
 }
 
@@ -693,6 +822,34 @@ func (u *CodingProblemUpsertBulk) Update(set func(*CodingProblemUpsert)) *Coding
 		set(&CodingProblemUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetCreateTime sets the "create_time" field.
+func (u *CodingProblemUpsertBulk) SetCreateTime(v time.Time) *CodingProblemUpsertBulk {
+	return u.Update(func(s *CodingProblemUpsert) {
+		s.SetCreateTime(v)
+	})
+}
+
+// UpdateCreateTime sets the "create_time" field to the value that was provided on create.
+func (u *CodingProblemUpsertBulk) UpdateCreateTime() *CodingProblemUpsertBulk {
+	return u.Update(func(s *CodingProblemUpsert) {
+		s.UpdateCreateTime()
+	})
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (u *CodingProblemUpsertBulk) SetUpdateTime(v time.Time) *CodingProblemUpsertBulk {
+	return u.Update(func(s *CodingProblemUpsert) {
+		s.SetUpdateTime(v)
+	})
+}
+
+// UpdateUpdateTime sets the "update_time" field to the value that was provided on create.
+func (u *CodingProblemUpsertBulk) UpdateUpdateTime() *CodingProblemUpsertBulk {
+	return u.Update(func(s *CodingProblemUpsert) {
+		s.UpdateUpdateTime()
+	})
 }
 
 // SetName sets the "name" field.

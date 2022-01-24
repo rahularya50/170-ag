@@ -327,12 +327,12 @@ func (cdq *CodingDraftQuery) WithCodingProblem(opts ...func(*CodingProblemQuery)
 // Example:
 //
 //	var v []struct {
-//		Code string `json:"code,omitempty"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.CodingDraft.Query().
-//		GroupBy(codingdraft.FieldCode).
+//		GroupBy(codingdraft.FieldCreateTime).
 //		Aggregate(generated.Count()).
 //		Scan(ctx, &v)
 //
@@ -354,11 +354,11 @@ func (cdq *CodingDraftQuery) GroupBy(field string, fields ...string) *CodingDraf
 // Example:
 //
 //	var v []struct {
-//		Code string `json:"code,omitempty"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //	}
 //
 //	client.CodingDraft.Query().
-//		Select(codingdraft.FieldCode).
+//		Select(codingdraft.FieldCreateTime).
 //		Scan(ctx, &v)
 //
 func (cdq *CodingDraftQuery) Select(fields ...string) *CodingDraftSelect {

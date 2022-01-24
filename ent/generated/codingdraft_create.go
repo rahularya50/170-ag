@@ -9,6 +9,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -21,6 +22,34 @@ type CodingDraftCreate struct {
 	mutation *CodingDraftMutation
 	hooks    []Hook
 	conflict []sql.ConflictOption
+}
+
+// SetCreateTime sets the "create_time" field.
+func (cdc *CodingDraftCreate) SetCreateTime(t time.Time) *CodingDraftCreate {
+	cdc.mutation.SetCreateTime(t)
+	return cdc
+}
+
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (cdc *CodingDraftCreate) SetNillableCreateTime(t *time.Time) *CodingDraftCreate {
+	if t != nil {
+		cdc.SetCreateTime(*t)
+	}
+	return cdc
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (cdc *CodingDraftCreate) SetUpdateTime(t time.Time) *CodingDraftCreate {
+	cdc.mutation.SetUpdateTime(t)
+	return cdc
+}
+
+// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
+func (cdc *CodingDraftCreate) SetNillableUpdateTime(t *time.Time) *CodingDraftCreate {
+	if t != nil {
+		cdc.SetUpdateTime(*t)
+	}
+	return cdc
 }
 
 // SetCode sets the "code" field.
@@ -62,6 +91,9 @@ func (cdc *CodingDraftCreate) Save(ctx context.Context) (*CodingDraft, error) {
 		err  error
 		node *CodingDraft
 	)
+	if err := cdc.defaults(); err != nil {
+		return nil, err
+	}
 	if len(cdc.hooks) == 0 {
 		if err = cdc.check(); err != nil {
 			return nil, err
@@ -119,8 +151,33 @@ func (cdc *CodingDraftCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (cdc *CodingDraftCreate) defaults() error {
+	if _, ok := cdc.mutation.CreateTime(); !ok {
+		if codingdraft.DefaultCreateTime == nil {
+			return fmt.Errorf("generated: uninitialized codingdraft.DefaultCreateTime (forgotten import generated/runtime?)")
+		}
+		v := codingdraft.DefaultCreateTime()
+		cdc.mutation.SetCreateTime(v)
+	}
+	if _, ok := cdc.mutation.UpdateTime(); !ok {
+		if codingdraft.DefaultUpdateTime == nil {
+			return fmt.Errorf("generated: uninitialized codingdraft.DefaultUpdateTime (forgotten import generated/runtime?)")
+		}
+		v := codingdraft.DefaultUpdateTime()
+		cdc.mutation.SetUpdateTime(v)
+	}
+	return nil
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (cdc *CodingDraftCreate) check() error {
+	if _, ok := cdc.mutation.CreateTime(); !ok {
+		return &ValidationError{Name: "create_time", err: errors.New(`generated: missing required field "CodingDraft.create_time"`)}
+	}
+	if _, ok := cdc.mutation.UpdateTime(); !ok {
+		return &ValidationError{Name: "update_time", err: errors.New(`generated: missing required field "CodingDraft.update_time"`)}
+	}
 	if _, ok := cdc.mutation.Code(); !ok {
 		return &ValidationError{Name: "code", err: errors.New(`generated: missing required field "CodingDraft.code"`)}
 	}
@@ -158,6 +215,22 @@ func (cdc *CodingDraftCreate) createSpec() (*CodingDraft, *sqlgraph.CreateSpec) 
 		}
 	)
 	_spec.OnConflict = cdc.conflict
+	if value, ok := cdc.mutation.CreateTime(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: codingdraft.FieldCreateTime,
+		})
+		_node.CreateTime = value
+	}
+	if value, ok := cdc.mutation.UpdateTime(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: codingdraft.FieldUpdateTime,
+		})
+		_node.UpdateTime = value
+	}
 	if value, ok := cdc.mutation.Code(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -213,7 +286,7 @@ func (cdc *CodingDraftCreate) createSpec() (*CodingDraft, *sqlgraph.CreateSpec) 
 // of the `INSERT` statement. For example:
 //
 //	client.CodingDraft.Create().
-//		SetCode(v).
+//		SetCreateTime(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
@@ -222,7 +295,7 @@ func (cdc *CodingDraftCreate) createSpec() (*CodingDraft, *sqlgraph.CreateSpec) 
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.CodingDraftUpsert) {
-//			SetCode(v+v).
+//			SetCreateTime(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -260,6 +333,30 @@ type (
 	}
 )
 
+// SetCreateTime sets the "create_time" field.
+func (u *CodingDraftUpsert) SetCreateTime(v time.Time) *CodingDraftUpsert {
+	u.Set(codingdraft.FieldCreateTime, v)
+	return u
+}
+
+// UpdateCreateTime sets the "create_time" field to the value that was provided on create.
+func (u *CodingDraftUpsert) UpdateCreateTime() *CodingDraftUpsert {
+	u.SetExcluded(codingdraft.FieldCreateTime)
+	return u
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (u *CodingDraftUpsert) SetUpdateTime(v time.Time) *CodingDraftUpsert {
+	u.Set(codingdraft.FieldUpdateTime, v)
+	return u
+}
+
+// UpdateUpdateTime sets the "update_time" field to the value that was provided on create.
+func (u *CodingDraftUpsert) UpdateUpdateTime() *CodingDraftUpsert {
+	u.SetExcluded(codingdraft.FieldUpdateTime)
+	return u
+}
+
 // SetCode sets the "code" field.
 func (u *CodingDraftUpsert) SetCode(v string) *CodingDraftUpsert {
 	u.Set(codingdraft.FieldCode, v)
@@ -283,6 +380,11 @@ func (u *CodingDraftUpsert) UpdateCode() *CodingDraftUpsert {
 //
 func (u *CodingDraftUpsertOne) UpdateNewValues() *CodingDraftUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.CreateTime(); exists {
+			s.SetIgnore(codingdraft.FieldCreateTime)
+		}
+	}))
 	return u
 }
 
@@ -312,6 +414,34 @@ func (u *CodingDraftUpsertOne) Update(set func(*CodingDraftUpsert)) *CodingDraft
 		set(&CodingDraftUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetCreateTime sets the "create_time" field.
+func (u *CodingDraftUpsertOne) SetCreateTime(v time.Time) *CodingDraftUpsertOne {
+	return u.Update(func(s *CodingDraftUpsert) {
+		s.SetCreateTime(v)
+	})
+}
+
+// UpdateCreateTime sets the "create_time" field to the value that was provided on create.
+func (u *CodingDraftUpsertOne) UpdateCreateTime() *CodingDraftUpsertOne {
+	return u.Update(func(s *CodingDraftUpsert) {
+		s.UpdateCreateTime()
+	})
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (u *CodingDraftUpsertOne) SetUpdateTime(v time.Time) *CodingDraftUpsertOne {
+	return u.Update(func(s *CodingDraftUpsert) {
+		s.SetUpdateTime(v)
+	})
+}
+
+// UpdateUpdateTime sets the "update_time" field to the value that was provided on create.
+func (u *CodingDraftUpsertOne) UpdateUpdateTime() *CodingDraftUpsertOne {
+	return u.Update(func(s *CodingDraftUpsert) {
+		s.UpdateUpdateTime()
+	})
 }
 
 // SetCode sets the "code" field.
@@ -376,6 +506,7 @@ func (cdcb *CodingDraftCreateBulk) Save(ctx context.Context) ([]*CodingDraft, er
 	for i := range cdcb.builders {
 		func(i int, root context.Context) {
 			builder := cdcb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*CodingDraftMutation)
 				if !ok {
@@ -458,7 +589,7 @@ func (cdcb *CodingDraftCreateBulk) ExecX(ctx context.Context) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.CodingDraftUpsert) {
-//			SetCode(v+v).
+//			SetCreateTime(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -500,6 +631,13 @@ type CodingDraftUpsertBulk struct {
 //
 func (u *CodingDraftUpsertBulk) UpdateNewValues() *CodingDraftUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.CreateTime(); exists {
+				s.SetIgnore(codingdraft.FieldCreateTime)
+			}
+		}
+	}))
 	return u
 }
 
@@ -529,6 +667,34 @@ func (u *CodingDraftUpsertBulk) Update(set func(*CodingDraftUpsert)) *CodingDraf
 		set(&CodingDraftUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetCreateTime sets the "create_time" field.
+func (u *CodingDraftUpsertBulk) SetCreateTime(v time.Time) *CodingDraftUpsertBulk {
+	return u.Update(func(s *CodingDraftUpsert) {
+		s.SetCreateTime(v)
+	})
+}
+
+// UpdateCreateTime sets the "create_time" field to the value that was provided on create.
+func (u *CodingDraftUpsertBulk) UpdateCreateTime() *CodingDraftUpsertBulk {
+	return u.Update(func(s *CodingDraftUpsert) {
+		s.UpdateCreateTime()
+	})
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (u *CodingDraftUpsertBulk) SetUpdateTime(v time.Time) *CodingDraftUpsertBulk {
+	return u.Update(func(s *CodingDraftUpsert) {
+		s.SetUpdateTime(v)
+	})
+}
+
+// UpdateUpdateTime sets the "update_time" field to the value that was provided on create.
+func (u *CodingDraftUpsertBulk) UpdateUpdateTime() *CodingDraftUpsertBulk {
+	return u.Update(func(s *CodingDraftUpsert) {
+		s.UpdateUpdateTime()
+	})
 }
 
 // SetCode sets the "code" field.

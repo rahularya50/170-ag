@@ -10,6 +10,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -26,6 +27,12 @@ type CodingTestCaseUpdate struct {
 // Where appends a list predicates to the CodingTestCaseUpdate builder.
 func (ctcu *CodingTestCaseUpdate) Where(ps ...predicate.CodingTestCase) *CodingTestCaseUpdate {
 	ctcu.mutation.Where(ps...)
+	return ctcu
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (ctcu *CodingTestCaseUpdate) SetUpdateTime(t time.Time) *CodingTestCaseUpdate {
+	ctcu.mutation.SetUpdateTime(t)
 	return ctcu
 }
 
@@ -117,6 +124,9 @@ func (ctcu *CodingTestCaseUpdate) Save(ctx context.Context) (int, error) {
 		err      error
 		affected int
 	)
+	if err := ctcu.defaults(); err != nil {
+		return 0, err
+	}
 	if len(ctcu.hooks) == 0 {
 		if err = ctcu.check(); err != nil {
 			return 0, err
@@ -171,6 +181,18 @@ func (ctcu *CodingTestCaseUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (ctcu *CodingTestCaseUpdate) defaults() error {
+	if _, ok := ctcu.mutation.UpdateTime(); !ok {
+		if codingtestcase.UpdateDefaultUpdateTime == nil {
+			return fmt.Errorf("generated: uninitialized codingtestcase.UpdateDefaultUpdateTime (forgotten import generated/runtime?)")
+		}
+		v := codingtestcase.UpdateDefaultUpdateTime()
+		ctcu.mutation.SetUpdateTime(v)
+	}
+	return nil
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (ctcu *CodingTestCaseUpdate) check() error {
 	if v, ok := ctcu.mutation.Points(); ok {
@@ -201,6 +223,13 @@ func (ctcu *CodingTestCaseUpdate) sqlSave(ctx context.Context) (n int, err error
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := ctcu.mutation.UpdateTime(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: codingtestcase.FieldUpdateTime,
+		})
 	}
 	if value, ok := ctcu.mutation.Points(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
@@ -312,6 +341,12 @@ type CodingTestCaseUpdateOne struct {
 	mutation *CodingTestCaseMutation
 }
 
+// SetUpdateTime sets the "update_time" field.
+func (ctcuo *CodingTestCaseUpdateOne) SetUpdateTime(t time.Time) *CodingTestCaseUpdateOne {
+	ctcuo.mutation.SetUpdateTime(t)
+	return ctcuo
+}
+
 // SetPoints sets the "points" field.
 func (ctcuo *CodingTestCaseUpdateOne) SetPoints(i int) *CodingTestCaseUpdateOne {
 	ctcuo.mutation.ResetPoints()
@@ -407,6 +442,9 @@ func (ctcuo *CodingTestCaseUpdateOne) Save(ctx context.Context) (*CodingTestCase
 		err  error
 		node *CodingTestCase
 	)
+	if err := ctcuo.defaults(); err != nil {
+		return nil, err
+	}
 	if len(ctcuo.hooks) == 0 {
 		if err = ctcuo.check(); err != nil {
 			return nil, err
@@ -461,6 +499,18 @@ func (ctcuo *CodingTestCaseUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (ctcuo *CodingTestCaseUpdateOne) defaults() error {
+	if _, ok := ctcuo.mutation.UpdateTime(); !ok {
+		if codingtestcase.UpdateDefaultUpdateTime == nil {
+			return fmt.Errorf("generated: uninitialized codingtestcase.UpdateDefaultUpdateTime (forgotten import generated/runtime?)")
+		}
+		v := codingtestcase.UpdateDefaultUpdateTime()
+		ctcuo.mutation.SetUpdateTime(v)
+	}
+	return nil
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (ctcuo *CodingTestCaseUpdateOne) check() error {
 	if v, ok := ctcuo.mutation.Points(); ok {
@@ -508,6 +558,13 @@ func (ctcuo *CodingTestCaseUpdateOne) sqlSave(ctx context.Context) (_node *Codin
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := ctcuo.mutation.UpdateTime(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: codingtestcase.FieldUpdateTime,
+		})
 	}
 	if value, ok := ctcuo.mutation.Points(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{

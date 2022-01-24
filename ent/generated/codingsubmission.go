@@ -9,6 +9,7 @@ import (
 	"170-ag/ent/generated/user"
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 )
@@ -18,6 +19,10 @@ type CodingSubmission struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
+	// CreateTime holds the value of the "create_time" field.
+	CreateTime time.Time `json:"create_time,omitempty"`
+	// UpdateTime holds the value of the "update_time" field.
+	UpdateTime time.Time `json:"update_time,omitempty"`
 	// Code holds the value of the "code" field.
 	Code string `json:"code,omitempty"`
 	// Status holds the value of the "status" field.
@@ -94,6 +99,8 @@ func (*CodingSubmission) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullInt64)
 		case codingsubmission.FieldCode, codingsubmission.FieldStatus:
 			values[i] = new(sql.NullString)
+		case codingsubmission.FieldCreateTime, codingsubmission.FieldUpdateTime:
+			values[i] = new(sql.NullTime)
 		case codingsubmission.ForeignKeys[0]: // coding_submission_author
 			values[i] = new(sql.NullInt64)
 		case codingsubmission.ForeignKeys[1]: // coding_submission_coding_problem
@@ -121,6 +128,18 @@ func (cs *CodingSubmission) assignValues(columns []string, values []interface{})
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			cs.ID = int(value.Int64)
+		case codingsubmission.FieldCreateTime:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field create_time", values[i])
+			} else if value.Valid {
+				cs.CreateTime = value.Time
+			}
+		case codingsubmission.FieldUpdateTime:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field update_time", values[i])
+			} else if value.Valid {
+				cs.UpdateTime = value.Time
+			}
 		case codingsubmission.FieldCode:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field code", values[i])
@@ -197,6 +216,10 @@ func (cs *CodingSubmission) String() string {
 	var builder strings.Builder
 	builder.WriteString("CodingSubmission(")
 	builder.WriteString(fmt.Sprintf("id=%v", cs.ID))
+	builder.WriteString(", create_time=")
+	builder.WriteString(cs.CreateTime.Format(time.ANSIC))
+	builder.WriteString(", update_time=")
+	builder.WriteString(cs.UpdateTime.Format(time.ANSIC))
 	builder.WriteString(", code=")
 	builder.WriteString(cs.Code)
 	builder.WriteString(", status=")

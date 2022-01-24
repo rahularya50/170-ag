@@ -102,6 +102,7 @@ export default function ProblemStatement(props: Props): React.Node {
                 value={statement}
                 disabled={isUpdating}
                 onChange={(e) => setStatement(e.target.value)}
+                style={{ minHeight: "100%" }}
               />
             </Col>
             <Col>

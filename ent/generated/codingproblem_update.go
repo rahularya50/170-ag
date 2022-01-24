@@ -11,6 +11,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -27,6 +28,12 @@ type CodingProblemUpdate struct {
 // Where appends a list predicates to the CodingProblemUpdate builder.
 func (cpu *CodingProblemUpdate) Where(ps ...predicate.CodingProblem) *CodingProblemUpdate {
 	cpu.mutation.Where(ps...)
+	return cpu
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (cpu *CodingProblemUpdate) SetUpdateTime(t time.Time) *CodingProblemUpdate {
+	cpu.mutation.SetUpdateTime(t)
 	return cpu
 }
 
@@ -183,6 +190,9 @@ func (cpu *CodingProblemUpdate) Save(ctx context.Context) (int, error) {
 		err      error
 		affected int
 	)
+	if err := cpu.defaults(); err != nil {
+		return 0, err
+	}
 	if len(cpu.hooks) == 0 {
 		if err = cpu.check(); err != nil {
 			return 0, err
@@ -237,6 +247,18 @@ func (cpu *CodingProblemUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (cpu *CodingProblemUpdate) defaults() error {
+	if _, ok := cpu.mutation.UpdateTime(); !ok {
+		if codingproblem.UpdateDefaultUpdateTime == nil {
+			return fmt.Errorf("generated: uninitialized codingproblem.UpdateDefaultUpdateTime (forgotten import generated/runtime?)")
+		}
+		v := codingproblem.UpdateDefaultUpdateTime()
+		cpu.mutation.SetUpdateTime(v)
+	}
+	return nil
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (cpu *CodingProblemUpdate) check() error {
 	if v, ok := cpu.mutation.Name(); ok {
@@ -269,6 +291,13 @@ func (cpu *CodingProblemUpdate) sqlSave(ctx context.Context) (n int, err error) 
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := cpu.mutation.UpdateTime(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: codingproblem.FieldUpdateTime,
+		})
 	}
 	if value, ok := cpu.mutation.Name(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
@@ -472,6 +501,12 @@ type CodingProblemUpdateOne struct {
 	mutation *CodingProblemMutation
 }
 
+// SetUpdateTime sets the "update_time" field.
+func (cpuo *CodingProblemUpdateOne) SetUpdateTime(t time.Time) *CodingProblemUpdateOne {
+	cpuo.mutation.SetUpdateTime(t)
+	return cpuo
+}
+
 // SetName sets the "name" field.
 func (cpuo *CodingProblemUpdateOne) SetName(s string) *CodingProblemUpdateOne {
 	cpuo.mutation.SetName(s)
@@ -632,6 +667,9 @@ func (cpuo *CodingProblemUpdateOne) Save(ctx context.Context) (*CodingProblem, e
 		err  error
 		node *CodingProblem
 	)
+	if err := cpuo.defaults(); err != nil {
+		return nil, err
+	}
 	if len(cpuo.hooks) == 0 {
 		if err = cpuo.check(); err != nil {
 			return nil, err
@@ -686,6 +724,18 @@ func (cpuo *CodingProblemUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (cpuo *CodingProblemUpdateOne) defaults() error {
+	if _, ok := cpuo.mutation.UpdateTime(); !ok {
+		if codingproblem.UpdateDefaultUpdateTime == nil {
+			return fmt.Errorf("generated: uninitialized codingproblem.UpdateDefaultUpdateTime (forgotten import generated/runtime?)")
+		}
+		v := codingproblem.UpdateDefaultUpdateTime()
+		cpuo.mutation.SetUpdateTime(v)
+	}
+	return nil
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (cpuo *CodingProblemUpdateOne) check() error {
 	if v, ok := cpuo.mutation.Name(); ok {
@@ -735,6 +785,13 @@ func (cpuo *CodingProblemUpdateOne) sqlSave(ctx context.Context) (_node *CodingP
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := cpuo.mutation.UpdateTime(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: codingproblem.FieldUpdateTime,
+		})
 	}
 	if value, ok := cpuo.mutation.Name(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{

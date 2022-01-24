@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/mixin"
 )
 
 // CodingTestCase holds the schema definition for the CodingTestCase entity.
@@ -42,6 +43,12 @@ func (CodingTestCase) Edges() []ent.Edge {
 				entgql.Bind(),
 				entsql.Annotation{OnDelete: entsql.Cascade},
 			),
+	}
+}
+
+func (CodingTestCase) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		mixin.Time{},
 	}
 }
 

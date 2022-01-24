@@ -8,6 +8,7 @@ import (
 	"170-ag/ent/generated/user"
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 )
@@ -17,6 +18,10 @@ type CodingDraft struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
+	// CreateTime holds the value of the "create_time" field.
+	CreateTime time.Time `json:"create_time,omitempty"`
+	// UpdateTime holds the value of the "update_time" field.
+	UpdateTime time.Time `json:"update_time,omitempty"`
 	// Code holds the value of the "code" field.
 	Code string `json:"code,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -74,6 +79,8 @@ func (*CodingDraft) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullInt64)
 		case codingdraft.FieldCode:
 			values[i] = new(sql.NullString)
+		case codingdraft.FieldCreateTime, codingdraft.FieldUpdateTime:
+			values[i] = new(sql.NullTime)
 		case codingdraft.ForeignKeys[0]: // coding_draft_author
 			values[i] = new(sql.NullInt64)
 		case codingdraft.ForeignKeys[1]: // coding_draft_coding_problem
@@ -99,6 +106,18 @@ func (cd *CodingDraft) assignValues(columns []string, values []interface{}) erro
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			cd.ID = int(value.Int64)
+		case codingdraft.FieldCreateTime:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field create_time", values[i])
+			} else if value.Valid {
+				cd.CreateTime = value.Time
+			}
+		case codingdraft.FieldUpdateTime:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field update_time", values[i])
+			} else if value.Valid {
+				cd.UpdateTime = value.Time
+			}
 		case codingdraft.FieldCode:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field code", values[i])
@@ -157,6 +176,10 @@ func (cd *CodingDraft) String() string {
 	var builder strings.Builder
 	builder.WriteString("CodingDraft(")
 	builder.WriteString(fmt.Sprintf("id=%v", cd.ID))
+	builder.WriteString(", create_time=")
+	builder.WriteString(cd.CreateTime.Format(time.ANSIC))
+	builder.WriteString(", update_time=")
+	builder.WriteString(cd.UpdateTime.Format(time.ANSIC))
 	builder.WriteString(", code=")
 	builder.WriteString(cd.Code)
 	builder.WriteByte(')')

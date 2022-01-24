@@ -32,7 +32,9 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "CodingDraft",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			codingdraft.FieldCode: {Type: field.TypeString, Column: codingdraft.FieldCode},
+			codingdraft.FieldCreateTime: {Type: field.TypeTime, Column: codingdraft.FieldCreateTime},
+			codingdraft.FieldUpdateTime: {Type: field.TypeTime, Column: codingdraft.FieldUpdateTime},
+			codingdraft.FieldCode:       {Type: field.TypeString, Column: codingdraft.FieldCode},
 		},
 	}
 	graph.Nodes[1] = &sqlgraph.Node{
@@ -46,9 +48,11 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "CodingProblem",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			codingproblem.FieldName:      {Type: field.TypeString, Column: codingproblem.FieldName},
-			codingproblem.FieldStatement: {Type: field.TypeString, Column: codingproblem.FieldStatement},
-			codingproblem.FieldReleased:  {Type: field.TypeBool, Column: codingproblem.FieldReleased},
+			codingproblem.FieldCreateTime: {Type: field.TypeTime, Column: codingproblem.FieldCreateTime},
+			codingproblem.FieldUpdateTime: {Type: field.TypeTime, Column: codingproblem.FieldUpdateTime},
+			codingproblem.FieldName:       {Type: field.TypeString, Column: codingproblem.FieldName},
+			codingproblem.FieldStatement:  {Type: field.TypeString, Column: codingproblem.FieldStatement},
+			codingproblem.FieldReleased:   {Type: field.TypeBool, Column: codingproblem.FieldReleased},
 		},
 	}
 	graph.Nodes[2] = &sqlgraph.Node{
@@ -62,8 +66,10 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "CodingSubmission",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			codingsubmission.FieldCode:   {Type: field.TypeString, Column: codingsubmission.FieldCode},
-			codingsubmission.FieldStatus: {Type: field.TypeEnum, Column: codingsubmission.FieldStatus},
+			codingsubmission.FieldCreateTime: {Type: field.TypeTime, Column: codingsubmission.FieldCreateTime},
+			codingsubmission.FieldUpdateTime: {Type: field.TypeTime, Column: codingsubmission.FieldUpdateTime},
+			codingsubmission.FieldCode:       {Type: field.TypeString, Column: codingsubmission.FieldCode},
+			codingsubmission.FieldStatus:     {Type: field.TypeEnum, Column: codingsubmission.FieldStatus},
 		},
 	}
 	graph.Nodes[3] = &sqlgraph.Node{
@@ -77,6 +83,8 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "CodingSubmissionStaffData",
 		Fields: map[string]*sqlgraph.FieldSpec{
+			codingsubmissionstaffdata.FieldCreateTime:  {Type: field.TypeTime, Column: codingsubmissionstaffdata.FieldCreateTime},
+			codingsubmissionstaffdata.FieldUpdateTime:  {Type: field.TypeTime, Column: codingsubmissionstaffdata.FieldUpdateTime},
 			codingsubmissionstaffdata.FieldExecutionID: {Type: field.TypeInt64, Column: codingsubmissionstaffdata.FieldExecutionID},
 			codingsubmissionstaffdata.FieldInput:       {Type: field.TypeString, Column: codingsubmissionstaffdata.FieldInput},
 			codingsubmissionstaffdata.FieldOutput:      {Type: field.TypeString, Column: codingsubmissionstaffdata.FieldOutput},
@@ -95,8 +103,10 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "CodingTestCase",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			codingtestcase.FieldPoints: {Type: field.TypeInt, Column: codingtestcase.FieldPoints},
-			codingtestcase.FieldPublic: {Type: field.TypeBool, Column: codingtestcase.FieldPublic},
+			codingtestcase.FieldCreateTime: {Type: field.TypeTime, Column: codingtestcase.FieldCreateTime},
+			codingtestcase.FieldUpdateTime: {Type: field.TypeTime, Column: codingtestcase.FieldUpdateTime},
+			codingtestcase.FieldPoints:     {Type: field.TypeInt, Column: codingtestcase.FieldPoints},
+			codingtestcase.FieldPublic:     {Type: field.TypeBool, Column: codingtestcase.FieldPublic},
 		},
 	}
 	graph.Nodes[5] = &sqlgraph.Node{
@@ -110,8 +120,10 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "CodingTestCaseData",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			codingtestcasedata.FieldInput:  {Type: field.TypeString, Column: codingtestcasedata.FieldInput},
-			codingtestcasedata.FieldOutput: {Type: field.TypeString, Column: codingtestcasedata.FieldOutput},
+			codingtestcasedata.FieldCreateTime: {Type: field.TypeTime, Column: codingtestcasedata.FieldCreateTime},
+			codingtestcasedata.FieldUpdateTime: {Type: field.TypeTime, Column: codingtestcasedata.FieldUpdateTime},
+			codingtestcasedata.FieldInput:      {Type: field.TypeString, Column: codingtestcasedata.FieldInput},
+			codingtestcasedata.FieldOutput:     {Type: field.TypeString, Column: codingtestcasedata.FieldOutput},
 		},
 	}
 	graph.Nodes[6] = &sqlgraph.Node{
@@ -125,9 +137,11 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "User",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			user.FieldEmail:   {Type: field.TypeString, Column: user.FieldEmail},
-			user.FieldName:    {Type: field.TypeString, Column: user.FieldName},
-			user.FieldIsStaff: {Type: field.TypeBool, Column: user.FieldIsStaff},
+			user.FieldCreateTime: {Type: field.TypeTime, Column: user.FieldCreateTime},
+			user.FieldUpdateTime: {Type: field.TypeTime, Column: user.FieldUpdateTime},
+			user.FieldEmail:      {Type: field.TypeString, Column: user.FieldEmail},
+			user.FieldName:       {Type: field.TypeString, Column: user.FieldName},
+			user.FieldIsStaff:    {Type: field.TypeBool, Column: user.FieldIsStaff},
 		},
 	}
 	graph.MustAddE(
@@ -334,6 +348,16 @@ func (f *CodingDraftFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(codingdraft.FieldID))
 }
 
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *CodingDraftFilter) WhereCreateTime(p entql.TimeP) {
+	f.Where(p.Field(codingdraft.FieldCreateTime))
+}
+
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *CodingDraftFilter) WhereUpdateTime(p entql.TimeP) {
+	f.Where(p.Field(codingdraft.FieldUpdateTime))
+}
+
 // WhereCode applies the entql string predicate on the code field.
 func (f *CodingDraftFilter) WhereCode(p entql.StringP) {
 	f.Where(p.Field(codingdraft.FieldCode))
@@ -404,6 +428,16 @@ func (f *CodingProblemFilter) Where(p entql.P) {
 // WhereID applies the entql int predicate on the id field.
 func (f *CodingProblemFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(codingproblem.FieldID))
+}
+
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *CodingProblemFilter) WhereCreateTime(p entql.TimeP) {
+	f.Where(p.Field(codingproblem.FieldCreateTime))
+}
+
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *CodingProblemFilter) WhereUpdateTime(p entql.TimeP) {
+	f.Where(p.Field(codingproblem.FieldUpdateTime))
 }
 
 // WhereName applies the entql string predicate on the name field.
@@ -502,6 +536,16 @@ func (f *CodingSubmissionFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(codingsubmission.FieldID))
 }
 
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *CodingSubmissionFilter) WhereCreateTime(p entql.TimeP) {
+	f.Where(p.Field(codingsubmission.FieldCreateTime))
+}
+
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *CodingSubmissionFilter) WhereUpdateTime(p entql.TimeP) {
+	f.Where(p.Field(codingsubmission.FieldUpdateTime))
+}
+
 // WhereCode applies the entql string predicate on the code field.
 func (f *CodingSubmissionFilter) WhereCode(p entql.StringP) {
 	f.Where(p.Field(codingsubmission.FieldCode))
@@ -593,6 +637,16 @@ func (f *CodingSubmissionStaffDataFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(codingsubmissionstaffdata.FieldID))
 }
 
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *CodingSubmissionStaffDataFilter) WhereCreateTime(p entql.TimeP) {
+	f.Where(p.Field(codingsubmissionstaffdata.FieldCreateTime))
+}
+
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *CodingSubmissionStaffDataFilter) WhereUpdateTime(p entql.TimeP) {
+	f.Where(p.Field(codingsubmissionstaffdata.FieldUpdateTime))
+}
+
 // WhereExecutionID applies the entql int64 predicate on the execution_id field.
 func (f *CodingSubmissionStaffDataFilter) WhereExecutionID(p entql.Int64P) {
 	f.Where(p.Field(codingsubmissionstaffdata.FieldExecutionID))
@@ -669,6 +723,16 @@ func (f *CodingTestCaseFilter) Where(p entql.P) {
 // WhereID applies the entql int predicate on the id field.
 func (f *CodingTestCaseFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(codingtestcase.FieldID))
+}
+
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *CodingTestCaseFilter) WhereCreateTime(p entql.TimeP) {
+	f.Where(p.Field(codingtestcase.FieldCreateTime))
+}
+
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *CodingTestCaseFilter) WhereUpdateTime(p entql.TimeP) {
+	f.Where(p.Field(codingtestcase.FieldUpdateTime))
 }
 
 // WherePoints applies the entql int predicate on the points field.
@@ -748,6 +812,16 @@ func (f *CodingTestCaseDataFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(codingtestcasedata.FieldID))
 }
 
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *CodingTestCaseDataFilter) WhereCreateTime(p entql.TimeP) {
+	f.Where(p.Field(codingtestcasedata.FieldCreateTime))
+}
+
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *CodingTestCaseDataFilter) WhereUpdateTime(p entql.TimeP) {
+	f.Where(p.Field(codingtestcasedata.FieldUpdateTime))
+}
+
 // WhereInput applies the entql string predicate on the input field.
 func (f *CodingTestCaseDataFilter) WhereInput(p entql.StringP) {
 	f.Where(p.Field(codingtestcasedata.FieldInput))
@@ -809,6 +883,16 @@ func (f *UserFilter) Where(p entql.P) {
 // WhereID applies the entql int predicate on the id field.
 func (f *UserFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(user.FieldID))
+}
+
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *UserFilter) WhereCreateTime(p entql.TimeP) {
+	f.Where(p.Field(user.FieldCreateTime))
+}
+
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *UserFilter) WhereUpdateTime(p entql.TimeP) {
+	f.Where(p.Field(user.FieldUpdateTime))
 }
 
 // WhereEmail applies the entql string predicate on the email field.

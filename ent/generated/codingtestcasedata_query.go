@@ -291,12 +291,12 @@ func (ctcdq *CodingTestCaseDataQuery) WithTestCase(opts ...func(*CodingTestCaseQ
 // Example:
 //
 //	var v []struct {
-//		Input string `json:"input,omitempty"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.CodingTestCaseData.Query().
-//		GroupBy(codingtestcasedata.FieldInput).
+//		GroupBy(codingtestcasedata.FieldCreateTime).
 //		Aggregate(generated.Count()).
 //		Scan(ctx, &v)
 //
@@ -318,11 +318,11 @@ func (ctcdq *CodingTestCaseDataQuery) GroupBy(field string, fields ...string) *C
 // Example:
 //
 //	var v []struct {
-//		Input string `json:"input,omitempty"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //	}
 //
 //	client.CodingTestCaseData.Query().
-//		Select(codingtestcasedata.FieldInput).
+//		Select(codingtestcasedata.FieldCreateTime).
 //		Scan(ctx, &v)
 //
 func (ctcdq *CodingTestCaseDataQuery) Select(fields ...string) *CodingTestCaseDataSelect {

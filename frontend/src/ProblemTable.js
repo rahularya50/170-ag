@@ -14,8 +14,9 @@ type Props = {
 export default function ProblemTable(props: Props): React.Node {
   const { coding_problems } = useFragment(
     graphql`
-      fragment ProblemTable on Query {
-        coding_problems(include_unreleased: $include_unreleased) {
+      fragment ProblemTable on Query
+      @argumentDefinitions(includeUnreleased: { type: "Boolean!" }) {
+        coding_problems(include_unreleased: $includeUnreleased) {
           edges {
             node {
               id

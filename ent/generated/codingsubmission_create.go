@@ -10,6 +10,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -22,6 +23,34 @@ type CodingSubmissionCreate struct {
 	mutation *CodingSubmissionMutation
 	hooks    []Hook
 	conflict []sql.ConflictOption
+}
+
+// SetCreateTime sets the "create_time" field.
+func (csc *CodingSubmissionCreate) SetCreateTime(t time.Time) *CodingSubmissionCreate {
+	csc.mutation.SetCreateTime(t)
+	return csc
+}
+
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (csc *CodingSubmissionCreate) SetNillableCreateTime(t *time.Time) *CodingSubmissionCreate {
+	if t != nil {
+		csc.SetCreateTime(*t)
+	}
+	return csc
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (csc *CodingSubmissionCreate) SetUpdateTime(t time.Time) *CodingSubmissionCreate {
+	csc.mutation.SetUpdateTime(t)
+	return csc
+}
+
+// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
+func (csc *CodingSubmissionCreate) SetNillableUpdateTime(t *time.Time) *CodingSubmissionCreate {
+	if t != nil {
+		csc.SetUpdateTime(*t)
+	}
+	return csc
 }
 
 // SetCode sets the "code" field.
@@ -158,6 +187,20 @@ func (csc *CodingSubmissionCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (csc *CodingSubmissionCreate) defaults() error {
+	if _, ok := csc.mutation.CreateTime(); !ok {
+		if codingsubmission.DefaultCreateTime == nil {
+			return fmt.Errorf("generated: uninitialized codingsubmission.DefaultCreateTime (forgotten import generated/runtime?)")
+		}
+		v := codingsubmission.DefaultCreateTime()
+		csc.mutation.SetCreateTime(v)
+	}
+	if _, ok := csc.mutation.UpdateTime(); !ok {
+		if codingsubmission.DefaultUpdateTime == nil {
+			return fmt.Errorf("generated: uninitialized codingsubmission.DefaultUpdateTime (forgotten import generated/runtime?)")
+		}
+		v := codingsubmission.DefaultUpdateTime()
+		csc.mutation.SetUpdateTime(v)
+	}
 	if _, ok := csc.mutation.Status(); !ok {
 		v := codingsubmission.DefaultStatus
 		csc.mutation.SetStatus(v)
@@ -167,6 +210,12 @@ func (csc *CodingSubmissionCreate) defaults() error {
 
 // check runs all checks and user-defined validators on the builder.
 func (csc *CodingSubmissionCreate) check() error {
+	if _, ok := csc.mutation.CreateTime(); !ok {
+		return &ValidationError{Name: "create_time", err: errors.New(`generated: missing required field "CodingSubmission.create_time"`)}
+	}
+	if _, ok := csc.mutation.UpdateTime(); !ok {
+		return &ValidationError{Name: "update_time", err: errors.New(`generated: missing required field "CodingSubmission.update_time"`)}
+	}
 	if _, ok := csc.mutation.Code(); !ok {
 		return &ValidationError{Name: "code", err: errors.New(`generated: missing required field "CodingSubmission.code"`)}
 	}
@@ -217,6 +266,22 @@ func (csc *CodingSubmissionCreate) createSpec() (*CodingSubmission, *sqlgraph.Cr
 		}
 	)
 	_spec.OnConflict = csc.conflict
+	if value, ok := csc.mutation.CreateTime(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: codingsubmission.FieldCreateTime,
+		})
+		_node.CreateTime = value
+	}
+	if value, ok := csc.mutation.UpdateTime(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: codingsubmission.FieldUpdateTime,
+		})
+		_node.UpdateTime = value
+	}
 	if value, ok := csc.mutation.Code(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -300,7 +365,7 @@ func (csc *CodingSubmissionCreate) createSpec() (*CodingSubmission, *sqlgraph.Cr
 // of the `INSERT` statement. For example:
 //
 //	client.CodingSubmission.Create().
-//		SetCode(v).
+//		SetCreateTime(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
@@ -309,7 +374,7 @@ func (csc *CodingSubmissionCreate) createSpec() (*CodingSubmission, *sqlgraph.Cr
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.CodingSubmissionUpsert) {
-//			SetCode(v+v).
+//			SetCreateTime(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -347,6 +412,30 @@ type (
 	}
 )
 
+// SetCreateTime sets the "create_time" field.
+func (u *CodingSubmissionUpsert) SetCreateTime(v time.Time) *CodingSubmissionUpsert {
+	u.Set(codingsubmission.FieldCreateTime, v)
+	return u
+}
+
+// UpdateCreateTime sets the "create_time" field to the value that was provided on create.
+func (u *CodingSubmissionUpsert) UpdateCreateTime() *CodingSubmissionUpsert {
+	u.SetExcluded(codingsubmission.FieldCreateTime)
+	return u
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (u *CodingSubmissionUpsert) SetUpdateTime(v time.Time) *CodingSubmissionUpsert {
+	u.Set(codingsubmission.FieldUpdateTime, v)
+	return u
+}
+
+// UpdateUpdateTime sets the "update_time" field to the value that was provided on create.
+func (u *CodingSubmissionUpsert) UpdateUpdateTime() *CodingSubmissionUpsert {
+	u.SetExcluded(codingsubmission.FieldUpdateTime)
+	return u
+}
+
 // SetCode sets the "code" field.
 func (u *CodingSubmissionUpsert) SetCode(v string) *CodingSubmissionUpsert {
 	u.Set(codingsubmission.FieldCode, v)
@@ -383,6 +472,9 @@ func (u *CodingSubmissionUpsert) UpdateStatus() *CodingSubmissionUpsert {
 func (u *CodingSubmissionUpsertOne) UpdateNewValues() *CodingSubmissionUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.CreateTime(); exists {
+			s.SetIgnore(codingsubmission.FieldCreateTime)
+		}
 		if _, exists := u.create.mutation.Code(); exists {
 			s.SetIgnore(codingsubmission.FieldCode)
 		}
@@ -416,6 +508,34 @@ func (u *CodingSubmissionUpsertOne) Update(set func(*CodingSubmissionUpsert)) *C
 		set(&CodingSubmissionUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetCreateTime sets the "create_time" field.
+func (u *CodingSubmissionUpsertOne) SetCreateTime(v time.Time) *CodingSubmissionUpsertOne {
+	return u.Update(func(s *CodingSubmissionUpsert) {
+		s.SetCreateTime(v)
+	})
+}
+
+// UpdateCreateTime sets the "create_time" field to the value that was provided on create.
+func (u *CodingSubmissionUpsertOne) UpdateCreateTime() *CodingSubmissionUpsertOne {
+	return u.Update(func(s *CodingSubmissionUpsert) {
+		s.UpdateCreateTime()
+	})
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (u *CodingSubmissionUpsertOne) SetUpdateTime(v time.Time) *CodingSubmissionUpsertOne {
+	return u.Update(func(s *CodingSubmissionUpsert) {
+		s.SetUpdateTime(v)
+	})
+}
+
+// UpdateUpdateTime sets the "update_time" field to the value that was provided on create.
+func (u *CodingSubmissionUpsertOne) UpdateUpdateTime() *CodingSubmissionUpsertOne {
+	return u.Update(func(s *CodingSubmissionUpsert) {
+		s.UpdateUpdateTime()
+	})
 }
 
 // SetCode sets the "code" field.
@@ -577,7 +697,7 @@ func (cscb *CodingSubmissionCreateBulk) ExecX(ctx context.Context) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.CodingSubmissionUpsert) {
-//			SetCode(v+v).
+//			SetCreateTime(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -621,6 +741,9 @@ func (u *CodingSubmissionUpsertBulk) UpdateNewValues() *CodingSubmissionUpsertBu
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
 		for _, b := range u.create.builders {
+			if _, exists := b.mutation.CreateTime(); exists {
+				s.SetIgnore(codingsubmission.FieldCreateTime)
+			}
 			if _, exists := b.mutation.Code(); exists {
 				s.SetIgnore(codingsubmission.FieldCode)
 			}
@@ -655,6 +778,34 @@ func (u *CodingSubmissionUpsertBulk) Update(set func(*CodingSubmissionUpsert)) *
 		set(&CodingSubmissionUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetCreateTime sets the "create_time" field.
+func (u *CodingSubmissionUpsertBulk) SetCreateTime(v time.Time) *CodingSubmissionUpsertBulk {
+	return u.Update(func(s *CodingSubmissionUpsert) {
+		s.SetCreateTime(v)
+	})
+}
+
+// UpdateCreateTime sets the "create_time" field to the value that was provided on create.
+func (u *CodingSubmissionUpsertBulk) UpdateCreateTime() *CodingSubmissionUpsertBulk {
+	return u.Update(func(s *CodingSubmissionUpsert) {
+		s.UpdateCreateTime()
+	})
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (u *CodingSubmissionUpsertBulk) SetUpdateTime(v time.Time) *CodingSubmissionUpsertBulk {
+	return u.Update(func(s *CodingSubmissionUpsert) {
+		s.SetUpdateTime(v)
+	})
+}
+
+// UpdateUpdateTime sets the "update_time" field to the value that was provided on create.
+func (u *CodingSubmissionUpsertBulk) UpdateUpdateTime() *CodingSubmissionUpsertBulk {
+	return u.Update(func(s *CodingSubmissionUpsert) {
+		s.UpdateUpdateTime()
+	})
 }
 
 // SetCode sets the "code" field.

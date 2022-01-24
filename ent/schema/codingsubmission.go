@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
+	"entgo.io/ent/schema/mixin"
 )
 
 // CodingSubmission holds the schema definition for the CodingSubmission entity.
@@ -40,6 +41,12 @@ func (CodingSubmission) Edges() []ent.Edge {
 		edge.To("author", User.Type).Required().Unique().Annotations(entgql.Bind()),
 		edge.To("coding_problem", CodingProblem.Type).Required().Unique().Annotations(entgql.Bind()),
 		edge.From("staff_data", CodingSubmissionStaffData.Type).Ref("coding_submission").Unique().Annotations(entgql.Bind()),
+	}
+}
+
+func (CodingSubmission) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		mixin.Time{},
 	}
 }
 

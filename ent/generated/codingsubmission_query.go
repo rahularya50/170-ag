@@ -363,12 +363,12 @@ func (csq *CodingSubmissionQuery) WithStaffData(opts ...func(*CodingSubmissionSt
 // Example:
 //
 //	var v []struct {
-//		Code string `json:"code,omitempty"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.CodingSubmission.Query().
-//		GroupBy(codingsubmission.FieldCode).
+//		GroupBy(codingsubmission.FieldCreateTime).
 //		Aggregate(generated.Count()).
 //		Scan(ctx, &v)
 //
@@ -390,11 +390,11 @@ func (csq *CodingSubmissionQuery) GroupBy(field string, fields ...string) *Codin
 // Example:
 //
 //	var v []struct {
-//		Code string `json:"code,omitempty"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //	}
 //
 //	client.CodingSubmission.Query().
-//		Select(codingsubmission.FieldCode).
+//		Select(codingsubmission.FieldCreateTime).
 //		Scan(ctx, &v)
 //
 func (csq *CodingSubmissionQuery) Select(fields ...string) *CodingSubmissionSelect {
