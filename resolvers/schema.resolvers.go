@@ -110,16 +110,21 @@ func (r *mutationResolver) CreateSubmission(ctx context.Context, input model.Cod
 	test_case_data, err := tx.CodingProblem.Query().
 		Where(codingproblem.ID(input.ProblemID)).
 		QueryTestCases().
-		Order(ent.Asc(codingtestcase.FieldID)).
+		Order(ent.Asc(codingtestcase.FieldCreateTime)).
 		QueryData().
 		All(submission_ctx)
 	if err != nil {
 		return nil, err
 	}
 
+	inputData, err := site.GenerateInput(test_case_data)
+	if err != nil {
+		return nil, err
+	}
+
 	err = tx.CodingSubmissionStaffData.Create().
 		SetCodingSubmission(submission).
-		SetInput(test_case_data[0].Input). // TODO: concat test cases, some way of ordering them!
+		SetInput(inputData).
 		Exec(submission_ctx)
 	if err != nil {
 		return nil, err

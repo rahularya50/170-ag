@@ -4,6 +4,7 @@ import (
 	"170-ag/proto/schemas"
 	"context"
 	"os/exec"
+	"strings"
 )
 
 func JudgeLoadedRequest(ctx context.Context) error {
@@ -12,7 +13,8 @@ func JudgeLoadedRequest(ctx context.Context) error {
 		return err
 	}
 	cmd := exec.Command("python3", "-c", request.GetCode())
-	stdout, err := cmd.Output() // TODO: handle err, stderr, inputs
+	cmd.Stdin = strings.NewReader(request.Input)
+	stdout, err := cmd.Output()
 	exit_err, _ := err.(*exec.ExitError)
 	var stderr string
 	var errorCode string

@@ -108,7 +108,7 @@ func (s *ScalerServer) GetJudgingRequest(ctx context.Context, _ *schemas.GetJudg
 	}
 	return &schemas.JudgingRequest{
 		Code:    submission.Code,
-		Input:   "",
+		Input:   staff_data.Input,
 		IdNonce: uint64(*staff_data.ExecutionID),
 	}, nil
 }

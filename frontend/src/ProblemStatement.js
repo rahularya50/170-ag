@@ -8,7 +8,7 @@ import * as React from "react";
 import { useState } from "react";
 import graphql from "babel-plugin-relay/macro";
 import { useFragment, useMutation } from "react-relay/hooks";
-import { Button, Col, Form, Row, Spinner } from "react-bootstrap";
+import { Button, Col, Form, Row } from "react-bootstrap";
 import ReactMarkdown from "react-markdown";
 import LoadingButton from "./LoadingButton";
 
