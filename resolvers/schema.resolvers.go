@@ -46,6 +46,13 @@ func (r *codingSubmissionStaffDataResolver) ExecutionID(ctx context.Context, obj
 	return &s, nil
 }
 
+func (r *codingTestCaseResolver) PublicData(ctx context.Context, obj *ent.CodingTestCase) (*ent.CodingTestCaseData, error) {
+	if obj.Public {
+		return obj.QueryData().Only(ctx)
+	}
+	return nil, nil
+}
+
 func (r *mutationResolver) NewUser(ctx context.Context, name string) (*ent.User, error) {
 	return r.client.User.Create().SetName(name).Save(ctx)
 }
@@ -256,6 +263,11 @@ func (r *Resolver) CodingSubmissionStaffData() resolvers.CodingSubmissionStaffDa
 	return &codingSubmissionStaffDataResolver{r}
 }
 
+// CodingTestCase returns resolvers.CodingTestCaseResolver implementation.
+func (r *Resolver) CodingTestCase() resolvers.CodingTestCaseResolver {
+	return &codingTestCaseResolver{r}
+}
+
 // Mutation returns resolvers.MutationResolver implementation.
 func (r *Resolver) Mutation() resolvers.MutationResolver { return &mutationResolver{r} }
 
@@ -264,5 +276,6 @@ func (r *Resolver) Query() resolvers.QueryResolver { return &queryResolver{r} }
 
 type codingProblemResolver struct{ *Resolver }
 type codingSubmissionStaffDataResolver struct{ *Resolver }
+type codingTestCaseResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

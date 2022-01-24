@@ -4,8 +4,7 @@ import * as React from "react";
 import { useState } from "react";
 import graphql from "babel-plugin-relay/macro";
 import { useLazyLoadQuery } from "react-relay/hooks";
-import { Form, Table } from "react-bootstrap";
-import { generatePath, Link } from "react-router-dom";
+import { Form } from "react-bootstrap";
 import ProblemTable from "./ProblemTable";
 
 export default function Problems(): React.Node {

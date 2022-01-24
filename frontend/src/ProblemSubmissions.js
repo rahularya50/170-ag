@@ -6,7 +6,6 @@ import graphql from "babel-plugin-relay/macro";
 import {
   fetchQuery,
   useFragment,
-  useRefetchableFragment,
   useRelayEnvironment,
 } from "react-relay/hooks";
 import useInterval from "use-interval";

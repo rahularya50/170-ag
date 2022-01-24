@@ -11,7 +11,6 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Problems from "./Problems";
 import { LinkContainer } from "react-router-bootstrap";
 import Problem from "./Problem";
-import { useParams } from "react-router-dom";
 
 export default function App(): React.Node {
   const { viewer } = useLazyLoadQuery(
