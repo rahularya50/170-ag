@@ -159,7 +159,7 @@ func (r *mutationResolver) AddTestCase(ctx context.Context, input model.CreateTe
 	if err = tx.Commit(); err != nil {
 		return nil, err
 	}
-	return test_case, nil
+	return test_case.Unwrap(), nil
 }
 
 func (r *mutationResolver) UpdateTestCase(ctx context.Context, input model.UpdateTestCaseInput) (*ent.CodingTestCase, error) {

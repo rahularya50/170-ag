@@ -10,6 +10,7 @@ import graphql from "babel-plugin-relay/macro";
 import { useFragment, useMutation } from "react-relay/hooks";
 import { Button, Col, Form, Row, Spinner } from "react-bootstrap";
 import ReactMarkdown from "react-markdown";
+import LoadingButton from "./LoadingButton";
 
 type Props = {
   viewer: ProblemStatement_viewer$key,
@@ -124,21 +125,13 @@ export default function ProblemStatement(props: Props): React.Node {
       <p>
         {isStaff &&
           (isEditing ? (
-            <Button onClick={handleSave} disabled={isUpdating}>
-              {isUpdating ? (
-                <Spinner
-                  as="span"
-                  animation="border"
-                  size="sm"
-                  role="status"
-                  aria-hidden="true"
-                />
-              ) : (
-                "Save"
-              )}
-            </Button>
+            <LoadingButton onClick={handleSave} isUpdating={isUpdating}>
+              Save
+            </LoadingButton>
           ) : (
-            <Button onClick={() => setIsEditing(true)}>Edit</Button>
+            <Button onClick={() => setIsEditing(true)} size="sm">
+              Edit
+            </Button>
           ))}
       </p>
     </>

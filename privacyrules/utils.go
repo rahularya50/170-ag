@@ -44,6 +44,18 @@ func DenyQueryIfSubPolicyFails(rules ...privacy.QueryRule) privacy.QueryRule {
 	})
 }
 
+func deduplicate(x []int) []int {
+	out := []int{}
+	vals := map[int]struct{}{}
+	for _, v := range x {
+		if _, contained := vals[v]; !contained {
+			out = append(out, v)
+			vals[v] = struct{}{}
+		}
+	}
+	return out
+}
+
 func AllowQueryIfDelegatesVisible(
 	getDelegateIDs func(allow_ctx context.Context, q ent.Query) ([]int, error),
 	verifyDelegateIDs func(client *ent.Client, ctx context.Context, ids []int) ([]int, error),
@@ -55,7 +67,7 @@ func AllowQueryIfDelegatesVisible(
 			return privacy.Skip
 		}
 		verifiedIDs, err := verifyDelegateIDs(site.EntClientFromContext(c), c, delegateIDs)
-		if err != nil || len(delegateIDs) != len(verifiedIDs) /* make sure nothing got filtered */ {
+		if err != nil || len(deduplicate(delegateIDs)) != len(deduplicate(verifiedIDs)) /* make sure nothing got filtered */ {
 			return privacy.Skip
 		}
 		return privacy.Allow

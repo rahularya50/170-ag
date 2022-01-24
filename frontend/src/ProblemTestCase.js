@@ -1,24 +1,25 @@
 // @flow
 
-import type { TestCase_viewer$key } from "./__generated__/TestCase_viewer.graphql";
-import type { TestCase_testCase$key } from "./__generated__/TestCase_testCase.graphql";
-import type { TestCaseUpdateMutation } from "./__generated__/TestCaseUpdateMutation.graphql";
+import type { ProblemTestCase_viewer$key } from "./__generated__/ProblemTestCase_viewer.graphql";
+import type { ProblemTestCase_testCase$key } from "./__generated__/ProblemTestCase_testCase.graphql";
+import type { ProblemTestCaseUpdateMutation } from "./__generated__/ProblemTestCaseUpdateMutation.graphql";
 
 import * as React from "react";
 import { useState } from "react";
 import graphql from "babel-plugin-relay/macro";
 import { useFragment, useMutation } from "react-relay/hooks";
-import { Button, Form, Spinner } from "react-bootstrap";
+import { Button, Form, Stack } from "react-bootstrap";
+import LoadingButton from "./LoadingButton";
 
 type Props = {
-  viewer: TestCase_viewer$key,
-  testCase: TestCase_testCase$key,
+  viewer: ProblemTestCase_viewer$key,
+  testCase: ProblemTestCase_testCase$key,
 };
 
 export default function TestCase(props: Props): React.Node {
   const { is_staff: isStaff } = useFragment(
     graphql`
-      fragment TestCase_viewer on User {
+      fragment ProblemTestCase_viewer on User {
         is_staff
       }
     `,
@@ -27,7 +28,7 @@ export default function TestCase(props: Props): React.Node {
 
   const testCase = useFragment(
     graphql`
-      fragment TestCase_testCase on CodingTestCase {
+      fragment ProblemTestCase_testCase on CodingTestCase {
         id
         points
         public
@@ -41,10 +42,19 @@ export default function TestCase(props: Props): React.Node {
   );
 
   const [updateTestCase, isUpdating] =
-    useMutation<TestCaseUpdateMutation>(graphql`
-      mutation TestCaseUpdateMutation($input: UpdateTestCaseInput!) {
+    useMutation<ProblemTestCaseUpdateMutation>(graphql`
+      mutation ProblemTestCaseUpdateMutation($input: UpdateTestCaseInput!) {
         update_test_case(input: $input) {
-          ...TestCase_testCase
+          ...ProblemTestCase_testCase
+        }
+      }
+    `);
+
+  const [deleteTestCase, isDeleting] =
+    useMutation<ProblemTestCaseUpdateMutation>(graphql`
+      mutation ProblemTestCaseDeleteMutation($input: DeleteTestCaseInput!) {
+        delete_test_case(input: $input) {
+          ...ProblemTestCases_problem
         }
       }
     `);
@@ -65,6 +75,19 @@ export default function TestCase(props: Props): React.Node {
       },
       onCompleted: () => {
         setIsEditing(false);
+      },
+      onError: (err) => {
+        alert(err);
+      },
+    });
+  };
+
+  const handleDelete = () => {
+    deleteTestCase({
+      variables: {
+        input: {
+          id: testCase.id,
+        },
       },
       onError: (err) => {
         alert(err);
@@ -112,21 +135,27 @@ export default function TestCase(props: Props): React.Node {
       <p>
         {isStaff &&
           (isEditing ? (
-            <Button onClick={handleSave} disabled={isUpdating}>
-              {isUpdating ? (
-                <Spinner
-                  as="span"
-                  animation="border"
-                  size="sm"
-                  role="status"
-                  aria-hidden="true"
-                />
-              ) : (
-                "Save"
-              )}
-            </Button>
+            <Stack direction="horizontal" gap={1}>
+              <LoadingButton
+                isUpdating={isUpdating}
+                onClick={handleSave}
+                size="sm"
+              >
+                Save
+              </LoadingButton>
+              <LoadingButton
+                isUpdating={isDeleting}
+                onClick={handleDelete}
+                size="sm"
+                variant="danger"
+              >
+                Delete
+              </LoadingButton>
+            </Stack>
           ) : (
-            <Button onClick={() => setIsEditing(true)}>Edit</Button>
+            <Button onClick={() => setIsEditing(true)} size="sm">
+              Edit
+            </Button>
           ))}
       </p>
     </div>

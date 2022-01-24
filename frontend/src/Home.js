@@ -28,7 +28,7 @@ export default function Home(): React.Node {
           will have opinions on what to put here?
         </p>
         <p className="col-md-8 fs-4">
-          {viewer?.name && <>Welcome, {viewer?.name}!</>}
+          {viewer?.name != null && <>Welcome, {viewer.name}!</>}
         </p>
         {!viewer && <LoginButton />}
       </Container>

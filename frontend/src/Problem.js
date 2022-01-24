@@ -9,7 +9,7 @@ import { Col, Container, Row } from "react-bootstrap";
 import ProblemEditor from "./ProblemEditor";
 import ProblemSubmissions from "./ProblemSubmissions";
 import ProblemStatement from "./ProblemStatement";
-import TestCase from "./TestCase";
+import ProblemTestCases from "./ProblemTestCases";
 
 export default function Problem(): React.Node {
   const { id } = useParams();
@@ -19,14 +19,11 @@ export default function Problem(): React.Node {
       query ProblemQuery($id: ID!) {
         viewer {
           ...ProblemStatement_viewer
-          ...TestCase_viewer
+          ...ProblemTestCases_viewer
         }
         coding_problem(id: $id) {
-          test_cases {
-            id
-            ...TestCase_testCase
-          }
           ...ProblemStatement_problem
+          ...ProblemTestCases_problem
           ...ProblemSubmissions_problem
           ...ProblemEditor_problem
         }
@@ -39,21 +36,12 @@ export default function Problem(): React.Node {
     return <Navigate to="404" />;
   }
 
-  <TestCase
-    key={coding_problem.test_cases[0].id}
-    viewer={viewer}
-    testCase={coding_problem.test_cases[0]}
-  />;
-
   return (
     <Container>
       <Row>
         <Col>
           <ProblemStatement viewer={viewer} problem={coding_problem} />
-          <h3>Test Cases</h3>
-          {coding_problem.test_cases.map((testCase) => (
-            <TestCase key={testCase.id} viewer={viewer} testCase={testCase} />
-          ))}
+          <ProblemTestCases viewer={viewer} problem={coding_problem} />
           <Link to="/problems/">(Back to all problems)</Link>
           <ProblemSubmissions problem={coding_problem} />
         </Col>
