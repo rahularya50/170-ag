@@ -30,12 +30,6 @@ func (csu *CodingSubmissionUpdate) Where(ps ...predicate.CodingSubmission) *Codi
 	return csu
 }
 
-// SetCode sets the "code" field.
-func (csu *CodingSubmissionUpdate) SetCode(s string) *CodingSubmissionUpdate {
-	csu.mutation.SetCode(s)
-	return csu
-}
-
 // SetStatus sets the "status" field.
 func (csu *CodingSubmissionUpdate) SetStatus(c codingsubmission.Status) *CodingSubmissionUpdate {
 	csu.mutation.SetStatus(c)
@@ -208,13 +202,6 @@ func (csu *CodingSubmissionUpdate) sqlSave(ctx context.Context) (n int, err erro
 			}
 		}
 	}
-	if value, ok := csu.mutation.Code(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: codingsubmission.FieldCode,
-		})
-	}
 	if value, ok := csu.mutation.Status(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeEnum,
@@ -344,12 +331,6 @@ type CodingSubmissionUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *CodingSubmissionMutation
-}
-
-// SetCode sets the "code" field.
-func (csuo *CodingSubmissionUpdateOne) SetCode(s string) *CodingSubmissionUpdateOne {
-	csuo.mutation.SetCode(s)
-	return csuo
 }
 
 // SetStatus sets the "status" field.
@@ -547,13 +528,6 @@ func (csuo *CodingSubmissionUpdateOne) sqlSave(ctx context.Context) (_node *Codi
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := csuo.mutation.Code(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: codingsubmission.FieldCode,
-		})
 	}
 	if value, ok := csuo.mutation.Status(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{

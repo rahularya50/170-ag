@@ -8,6 +8,7 @@ import (
 	"170-ag/ent/generated/codingdraft"
 	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/codingsubmission"
+	"170-ag/ent/generated/codingtestcase"
 	"170-ag/ent/generated/user"
 	"170-ag/privacyrules"
 	resolvers "170-ag/resolvers/generated"
@@ -116,11 +117,9 @@ func (r *mutationResolver) CreateSubmission(ctx context.Context, input model.Cod
 		return nil, err
 	}
 
-	err = tx.Commit()
-	if err != nil {
+	if err = tx.Commit(); err != nil {
 		return nil, err
 	}
-
 	return submission.Unwrap(), nil
 }
 
@@ -134,6 +133,84 @@ func (r *mutationResolver) UpdateProblem(ctx context.Context, input model.Update
 		SetStatement(input.Problem.Statement).
 		SetReleased(input.Problem.Released).
 		Save(ctx)
+}
+
+func (r *mutationResolver) AddTestCase(ctx context.Context, input model.CreateTestCaseInput) (*ent.CodingTestCase, error) {
+	tx, err := r.client.Tx(ctx)
+	defer tx.Rollback()
+	if err != nil {
+		return nil, err
+	}
+	test_case, err := tx.CodingTestCase.Create().SetCodingProblemID(input.ProblemID).Save(ctx)
+	if err != nil {
+		return nil, err
+	}
+	err = tx.CodingTestCaseData.Create().SetTestCase(test_case).Exec(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if err = tx.Commit(); err != nil {
+		return nil, err
+	}
+	return test_case, nil
+}
+
+func (r *mutationResolver) UpdateTestCase(ctx context.Context, input model.UpdateTestCaseInput) (*ent.CodingTestCase, error) {
+	tx, err := r.client.Tx(ctx)
+	defer tx.Rollback()
+	if err != nil {
+		return nil, err
+	}
+	test_case, err := tx.CodingTestCase.Get(ctx, input.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := test_case.QueryData().Only(ctx)
+	if err != nil {
+		return nil, err
+	}
+	data_updater := data.Update()
+	if input.Input != nil {
+		data_updater.SetInput(*input.Input)
+	}
+	if input.Output != nil {
+		data_updater.SetOutput(*input.Output)
+	}
+	err = data_updater.Exec(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	case_updater := test_case.Update()
+	if input.Points != nil {
+		case_updater.SetPoints(*input.Points)
+	}
+	if input.Public != nil {
+		case_updater.SetPublic(*input.Public)
+	}
+
+	test_case, err = case_updater.Save(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = tx.Commit(); err != nil {
+		return nil, err
+	}
+	return test_case.Unwrap(), nil
+}
+
+func (r *mutationResolver) DeleteTestCase(ctx context.Context, input model.DeleteTestCaseInput) (*ent.CodingProblem, error) {
+	problem, err := r.client.CodingTestCase.Query().Where(codingtestcase.ID(input.ID)).QueryCodingProblem().Only(ctx)
+	if err != nil {
+		return nil, err
+	}
+	err = r.client.CodingTestCase.DeleteOneID(input.ID).Exec(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return problem, nil
 }
 
 func (r *queryResolver) Viewer(ctx context.Context) (*ent.User, error) {

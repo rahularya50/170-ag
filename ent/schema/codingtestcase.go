@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
@@ -21,8 +22,8 @@ type CodingTestCase struct {
 // Fields of the CodingTestCase.
 func (CodingTestCase) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("points").NonNegative(),
-		field.Bool("public"),
+		field.Int("points").NonNegative().Default(0),
+		field.Bool("public").Default(false),
 	}
 }
 
@@ -37,7 +38,10 @@ func (CodingTestCase) Edges() []ent.Edge {
 		edge.From("data", CodingTestCaseData.Type).
 			Unique().
 			Ref("test_case").
-			Annotations(entgql.Bind()),
+			Annotations(
+				entgql.Bind(),
+				entsql.Annotation{OnDelete: entsql.Cascade},
+			),
 	}
 }
 

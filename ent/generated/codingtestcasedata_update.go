@@ -34,9 +34,25 @@ func (ctcdu *CodingTestCaseDataUpdate) SetInput(s string) *CodingTestCaseDataUpd
 	return ctcdu
 }
 
+// SetNillableInput sets the "input" field if the given value is not nil.
+func (ctcdu *CodingTestCaseDataUpdate) SetNillableInput(s *string) *CodingTestCaseDataUpdate {
+	if s != nil {
+		ctcdu.SetInput(*s)
+	}
+	return ctcdu
+}
+
 // SetOutput sets the "output" field.
 func (ctcdu *CodingTestCaseDataUpdate) SetOutput(s string) *CodingTestCaseDataUpdate {
 	ctcdu.mutation.SetOutput(s)
+	return ctcdu
+}
+
+// SetNillableOutput sets the "output" field if the given value is not nil.
+func (ctcdu *CodingTestCaseDataUpdate) SetNillableOutput(s *string) *CodingTestCaseDataUpdate {
+	if s != nil {
+		ctcdu.SetOutput(*s)
+	}
 	return ctcdu
 }
 
@@ -222,9 +238,25 @@ func (ctcduo *CodingTestCaseDataUpdateOne) SetInput(s string) *CodingTestCaseDat
 	return ctcduo
 }
 
+// SetNillableInput sets the "input" field if the given value is not nil.
+func (ctcduo *CodingTestCaseDataUpdateOne) SetNillableInput(s *string) *CodingTestCaseDataUpdateOne {
+	if s != nil {
+		ctcduo.SetInput(*s)
+	}
+	return ctcduo
+}
+
 // SetOutput sets the "output" field.
 func (ctcduo *CodingTestCaseDataUpdateOne) SetOutput(s string) *CodingTestCaseDataUpdateOne {
 	ctcduo.mutation.SetOutput(s)
+	return ctcduo
+}
+
+// SetNillableOutput sets the "output" field if the given value is not nil.
+func (ctcduo *CodingTestCaseDataUpdateOne) SetNillableOutput(s *string) *CodingTestCaseDataUpdateOne {
+	if s != nil {
+		ctcduo.SetOutput(*s)
+	}
 	return ctcduo
 }
 

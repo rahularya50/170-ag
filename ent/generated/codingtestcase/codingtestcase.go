@@ -75,6 +75,10 @@ func ValidColumn(column string) bool {
 var (
 	Hooks  [1]ent.Hook
 	Policy ent.Policy
+	// DefaultPoints holds the default value on creation for the "points" field.
+	DefaultPoints int
 	// PointsValidator is a validator for the "points" field. It is called by the builders before save.
 	PointsValidator func(int) error
+	// DefaultPublic holds the default value on creation for the "public" field.
+	DefaultPublic bool
 )

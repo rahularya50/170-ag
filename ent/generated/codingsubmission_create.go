@@ -170,6 +170,11 @@ func (csc *CodingSubmissionCreate) check() error {
 	if _, ok := csc.mutation.Code(); !ok {
 		return &ValidationError{Name: "code", err: errors.New(`generated: missing required field "CodingSubmission.code"`)}
 	}
+	if v, ok := csc.mutation.Code(); ok {
+		if err := codingsubmission.CodeValidator(v); err != nil {
+			return &ValidationError{Name: "code", err: fmt.Errorf(`generated: validator failed for field "CodingSubmission.code": %w`, err)}
+		}
+	}
 	if _, ok := csc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`generated: missing required field "CodingSubmission.status"`)}
 	}
@@ -377,6 +382,11 @@ func (u *CodingSubmissionUpsert) UpdateStatus() *CodingSubmissionUpsert {
 //
 func (u *CodingSubmissionUpsertOne) UpdateNewValues() *CodingSubmissionUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.Code(); exists {
+			s.SetIgnore(codingsubmission.FieldCode)
+		}
+	}))
 	return u
 }
 
@@ -609,6 +619,13 @@ type CodingSubmissionUpsertBulk struct {
 //
 func (u *CodingSubmissionUpsertBulk) UpdateNewValues() *CodingSubmissionUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.Code(); exists {
+				s.SetIgnore(codingsubmission.FieldCode)
+			}
+		}
+	}))
 	return u
 }
 

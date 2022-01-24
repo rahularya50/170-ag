@@ -23,7 +23,7 @@ type CodingSubmission struct {
 // Fields of the CodingSubmission.
 func (CodingSubmission) Fields() []ent.Field {
 	return []ent.Field{
-		field.Text("code"),
+		field.Text("code").Immutable().MaxLen(65535),
 		field.Enum("status").
 			NamedValues(
 				"Queued", "QUEUED",

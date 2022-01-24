@@ -54,4 +54,8 @@ func ValidColumn(column string) bool {
 var (
 	Hooks  [1]ent.Hook
 	Policy ent.Policy
+	// DefaultInput holds the default value on creation for the "input" field.
+	DefaultInput string
+	// DefaultOutput holds the default value on creation for the "output" field.
+	DefaultOutput string
 )

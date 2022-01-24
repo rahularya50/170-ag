@@ -58,7 +58,7 @@ var (
 	// CodingSubmissionsColumns holds the columns for the "coding_submissions" table.
 	CodingSubmissionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "code", Type: field.TypeString, Size: 2147483647},
+		{Name: "code", Type: field.TypeString, Size: 65535},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"QUEUED", "RUNNING", "COMPLETED"}, Default: "QUEUED"},
 		{Name: "coding_submission_author", Type: field.TypeInt, Nullable: true},
 		{Name: "coding_submission_coding_problem", Type: field.TypeInt, Nullable: true},
@@ -132,8 +132,8 @@ var (
 	// CodingTestCasesColumns holds the columns for the "coding_test_cases" table.
 	CodingTestCasesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "points", Type: field.TypeInt},
-		{Name: "public", Type: field.TypeBool},
+		{Name: "points", Type: field.TypeInt, Default: 0},
+		{Name: "public", Type: field.TypeBool, Default: false},
 		{Name: "coding_problem_test_cases", Type: field.TypeInt, Nullable: true},
 		{Name: "coding_test_case_data_test_case", Type: field.TypeInt, Unique: true, Nullable: true},
 	}
@@ -160,8 +160,8 @@ var (
 	// CodingTestCaseDataColumns holds the columns for the "coding_test_case_data" table.
 	CodingTestCaseDataColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "input", Type: field.TypeString, Size: 2147483647},
-		{Name: "output", Type: field.TypeString, Size: 2147483647},
+		{Name: "input", Type: field.TypeString, Size: 2147483647, Default: "0\n"},
+		{Name: "output", Type: field.TypeString, Size: 2147483647, Default: ""},
 	}
 	// CodingTestCaseDataTable holds the schema information for the "coding_test_case_data" table.
 	CodingTestCaseDataTable = &schema.Table{

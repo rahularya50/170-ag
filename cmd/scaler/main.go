@@ -142,7 +142,9 @@ func (s *ScalerServer) SubmitGradingResponse(ctx context.Context, response *sche
 		return nil, err
 	}
 	// TODO: actually grade the output against the input
-	tx.Commit()
+	if err = tx.Commit(); err != nil {
+		return nil, err
+	}
 	return &schemas.GradingReply{}, nil
 }
 

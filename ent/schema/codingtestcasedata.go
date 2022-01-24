@@ -21,8 +21,8 @@ type CodingTestCaseData struct {
 // Fields of the CodingTestCaseData.
 func (CodingTestCaseData) Fields() []ent.Field {
 	return []ent.Field{
-		field.Text("input"),
-		field.Text("output"),
+		field.Text("input").Default("0\n"),
+		field.Text("output").Default(""),
 	}
 }
 

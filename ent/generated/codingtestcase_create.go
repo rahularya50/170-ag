@@ -29,9 +29,25 @@ func (ctcc *CodingTestCaseCreate) SetPoints(i int) *CodingTestCaseCreate {
 	return ctcc
 }
 
+// SetNillablePoints sets the "points" field if the given value is not nil.
+func (ctcc *CodingTestCaseCreate) SetNillablePoints(i *int) *CodingTestCaseCreate {
+	if i != nil {
+		ctcc.SetPoints(*i)
+	}
+	return ctcc
+}
+
 // SetPublic sets the "public" field.
 func (ctcc *CodingTestCaseCreate) SetPublic(b bool) *CodingTestCaseCreate {
 	ctcc.mutation.SetPublic(b)
+	return ctcc
+}
+
+// SetNillablePublic sets the "public" field if the given value is not nil.
+func (ctcc *CodingTestCaseCreate) SetNillablePublic(b *bool) *CodingTestCaseCreate {
+	if b != nil {
+		ctcc.SetPublic(*b)
+	}
 	return ctcc
 }
 
@@ -76,6 +92,9 @@ func (ctcc *CodingTestCaseCreate) Save(ctx context.Context) (*CodingTestCase, er
 		err  error
 		node *CodingTestCase
 	)
+	if err := ctcc.defaults(); err != nil {
+		return nil, err
+	}
 	if len(ctcc.hooks) == 0 {
 		if err = ctcc.check(); err != nil {
 			return nil, err
@@ -131,6 +150,19 @@ func (ctcc *CodingTestCaseCreate) ExecX(ctx context.Context) {
 	if err := ctcc.Exec(ctx); err != nil {
 		panic(err)
 	}
+}
+
+// defaults sets the default values of the builder before save.
+func (ctcc *CodingTestCaseCreate) defaults() error {
+	if _, ok := ctcc.mutation.Points(); !ok {
+		v := codingtestcase.DefaultPoints
+		ctcc.mutation.SetPoints(v)
+	}
+	if _, ok := ctcc.mutation.Public(); !ok {
+		v := codingtestcase.DefaultPublic
+		ctcc.mutation.SetPublic(v)
+	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -442,6 +474,7 @@ func (ctccb *CodingTestCaseCreateBulk) Save(ctx context.Context) ([]*CodingTestC
 	for i := range ctccb.builders {
 		func(i int, root context.Context) {
 			builder := ctccb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*CodingTestCaseMutation)
 				if !ok {

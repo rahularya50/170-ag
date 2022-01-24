@@ -28,9 +28,25 @@ func (ctcdc *CodingTestCaseDataCreate) SetInput(s string) *CodingTestCaseDataCre
 	return ctcdc
 }
 
+// SetNillableInput sets the "input" field if the given value is not nil.
+func (ctcdc *CodingTestCaseDataCreate) SetNillableInput(s *string) *CodingTestCaseDataCreate {
+	if s != nil {
+		ctcdc.SetInput(*s)
+	}
+	return ctcdc
+}
+
 // SetOutput sets the "output" field.
 func (ctcdc *CodingTestCaseDataCreate) SetOutput(s string) *CodingTestCaseDataCreate {
 	ctcdc.mutation.SetOutput(s)
+	return ctcdc
+}
+
+// SetNillableOutput sets the "output" field if the given value is not nil.
+func (ctcdc *CodingTestCaseDataCreate) SetNillableOutput(s *string) *CodingTestCaseDataCreate {
+	if s != nil {
+		ctcdc.SetOutput(*s)
+	}
 	return ctcdc
 }
 
@@ -56,6 +72,9 @@ func (ctcdc *CodingTestCaseDataCreate) Save(ctx context.Context) (*CodingTestCas
 		err  error
 		node *CodingTestCaseData
 	)
+	if err := ctcdc.defaults(); err != nil {
+		return nil, err
+	}
 	if len(ctcdc.hooks) == 0 {
 		if err = ctcdc.check(); err != nil {
 			return nil, err
@@ -111,6 +130,19 @@ func (ctcdc *CodingTestCaseDataCreate) ExecX(ctx context.Context) {
 	if err := ctcdc.Exec(ctx); err != nil {
 		panic(err)
 	}
+}
+
+// defaults sets the default values of the builder before save.
+func (ctcdc *CodingTestCaseDataCreate) defaults() error {
+	if _, ok := ctcdc.mutation.Input(); !ok {
+		v := codingtestcasedata.DefaultInput
+		ctcdc.mutation.SetInput(v)
+	}
+	if _, ok := ctcdc.mutation.Output(); !ok {
+		v := codingtestcasedata.DefaultOutput
+		ctcdc.mutation.SetOutput(v)
+	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -383,6 +415,7 @@ func (ctcdcb *CodingTestCaseDataCreateBulk) Save(ctx context.Context) ([]*Coding
 	for i := range ctcdcb.builders {
 		func(i int, root context.Context) {
 			builder := ctcdcb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*CodingTestCaseDataMutation)
 				if !ok {

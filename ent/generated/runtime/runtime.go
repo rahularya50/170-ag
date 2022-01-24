@@ -80,6 +80,10 @@ func init() {
 	}
 	codingsubmissionFields := schema.CodingSubmission{}.Fields()
 	_ = codingsubmissionFields
+	// codingsubmissionDescCode is the schema descriptor for code field.
+	codingsubmissionDescCode := codingsubmissionFields[0].Descriptor()
+	// codingsubmission.CodeValidator is a validator for the "code" field. It is called by the builders before save.
+	codingsubmission.CodeValidator = codingsubmissionDescCode.Validators[0].(func(string) error)
 	codingsubmissionstaffdata.Policy = privacy.NewPolicies(schema.CodingSubmissionStaffData{})
 	codingsubmissionstaffdata.Hooks[0] = func(next ent.Mutator) ent.Mutator {
 		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
@@ -116,8 +120,14 @@ func init() {
 	_ = codingtestcaseFields
 	// codingtestcaseDescPoints is the schema descriptor for points field.
 	codingtestcaseDescPoints := codingtestcaseFields[0].Descriptor()
+	// codingtestcase.DefaultPoints holds the default value on creation for the points field.
+	codingtestcase.DefaultPoints = codingtestcaseDescPoints.Default.(int)
 	// codingtestcase.PointsValidator is a validator for the "points" field. It is called by the builders before save.
 	codingtestcase.PointsValidator = codingtestcaseDescPoints.Validators[0].(func(int) error)
+	// codingtestcaseDescPublic is the schema descriptor for public field.
+	codingtestcaseDescPublic := codingtestcaseFields[1].Descriptor()
+	// codingtestcase.DefaultPublic holds the default value on creation for the public field.
+	codingtestcase.DefaultPublic = codingtestcaseDescPublic.Default.(bool)
 	codingtestcasedata.Policy = privacy.NewPolicies(schema.CodingTestCaseData{})
 	codingtestcasedata.Hooks[0] = func(next ent.Mutator) ent.Mutator {
 		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
@@ -127,6 +137,16 @@ func init() {
 			return next.Mutate(ctx, m)
 		})
 	}
+	codingtestcasedataFields := schema.CodingTestCaseData{}.Fields()
+	_ = codingtestcasedataFields
+	// codingtestcasedataDescInput is the schema descriptor for input field.
+	codingtestcasedataDescInput := codingtestcasedataFields[0].Descriptor()
+	// codingtestcasedata.DefaultInput holds the default value on creation for the input field.
+	codingtestcasedata.DefaultInput = codingtestcasedataDescInput.Default.(string)
+	// codingtestcasedataDescOutput is the schema descriptor for output field.
+	codingtestcasedataDescOutput := codingtestcasedataFields[1].Descriptor()
+	// codingtestcasedata.DefaultOutput holds the default value on creation for the output field.
+	codingtestcasedata.DefaultOutput = codingtestcasedataDescOutput.Default.(string)
 	user.Policy = privacy.NewPolicies(schema.User{})
 	user.Hooks[0] = func(next ent.Mutator) ent.Mutator {
 		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {

@@ -36,6 +36,14 @@ func (ctcu *CodingTestCaseUpdate) SetPoints(i int) *CodingTestCaseUpdate {
 	return ctcu
 }
 
+// SetNillablePoints sets the "points" field if the given value is not nil.
+func (ctcu *CodingTestCaseUpdate) SetNillablePoints(i *int) *CodingTestCaseUpdate {
+	if i != nil {
+		ctcu.SetPoints(*i)
+	}
+	return ctcu
+}
+
 // AddPoints adds i to the "points" field.
 func (ctcu *CodingTestCaseUpdate) AddPoints(i int) *CodingTestCaseUpdate {
 	ctcu.mutation.AddPoints(i)
@@ -45,6 +53,14 @@ func (ctcu *CodingTestCaseUpdate) AddPoints(i int) *CodingTestCaseUpdate {
 // SetPublic sets the "public" field.
 func (ctcu *CodingTestCaseUpdate) SetPublic(b bool) *CodingTestCaseUpdate {
 	ctcu.mutation.SetPublic(b)
+	return ctcu
+}
+
+// SetNillablePublic sets the "public" field if the given value is not nil.
+func (ctcu *CodingTestCaseUpdate) SetNillablePublic(b *bool) *CodingTestCaseUpdate {
+	if b != nil {
+		ctcu.SetPublic(*b)
+	}
 	return ctcu
 }
 
@@ -303,6 +319,14 @@ func (ctcuo *CodingTestCaseUpdateOne) SetPoints(i int) *CodingTestCaseUpdateOne 
 	return ctcuo
 }
 
+// SetNillablePoints sets the "points" field if the given value is not nil.
+func (ctcuo *CodingTestCaseUpdateOne) SetNillablePoints(i *int) *CodingTestCaseUpdateOne {
+	if i != nil {
+		ctcuo.SetPoints(*i)
+	}
+	return ctcuo
+}
+
 // AddPoints adds i to the "points" field.
 func (ctcuo *CodingTestCaseUpdateOne) AddPoints(i int) *CodingTestCaseUpdateOne {
 	ctcuo.mutation.AddPoints(i)
@@ -312,6 +336,14 @@ func (ctcuo *CodingTestCaseUpdateOne) AddPoints(i int) *CodingTestCaseUpdateOne 
 // SetPublic sets the "public" field.
 func (ctcuo *CodingTestCaseUpdateOne) SetPublic(b bool) *CodingTestCaseUpdateOne {
 	ctcuo.mutation.SetPublic(b)
+	return ctcuo
+}
+
+// SetNillablePublic sets the "public" field if the given value is not nil.
+func (ctcuo *CodingTestCaseUpdateOne) SetNillablePublic(b *bool) *CodingTestCaseUpdateOne {
+	if b != nil {
+		ctcuo.SetPublic(*b)
+	}
 	return ctcuo
 }
 

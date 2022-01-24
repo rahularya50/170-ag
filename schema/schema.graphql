@@ -48,6 +48,9 @@ type Mutation {
   save_draft(input: CodingDraftInput!): CodingDraft!
   create_submission(input: CodingSubmissionInput!): CodingSubmission!
   update_problem(input: UpdateCodingProblemInput!): CodingProblem!
+  add_test_case(input: CreateTestCaseInput!): CodingTestCase!
+  update_test_case(input: UpdateTestCaseInput!): CodingTestCase!
+  delete_test_case(input: DeleteTestCaseInput!): CodingProblem!
 }
 
 type User implements Node {
@@ -103,8 +106,25 @@ input UpdateCodingProblemInput {
 type CodingTestCase implements Node {
   id: ID!
   points: Int!
+  public: Boolean!
   data: CodingTestCaseData!
   coding_problem: CodingProblem!
+}
+
+input CreateTestCaseInput {
+  problem_id: ID!
+}
+
+input UpdateTestCaseInput {
+  id: ID!
+  points: Int
+  public: Boolean
+  input: String
+  output: String
+}
+
+input DeleteTestCaseInput {
+  id: ID!
 }
 
 type CodingTestCaseData implements Node {
