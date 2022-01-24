@@ -122,13 +122,13 @@ func (cdc *CodingDraftCreate) ExecX(ctx context.Context) {
 // check runs all checks and user-defined validators on the builder.
 func (cdc *CodingDraftCreate) check() error {
 	if _, ok := cdc.mutation.Code(); !ok {
-		return &ValidationError{Name: "code", err: errors.New(`generated: missing required field "code"`)}
+		return &ValidationError{Name: "code", err: errors.New(`generated: missing required field "CodingDraft.code"`)}
 	}
 	if _, ok := cdc.mutation.AuthorID(); !ok {
-		return &ValidationError{Name: "author", err: errors.New("generated: missing required edge \"author\"")}
+		return &ValidationError{Name: "author", err: errors.New(`generated: missing required edge "CodingDraft.author"`)}
 	}
 	if _, ok := cdc.mutation.CodingProblemID(); !ok {
-		return &ValidationError{Name: "coding_problem", err: errors.New("generated: missing required edge \"coding_problem\"")}
+		return &ValidationError{Name: "coding_problem", err: errors.New(`generated: missing required edge "CodingDraft.coding_problem"`)}
 	}
 	return nil
 }
@@ -272,7 +272,7 @@ func (u *CodingDraftUpsert) UpdateCode() *CodingDraftUpsert {
 	return u
 }
 
-// UpdateNewValues updates the fields using the new values that were set on create.
+// UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
 //	client.CodingDraft.Create().
@@ -489,7 +489,7 @@ type CodingDraftUpsertBulk struct {
 	create *CodingDraftCreateBulk
 }
 
-// UpdateNewValues updates the fields using the new values that
+// UpdateNewValues updates the mutable fields using the new values that
 // were set on create. Using this option is equivalent to using:
 //
 //	client.CodingDraft.Create().

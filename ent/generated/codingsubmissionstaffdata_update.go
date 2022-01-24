@@ -207,21 +207,21 @@ func (cssdu *CodingSubmissionStaffDataUpdate) ExecX(ctx context.Context) {
 func (cssdu *CodingSubmissionStaffDataUpdate) check() error {
 	if v, ok := cssdu.mutation.Output(); ok {
 		if err := codingsubmissionstaffdata.OutputValidator(v); err != nil {
-			return &ValidationError{Name: "output", err: fmt.Errorf("generated: validator failed for field \"output\": %w", err)}
+			return &ValidationError{Name: "output", err: fmt.Errorf(`generated: validator failed for field "CodingSubmissionStaffData.output": %w`, err)}
 		}
 	}
 	if v, ok := cssdu.mutation.Stderr(); ok {
 		if err := codingsubmissionstaffdata.StderrValidator(v); err != nil {
-			return &ValidationError{Name: "stderr", err: fmt.Errorf("generated: validator failed for field \"stderr\": %w", err)}
+			return &ValidationError{Name: "stderr", err: fmt.Errorf(`generated: validator failed for field "CodingSubmissionStaffData.stderr": %w`, err)}
 		}
 	}
 	if v, ok := cssdu.mutation.ExitError(); ok {
 		if err := codingsubmissionstaffdata.ExitErrorValidator(v); err != nil {
-			return &ValidationError{Name: "exit_error", err: fmt.Errorf("generated: validator failed for field \"exit_error\": %w", err)}
+			return &ValidationError{Name: "exit_error", err: fmt.Errorf(`generated: validator failed for field "CodingSubmissionStaffData.exit_error": %w`, err)}
 		}
 	}
 	if _, ok := cssdu.mutation.CodingSubmissionID(); cssdu.mutation.CodingSubmissionCleared() && !ok {
-		return errors.New("generated: clearing a required unique edge \"coding_submission\"")
+		return errors.New(`generated: clearing a required unique edge "CodingSubmissionStaffData.coding_submission"`)
 	}
 	return nil
 }
@@ -550,21 +550,21 @@ func (cssduo *CodingSubmissionStaffDataUpdateOne) ExecX(ctx context.Context) {
 func (cssduo *CodingSubmissionStaffDataUpdateOne) check() error {
 	if v, ok := cssduo.mutation.Output(); ok {
 		if err := codingsubmissionstaffdata.OutputValidator(v); err != nil {
-			return &ValidationError{Name: "output", err: fmt.Errorf("generated: validator failed for field \"output\": %w", err)}
+			return &ValidationError{Name: "output", err: fmt.Errorf(`generated: validator failed for field "CodingSubmissionStaffData.output": %w`, err)}
 		}
 	}
 	if v, ok := cssduo.mutation.Stderr(); ok {
 		if err := codingsubmissionstaffdata.StderrValidator(v); err != nil {
-			return &ValidationError{Name: "stderr", err: fmt.Errorf("generated: validator failed for field \"stderr\": %w", err)}
+			return &ValidationError{Name: "stderr", err: fmt.Errorf(`generated: validator failed for field "CodingSubmissionStaffData.stderr": %w`, err)}
 		}
 	}
 	if v, ok := cssduo.mutation.ExitError(); ok {
 		if err := codingsubmissionstaffdata.ExitErrorValidator(v); err != nil {
-			return &ValidationError{Name: "exit_error", err: fmt.Errorf("generated: validator failed for field \"exit_error\": %w", err)}
+			return &ValidationError{Name: "exit_error", err: fmt.Errorf(`generated: validator failed for field "CodingSubmissionStaffData.exit_error": %w`, err)}
 		}
 	}
 	if _, ok := cssduo.mutation.CodingSubmissionID(); cssduo.mutation.CodingSubmissionCleared() && !ok {
-		return errors.New("generated: clearing a required unique edge \"coding_submission\"")
+		return errors.New(`generated: clearing a required unique edge "CodingSubmissionStaffData.coding_submission"`)
 	}
 	return nil
 }
@@ -582,7 +582,7 @@ func (cssduo *CodingSubmissionStaffDataUpdateOne) sqlSave(ctx context.Context) (
 	}
 	id, ok := cssduo.mutation.ID()
 	if !ok {
-		return nil, &ValidationError{Name: "ID", err: fmt.Errorf("missing CodingSubmissionStaffData.ID for update")}
+		return nil, &ValidationError{Name: "id", err: errors.New(`generated: missing "CodingSubmissionStaffData.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
 	if fields := cssduo.fields; len(fields) > 0 {

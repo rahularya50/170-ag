@@ -159,11 +159,11 @@ func (ctcu *CodingTestCaseUpdate) ExecX(ctx context.Context) {
 func (ctcu *CodingTestCaseUpdate) check() error {
 	if v, ok := ctcu.mutation.Points(); ok {
 		if err := codingtestcase.PointsValidator(v); err != nil {
-			return &ValidationError{Name: "points", err: fmt.Errorf("generated: validator failed for field \"points\": %w", err)}
+			return &ValidationError{Name: "points", err: fmt.Errorf(`generated: validator failed for field "CodingTestCase.points": %w`, err)}
 		}
 	}
 	if _, ok := ctcu.mutation.CodingProblemID(); ctcu.mutation.CodingProblemCleared() && !ok {
-		return errors.New("generated: clearing a required unique edge \"coding_problem\"")
+		return errors.New(`generated: clearing a required unique edge "CodingTestCase.coding_problem"`)
 	}
 	return nil
 }
@@ -433,11 +433,11 @@ func (ctcuo *CodingTestCaseUpdateOne) ExecX(ctx context.Context) {
 func (ctcuo *CodingTestCaseUpdateOne) check() error {
 	if v, ok := ctcuo.mutation.Points(); ok {
 		if err := codingtestcase.PointsValidator(v); err != nil {
-			return &ValidationError{Name: "points", err: fmt.Errorf("generated: validator failed for field \"points\": %w", err)}
+			return &ValidationError{Name: "points", err: fmt.Errorf(`generated: validator failed for field "CodingTestCase.points": %w`, err)}
 		}
 	}
 	if _, ok := ctcuo.mutation.CodingProblemID(); ctcuo.mutation.CodingProblemCleared() && !ok {
-		return errors.New("generated: clearing a required unique edge \"coding_problem\"")
+		return errors.New(`generated: clearing a required unique edge "CodingTestCase.coding_problem"`)
 	}
 	return nil
 }
@@ -455,7 +455,7 @@ func (ctcuo *CodingTestCaseUpdateOne) sqlSave(ctx context.Context) (_node *Codin
 	}
 	id, ok := ctcuo.mutation.ID()
 	if !ok {
-		return nil, &ValidationError{Name: "ID", err: fmt.Errorf("missing CodingTestCase.ID for update")}
+		return nil, &ValidationError{Name: "id", err: errors.New(`generated: missing "CodingTestCase.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
 	if fields := ctcuo.fields; len(fields) > 0 {

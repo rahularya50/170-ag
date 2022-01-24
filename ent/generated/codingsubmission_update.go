@@ -178,14 +178,14 @@ func (csu *CodingSubmissionUpdate) ExecX(ctx context.Context) {
 func (csu *CodingSubmissionUpdate) check() error {
 	if v, ok := csu.mutation.Status(); ok {
 		if err := codingsubmission.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf("generated: validator failed for field \"status\": %w", err)}
+			return &ValidationError{Name: "status", err: fmt.Errorf(`generated: validator failed for field "CodingSubmission.status": %w`, err)}
 		}
 	}
 	if _, ok := csu.mutation.AuthorID(); csu.mutation.AuthorCleared() && !ok {
-		return errors.New("generated: clearing a required unique edge \"author\"")
+		return errors.New(`generated: clearing a required unique edge "CodingSubmission.author"`)
 	}
 	if _, ok := csu.mutation.CodingProblemID(); csu.mutation.CodingProblemCleared() && !ok {
-		return errors.New("generated: clearing a required unique edge \"coding_problem\"")
+		return errors.New(`generated: clearing a required unique edge "CodingSubmission.coding_problem"`)
 	}
 	return nil
 }
@@ -501,14 +501,14 @@ func (csuo *CodingSubmissionUpdateOne) ExecX(ctx context.Context) {
 func (csuo *CodingSubmissionUpdateOne) check() error {
 	if v, ok := csuo.mutation.Status(); ok {
 		if err := codingsubmission.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf("generated: validator failed for field \"status\": %w", err)}
+			return &ValidationError{Name: "status", err: fmt.Errorf(`generated: validator failed for field "CodingSubmission.status": %w`, err)}
 		}
 	}
 	if _, ok := csuo.mutation.AuthorID(); csuo.mutation.AuthorCleared() && !ok {
-		return errors.New("generated: clearing a required unique edge \"author\"")
+		return errors.New(`generated: clearing a required unique edge "CodingSubmission.author"`)
 	}
 	if _, ok := csuo.mutation.CodingProblemID(); csuo.mutation.CodingProblemCleared() && !ok {
-		return errors.New("generated: clearing a required unique edge \"coding_problem\"")
+		return errors.New(`generated: clearing a required unique edge "CodingSubmission.coding_problem"`)
 	}
 	return nil
 }
@@ -526,7 +526,7 @@ func (csuo *CodingSubmissionUpdateOne) sqlSave(ctx context.Context) (_node *Codi
 	}
 	id, ok := csuo.mutation.ID()
 	if !ok {
-		return nil, &ValidationError{Name: "ID", err: fmt.Errorf("missing CodingSubmission.ID for update")}
+		return nil, &ValidationError{Name: "id", err: errors.New(`generated: missing "CodingSubmission.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
 	if fields := csuo.fields; len(fields) > 0 {

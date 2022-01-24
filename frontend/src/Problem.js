@@ -8,16 +8,22 @@ import { Link } from "react-router-dom";
 import { Col, Container, Row } from "react-bootstrap";
 import ProblemEditor from "./ProblemEditor";
 import ProblemSubmissions from "./ProblemSubmissions";
+import ProblemStatement from "./ProblemStatement";
 
-export default function Problems(): React.Node {
+export default function Problem(): React.Node {
   const { id } = useParams();
 
-  const { coding_problem } = useLazyLoadQuery(
+  const { coding_problem, viewer } = useLazyLoadQuery(
     graphql`
       query ProblemQuery($id: ID!) {
+        viewer {
+          ...ProblemStatement_viewer
+        }
         coding_problem(id: $id) {
-          name
-          statement
+          test_cases {
+            __typename
+          }
+          ...ProblemStatement_problem
           ...ProblemSubmissions_problem
           ...ProblemEditor_problem
         }
@@ -26,7 +32,7 @@ export default function Problems(): React.Node {
     { id }
   );
 
-  if (!coding_problem) {
+  if (!coding_problem || !viewer) {
     return <Navigate to="404" />;
   }
 
@@ -34,8 +40,7 @@ export default function Problems(): React.Node {
     <Container>
       <Row>
         <Col>
-          <h3>{coding_problem.name}</h3>
-          <p>{coding_problem.statement}</p>{" "}
+          <ProblemStatement viewer={viewer} problem={coding_problem} />
           <Link to="/problems/">(Back to all problems)</Link>
           <ProblemSubmissions problem={coding_problem} />
         </Col>

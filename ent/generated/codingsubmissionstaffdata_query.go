@@ -413,6 +413,10 @@ func (cssdq *CodingSubmissionStaffDataQuery) sqlAll(ctx context.Context) ([]*Cod
 
 func (cssdq *CodingSubmissionStaffDataQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := cssdq.querySpec()
+	_spec.Node.Columns = cssdq.fields
+	if len(cssdq.fields) > 0 {
+		_spec.Unique = cssdq.unique != nil && *cssdq.unique
+	}
 	return sqlgraph.CountNodes(ctx, cssdq.driver, _spec)
 }
 
@@ -483,6 +487,9 @@ func (cssdq *CodingSubmissionStaffDataQuery) sqlQuery(ctx context.Context) *sql.
 	if cssdq.sql != nil {
 		selector = cssdq.sql
 		selector.Select(selector.Columns(columns...)...)
+	}
+	if cssdq.unique != nil && *cssdq.unique {
+		selector.Distinct()
 	}
 	for _, p := range cssdq.predicates {
 		p(selector)
@@ -762,9 +769,7 @@ func (cssdgb *CodingSubmissionStaffDataGroupBy) sqlQuery() *sql.Selector {
 		for _, f := range cssdgb.fields {
 			columns = append(columns, selector.C(f))
 		}
-		for _, c := range aggregation {
-			columns = append(columns, c)
-		}
+		columns = append(columns, aggregation...)
 		selector.Select(columns...)
 	}
 	return selector.GroupBy(selector.Columns(cssdgb.fields...)...)

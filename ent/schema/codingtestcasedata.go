@@ -39,7 +39,7 @@ func (CodingTestCaseData) Edges() []ent.Edge {
 func allowIfTestCaseIsPublic() privacy.QueryRule {
 	return privacy.CodingTestCaseDataQueryRuleFunc(func(ctx context.Context, q *generated.CodingTestCaseDataQuery) error {
 		allow_ctx := privacy.DecisionContext(ctx, privacy.Allow)
-		test_cases, err := q.QueryTestCase().All(allow_ctx)
+		test_cases, err := q.Clone().QueryTestCase().All(allow_ctx)
 		if err != nil {
 			return err
 		}
@@ -64,7 +64,7 @@ func (CodingTestCaseData) Policy() ent.Policy {
 			// the associated test cases must be visible
 			privacyrules.DenyQueryIfSubPolicyFails(
 				privacyrules.AllowQueryIfDelegatesVisible(func(allow_ctx context.Context, q generated.Query) ([]int, error) {
-					return q.(*generated.CodingTestCaseDataQuery).QueryTestCase().IDs(allow_ctx)
+					return q.(*generated.CodingTestCaseDataQuery).Clone().QueryTestCase().IDs(allow_ctx)
 				}, func(client *generated.Client, ctx context.Context, ids []int) ([]int, error) {
 					return client.CodingTestCase.Query().Where(codingtestcase.IDIn(ids...)).IDs(ctx)
 				}),

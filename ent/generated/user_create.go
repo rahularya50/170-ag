@@ -154,20 +154,20 @@ func (uc *UserCreate) defaults() error {
 // check runs all checks and user-defined validators on the builder.
 func (uc *UserCreate) check() error {
 	if _, ok := uc.mutation.Email(); !ok {
-		return &ValidationError{Name: "email", err: errors.New(`generated: missing required field "email"`)}
+		return &ValidationError{Name: "email", err: errors.New(`generated: missing required field "User.email"`)}
 	}
 	if v, ok := uc.mutation.Email(); ok {
 		if err := user.EmailValidator(v); err != nil {
-			return &ValidationError{Name: "email", err: fmt.Errorf(`generated: validator failed for field "email": %w`, err)}
+			return &ValidationError{Name: "email", err: fmt.Errorf(`generated: validator failed for field "User.email": %w`, err)}
 		}
 	}
 	if v, ok := uc.mutation.Name(); ok {
 		if err := user.NameValidator(v); err != nil {
-			return &ValidationError{Name: "name", err: fmt.Errorf(`generated: validator failed for field "name": %w`, err)}
+			return &ValidationError{Name: "name", err: fmt.Errorf(`generated: validator failed for field "User.name": %w`, err)}
 		}
 	}
 	if _, ok := uc.mutation.IsStaff(); !ok {
-		return &ValidationError{Name: "is_staff", err: errors.New(`generated: missing required field "is_staff"`)}
+		return &ValidationError{Name: "is_staff", err: errors.New(`generated: missing required field "User.is_staff"`)}
 	}
 	return nil
 }
@@ -336,7 +336,7 @@ func (u *UserUpsert) UpdateIsStaff() *UserUpsert {
 	return u
 }
 
-// UpdateNewValues updates the fields using the new values that were set on create.
+// UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
 //	client.User.Create().
@@ -347,6 +347,11 @@ func (u *UserUpsert) UpdateIsStaff() *UserUpsert {
 //
 func (u *UserUpsertOne) UpdateNewValues() *UserUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.Email(); exists {
+			s.SetIgnore(user.FieldEmail)
+		}
+	}))
 	return u
 }
 
@@ -589,7 +594,7 @@ type UserUpsertBulk struct {
 	create *UserCreateBulk
 }
 
-// UpdateNewValues updates the fields using the new values that
+// UpdateNewValues updates the mutable fields using the new values that
 // were set on create. Using this option is equivalent to using:
 //
 //	client.User.Create().
@@ -600,6 +605,13 @@ type UserUpsertBulk struct {
 //
 func (u *UserUpsertBulk) UpdateNewValues() *UserUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.Email(); exists {
+				s.SetIgnore(user.FieldEmail)
+			}
+		}
+	}))
 	return u
 }
 

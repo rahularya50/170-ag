@@ -45,11 +45,11 @@ func (r *codingSubmissionStaffDataResolver) ExecutionID(ctx context.Context, obj
 	return &s, nil
 }
 
-func (r *mutationResolver) NewUser(ctx context.Context, name *string) (*ent.User, error) {
-	return r.client.User.Create().SetName(*name).Save(ctx)
+func (r *mutationResolver) NewUser(ctx context.Context, name string) (*ent.User, error) {
+	return r.client.User.Create().SetName(name).Save(ctx)
 }
 
-func (r *mutationResolver) NewProblem(ctx context.Context, input *model.CodingProblemInput) (*ent.CodingProblem, error) {
+func (r *mutationResolver) NewProblem(ctx context.Context, input model.CodingProblemInput) (*ent.CodingProblem, error) {
 	return r.client.CodingProblem.
 		Create().
 		SetName(input.Name).
@@ -58,7 +58,7 @@ func (r *mutationResolver) NewProblem(ctx context.Context, input *model.CodingPr
 		Save(ctx)
 }
 
-func (r *mutationResolver) SaveDraft(ctx context.Context, input *model.CodingDraftInput) (*ent.CodingDraft, error) {
+func (r *mutationResolver) SaveDraft(ctx context.Context, input model.CodingDraftInput) (*ent.CodingDraft, error) {
 	viewer, ok := site.ViewerFromContext(ctx)
 	if !ok {
 		return nil, fmt.Errorf("viewer not found")
@@ -76,7 +76,7 @@ func (r *mutationResolver) SaveDraft(ctx context.Context, input *model.CodingDra
 	return r.client.CodingDraft.Get(ctx, coding_draft_id)
 }
 
-func (r *mutationResolver) CreateSubmission(ctx context.Context, input *model.CodingSubmissionInput) (*ent.CodingSubmission, error) {
+func (r *mutationResolver) CreateSubmission(ctx context.Context, input model.CodingSubmissionInput) (*ent.CodingSubmission, error) {
 	viewer, ok := site.ViewerFromContext(ctx)
 	if !ok {
 		return nil, fmt.Errorf("viewer not found")
@@ -99,9 +99,10 @@ func (r *mutationResolver) CreateSubmission(ctx context.Context, input *model.Co
 
 	submission_ctx := privacyrules.NewContextWithAccessToken(ctx, privacyrules.SubmissionEnqueuingAccessToken)
 
-	test_cases, err := tx.CodingProblem.Query().
+	test_case_data, err := tx.CodingProblem.Query().
 		Where(codingproblem.ID(input.ProblemID)).
 		QueryTestCases().
+		QueryData().
 		All(submission_ctx)
 	if err != nil {
 		return nil, err
@@ -109,7 +110,7 @@ func (r *mutationResolver) CreateSubmission(ctx context.Context, input *model.Co
 
 	err = tx.CodingSubmissionStaffData.Create().
 		SetCodingSubmission(submission).
-		SetInput(test_cases[0].Input). // TODO: concat test cases
+		SetInput(test_case_data[0].Input). // TODO: concat test cases, some way of ordering them!
 		Exec(submission_ctx)
 	if err != nil {
 		return nil, err
@@ -121,6 +122,18 @@ func (r *mutationResolver) CreateSubmission(ctx context.Context, input *model.Co
 	}
 
 	return submission.Unwrap(), nil
+}
+
+func (r *mutationResolver) UpdateProblem(ctx context.Context, input model.UpdateCodingProblemInput) (*ent.CodingProblem, error) {
+	problem, err := r.client.CodingProblem.Get(ctx, input.ID)
+	if err != nil {
+		return nil, err
+	}
+	return problem.Update().
+		SetName(input.Problem.Name).
+		SetStatement(input.Problem.Statement).
+		SetReleased(input.Problem.Released).
+		Save(ctx)
 }
 
 func (r *queryResolver) Viewer(ctx context.Context) (*ent.User, error) {

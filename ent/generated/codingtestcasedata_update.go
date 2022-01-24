@@ -125,7 +125,7 @@ func (ctcdu *CodingTestCaseDataUpdate) ExecX(ctx context.Context) {
 // check runs all checks and user-defined validators on the builder.
 func (ctcdu *CodingTestCaseDataUpdate) check() error {
 	if _, ok := ctcdu.mutation.TestCaseID(); ctcdu.mutation.TestCaseCleared() && !ok {
-		return errors.New("generated: clearing a required unique edge \"test_case\"")
+		return errors.New(`generated: clearing a required unique edge "CodingTestCaseData.test_case"`)
 	}
 	return nil
 }
@@ -320,7 +320,7 @@ func (ctcduo *CodingTestCaseDataUpdateOne) ExecX(ctx context.Context) {
 // check runs all checks and user-defined validators on the builder.
 func (ctcduo *CodingTestCaseDataUpdateOne) check() error {
 	if _, ok := ctcduo.mutation.TestCaseID(); ctcduo.mutation.TestCaseCleared() && !ok {
-		return errors.New("generated: clearing a required unique edge \"test_case\"")
+		return errors.New(`generated: clearing a required unique edge "CodingTestCaseData.test_case"`)
 	}
 	return nil
 }
@@ -338,7 +338,7 @@ func (ctcduo *CodingTestCaseDataUpdateOne) sqlSave(ctx context.Context) (_node *
 	}
 	id, ok := ctcduo.mutation.ID()
 	if !ok {
-		return nil, &ValidationError{Name: "ID", err: fmt.Errorf("missing CodingTestCaseData.ID for update")}
+		return nil, &ValidationError{Name: "id", err: errors.New(`generated: missing "CodingTestCaseData.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
 	if fields := ctcduo.fields; len(fields) > 0 {

@@ -166,25 +166,25 @@ func (cssdc *CodingSubmissionStaffDataCreate) ExecX(ctx context.Context) {
 // check runs all checks and user-defined validators on the builder.
 func (cssdc *CodingSubmissionStaffDataCreate) check() error {
 	if _, ok := cssdc.mutation.Input(); !ok {
-		return &ValidationError{Name: "input", err: errors.New(`generated: missing required field "input"`)}
+		return &ValidationError{Name: "input", err: errors.New(`generated: missing required field "CodingSubmissionStaffData.input"`)}
 	}
 	if v, ok := cssdc.mutation.Output(); ok {
 		if err := codingsubmissionstaffdata.OutputValidator(v); err != nil {
-			return &ValidationError{Name: "output", err: fmt.Errorf(`generated: validator failed for field "output": %w`, err)}
+			return &ValidationError{Name: "output", err: fmt.Errorf(`generated: validator failed for field "CodingSubmissionStaffData.output": %w`, err)}
 		}
 	}
 	if v, ok := cssdc.mutation.Stderr(); ok {
 		if err := codingsubmissionstaffdata.StderrValidator(v); err != nil {
-			return &ValidationError{Name: "stderr", err: fmt.Errorf(`generated: validator failed for field "stderr": %w`, err)}
+			return &ValidationError{Name: "stderr", err: fmt.Errorf(`generated: validator failed for field "CodingSubmissionStaffData.stderr": %w`, err)}
 		}
 	}
 	if v, ok := cssdc.mutation.ExitError(); ok {
 		if err := codingsubmissionstaffdata.ExitErrorValidator(v); err != nil {
-			return &ValidationError{Name: "exit_error", err: fmt.Errorf(`generated: validator failed for field "exit_error": %w`, err)}
+			return &ValidationError{Name: "exit_error", err: fmt.Errorf(`generated: validator failed for field "CodingSubmissionStaffData.exit_error": %w`, err)}
 		}
 	}
 	if _, ok := cssdc.mutation.CodingSubmissionID(); !ok {
-		return &ValidationError{Name: "coding_submission", err: errors.New("generated: missing required edge \"coding_submission\"")}
+		return &ValidationError{Name: "coding_submission", err: errors.New(`generated: missing required edge "CodingSubmissionStaffData.coding_submission"`)}
 	}
 	return nil
 }
@@ -339,6 +339,12 @@ func (u *CodingSubmissionStaffDataUpsert) UpdateExecutionID() *CodingSubmissionS
 	return u
 }
 
+// AddExecutionID adds v to the "execution_id" field.
+func (u *CodingSubmissionStaffDataUpsert) AddExecutionID(v int64) *CodingSubmissionStaffDataUpsert {
+	u.Add(codingsubmissionstaffdata.FieldExecutionID, v)
+	return u
+}
+
 // ClearExecutionID clears the value of the "execution_id" field.
 func (u *CodingSubmissionStaffDataUpsert) ClearExecutionID() *CodingSubmissionStaffDataUpsert {
 	u.SetNull(codingsubmissionstaffdata.FieldExecutionID)
@@ -411,7 +417,7 @@ func (u *CodingSubmissionStaffDataUpsert) ClearExitError() *CodingSubmissionStaf
 	return u
 }
 
-// UpdateNewValues updates the fields using the new values that were set on create.
+// UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
 //	client.CodingSubmissionStaffData.Create().
@@ -457,6 +463,13 @@ func (u *CodingSubmissionStaffDataUpsertOne) Update(set func(*CodingSubmissionSt
 func (u *CodingSubmissionStaffDataUpsertOne) SetExecutionID(v int64) *CodingSubmissionStaffDataUpsertOne {
 	return u.Update(func(s *CodingSubmissionStaffDataUpsert) {
 		s.SetExecutionID(v)
+	})
+}
+
+// AddExecutionID adds v to the "execution_id" field.
+func (u *CodingSubmissionStaffDataUpsertOne) AddExecutionID(v int64) *CodingSubmissionStaffDataUpsertOne {
+	return u.Update(func(s *CodingSubmissionStaffDataUpsert) {
+		s.AddExecutionID(v)
 	})
 }
 
@@ -712,7 +725,7 @@ type CodingSubmissionStaffDataUpsertBulk struct {
 	create *CodingSubmissionStaffDataCreateBulk
 }
 
-// UpdateNewValues updates the fields using the new values that
+// UpdateNewValues updates the mutable fields using the new values that
 // were set on create. Using this option is equivalent to using:
 //
 //	client.CodingSubmissionStaffData.Create().
@@ -758,6 +771,13 @@ func (u *CodingSubmissionStaffDataUpsertBulk) Update(set func(*CodingSubmissionS
 func (u *CodingSubmissionStaffDataUpsertBulk) SetExecutionID(v int64) *CodingSubmissionStaffDataUpsertBulk {
 	return u.Update(func(s *CodingSubmissionStaffDataUpsert) {
 		s.SetExecutionID(v)
+	})
+}
+
+// AddExecutionID adds v to the "execution_id" field.
+func (u *CodingSubmissionStaffDataUpsertBulk) AddExecutionID(v int64) *CodingSubmissionStaffDataUpsertBulk {
+	return u.Update(func(s *CodingSubmissionStaffDataUpsert) {
+		s.AddExecutionID(v)
 	})
 }
 

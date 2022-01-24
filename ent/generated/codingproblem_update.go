@@ -9,6 +9,7 @@ import (
 	"170-ag/ent/generated/codingtestcase"
 	"170-ag/ent/generated/predicate"
 	"context"
+	"errors"
 	"fmt"
 
 	"entgo.io/ent/dialect/sql"
@@ -240,12 +241,12 @@ func (cpu *CodingProblemUpdate) ExecX(ctx context.Context) {
 func (cpu *CodingProblemUpdate) check() error {
 	if v, ok := cpu.mutation.Name(); ok {
 		if err := codingproblem.NameValidator(v); err != nil {
-			return &ValidationError{Name: "name", err: fmt.Errorf("generated: validator failed for field \"name\": %w", err)}
+			return &ValidationError{Name: "name", err: fmt.Errorf(`generated: validator failed for field "CodingProblem.name": %w`, err)}
 		}
 	}
 	if v, ok := cpu.mutation.Statement(); ok {
 		if err := codingproblem.StatementValidator(v); err != nil {
-			return &ValidationError{Name: "statement", err: fmt.Errorf("generated: validator failed for field \"statement\": %w", err)}
+			return &ValidationError{Name: "statement", err: fmt.Errorf(`generated: validator failed for field "CodingProblem.statement": %w`, err)}
 		}
 	}
 	return nil
@@ -689,12 +690,12 @@ func (cpuo *CodingProblemUpdateOne) ExecX(ctx context.Context) {
 func (cpuo *CodingProblemUpdateOne) check() error {
 	if v, ok := cpuo.mutation.Name(); ok {
 		if err := codingproblem.NameValidator(v); err != nil {
-			return &ValidationError{Name: "name", err: fmt.Errorf("generated: validator failed for field \"name\": %w", err)}
+			return &ValidationError{Name: "name", err: fmt.Errorf(`generated: validator failed for field "CodingProblem.name": %w`, err)}
 		}
 	}
 	if v, ok := cpuo.mutation.Statement(); ok {
 		if err := codingproblem.StatementValidator(v); err != nil {
-			return &ValidationError{Name: "statement", err: fmt.Errorf("generated: validator failed for field \"statement\": %w", err)}
+			return &ValidationError{Name: "statement", err: fmt.Errorf(`generated: validator failed for field "CodingProblem.statement": %w`, err)}
 		}
 	}
 	return nil
@@ -713,7 +714,7 @@ func (cpuo *CodingProblemUpdateOne) sqlSave(ctx context.Context) (_node *CodingP
 	}
 	id, ok := cpuo.mutation.ID()
 	if !ok {
-		return nil, &ValidationError{Name: "ID", err: fmt.Errorf("missing CodingProblem.ID for update")}
+		return nil, &ValidationError{Name: "id", err: errors.New(`generated: missing "CodingProblem.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
 	if fields := cpuo.fields; len(fields) > 0 {

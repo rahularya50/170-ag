@@ -487,6 +487,10 @@ func (cdq *CodingDraftQuery) sqlAll(ctx context.Context) ([]*CodingDraft, error)
 
 func (cdq *CodingDraftQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := cdq.querySpec()
+	_spec.Node.Columns = cdq.fields
+	if len(cdq.fields) > 0 {
+		_spec.Unique = cdq.unique != nil && *cdq.unique
+	}
 	return sqlgraph.CountNodes(ctx, cdq.driver, _spec)
 }
 
@@ -557,6 +561,9 @@ func (cdq *CodingDraftQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	if cdq.sql != nil {
 		selector = cdq.sql
 		selector.Select(selector.Columns(columns...)...)
+	}
+	if cdq.unique != nil && *cdq.unique {
+		selector.Distinct()
 	}
 	for _, p := range cdq.predicates {
 		p(selector)
@@ -836,9 +843,7 @@ func (cdgb *CodingDraftGroupBy) sqlQuery() *sql.Selector {
 		for _, f := range cdgb.fields {
 			columns = append(columns, selector.C(f))
 		}
-		for _, c := range aggregation {
-			columns = append(columns, c)
-		}
+		columns = append(columns, aggregation...)
 		selector.Select(columns...)
 	}
 	return selector.GroupBy(selector.Columns(cdgb.fields...)...)

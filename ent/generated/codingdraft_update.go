@@ -137,10 +137,10 @@ func (cdu *CodingDraftUpdate) ExecX(ctx context.Context) {
 // check runs all checks and user-defined validators on the builder.
 func (cdu *CodingDraftUpdate) check() error {
 	if _, ok := cdu.mutation.AuthorID(); cdu.mutation.AuthorCleared() && !ok {
-		return errors.New("generated: clearing a required unique edge \"author\"")
+		return errors.New(`generated: clearing a required unique edge "CodingDraft.author"`)
 	}
 	if _, ok := cdu.mutation.CodingProblemID(); cdu.mutation.CodingProblemCleared() && !ok {
-		return errors.New("generated: clearing a required unique edge \"coding_problem\"")
+		return errors.New(`generated: clearing a required unique edge "CodingDraft.coding_problem"`)
 	}
 	return nil
 }
@@ -374,10 +374,10 @@ func (cduo *CodingDraftUpdateOne) ExecX(ctx context.Context) {
 // check runs all checks and user-defined validators on the builder.
 func (cduo *CodingDraftUpdateOne) check() error {
 	if _, ok := cduo.mutation.AuthorID(); cduo.mutation.AuthorCleared() && !ok {
-		return errors.New("generated: clearing a required unique edge \"author\"")
+		return errors.New(`generated: clearing a required unique edge "CodingDraft.author"`)
 	}
 	if _, ok := cduo.mutation.CodingProblemID(); cduo.mutation.CodingProblemCleared() && !ok {
-		return errors.New("generated: clearing a required unique edge \"coding_problem\"")
+		return errors.New(`generated: clearing a required unique edge "CodingDraft.coding_problem"`)
 	}
 	return nil
 }
@@ -395,7 +395,7 @@ func (cduo *CodingDraftUpdateOne) sqlSave(ctx context.Context) (_node *CodingDra
 	}
 	id, ok := cduo.mutation.ID()
 	if !ok {
-		return nil, &ValidationError{Name: "ID", err: fmt.Errorf("missing CodingDraft.ID for update")}
+		return nil, &ValidationError{Name: "id", err: errors.New(`generated: missing "CodingDraft.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
 	if fields := cduo.fields; len(fields) > 0 {

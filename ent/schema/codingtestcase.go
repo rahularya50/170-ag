@@ -30,8 +30,8 @@ func (CodingTestCase) Fields() []ent.Field {
 func (CodingTestCase) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("coding_problem", CodingProblem.Type).
-			Unique().
 			Ref("test_cases").
+			Unique().
 			Required().
 			Annotations(entgql.Bind()),
 		edge.From("data", CodingTestCaseData.Type).
@@ -51,7 +51,7 @@ func (CodingTestCase) Policy() ent.Policy {
 		Query: privacy.QueryPolicy{
 			// test cases are visible iff their associated problem is visible (the test *data* is in a different ent)
 			privacyrules.AllowQueryIfDelegatesVisible(func(allow_ctx context.Context, q generated.Query) ([]int, error) {
-				return q.(*generated.CodingTestCaseQuery).QueryCodingProblem().IDs(allow_ctx)
+				return q.(*generated.CodingTestCaseQuery).Clone().QueryCodingProblem().IDs(allow_ctx)
 			}, func(client *generated.Client, ctx context.Context, ids []int) ([]int, error) {
 				return client.CodingProblem.Query().Where(codingproblem.IDIn(ids...)).IDs(ctx)
 			}),

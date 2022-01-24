@@ -1,48 +1,44 @@
 // @flow
 
 import * as React from "react";
+import { useState } from "react";
 import graphql from "babel-plugin-relay/macro";
 import { useLazyLoadQuery } from "react-relay/hooks";
-import { Table } from "react-bootstrap";
+import { Form, Table } from "react-bootstrap";
 import { generatePath, Link } from "react-router-dom";
+import ProblemTable from "./ProblemTable";
 
 export default function Problems(): React.Node {
-  const { coding_problems } = useLazyLoadQuery(
+  const [includeUnreleased, setIncludeUnreleased] = useState(false);
+
+  const query = useLazyLoadQuery(
     graphql`
-      query ProblemsQuery {
-        coding_problems {
-          edges {
-            node {
-              id
-              name
-            }
-          }
+      query ProblemsQuery($include_unreleased: Boolean!) {
+        viewer {
+          is_staff
         }
+        ...ProblemTable
       }
     `,
-    {}
+    { include_unreleased: includeUnreleased }
   );
+
   return (
     <>
       <h3>Problems</h3>
-      <Table hover>
-        <thead>
-          <tr>
-            <th>Name</th>
-          </tr>
-        </thead>
-        <tbody>
-          {coding_problems.edges.map(({ node }) => (
-            <tr key={node.id}>
-              <td>
-                <Link to={generatePath("/problem/:id", { id: node.id })}>
-                  {node.name}
-                </Link>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+      {query.viewer?.is_staff && (
+        <Form.Group className="mb-3" controlId="unreleasedCheckbox">
+          <Form.Check
+            type="checkbox"
+            label="Include unreleased"
+            checked={includeUnreleased}
+            onChange={(e) => setIncludeUnreleased(e.target.checked)}
+          />
+        </Form.Group>
+      )}
+      <React.Suspense fallback={null}>
+        <ProblemTable query={query} />
+      </React.Suspense>
     </>
   );
 }

@@ -43,10 +43,11 @@ type Query {
 }
 
 type Mutation {
-  new_user(name: String): User
-  new_problem(input: CodingProblemInput): CodingProblem!
-  save_draft(input: CodingDraftInput): CodingDraft!
-  create_submission(input: CodingSubmissionInput): CodingSubmission!
+  new_user(name: String!): User
+  new_problem(input: CodingProblemInput!): CodingProblem!
+  save_draft(input: CodingDraftInput!): CodingDraft!
+  create_submission(input: CodingSubmissionInput!): CodingSubmission!
+  update_problem(input: UpdateCodingProblemInput!): CodingProblem!
 }
 
 type User implements Node {
@@ -94,12 +95,22 @@ input CodingProblemInput {
   released: Boolean!
 }
 
+input UpdateCodingProblemInput {
+  id: ID!
+  problem: CodingProblemInput!
+}
+
 type CodingTestCase implements Node {
   id: ID!
   points: Int!
+  data: CodingTestCaseData!
+  coding_problem: CodingProblem!
+}
+
+type CodingTestCaseData implements Node {
+  id: ID!
   input: String!
   output: String!
-  coding_problem: CodingProblem!
 }
 
 type CodingDraft implements Node {

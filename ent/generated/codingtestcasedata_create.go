@@ -116,13 +116,13 @@ func (ctcdc *CodingTestCaseDataCreate) ExecX(ctx context.Context) {
 // check runs all checks and user-defined validators on the builder.
 func (ctcdc *CodingTestCaseDataCreate) check() error {
 	if _, ok := ctcdc.mutation.Input(); !ok {
-		return &ValidationError{Name: "input", err: errors.New(`generated: missing required field "input"`)}
+		return &ValidationError{Name: "input", err: errors.New(`generated: missing required field "CodingTestCaseData.input"`)}
 	}
 	if _, ok := ctcdc.mutation.Output(); !ok {
-		return &ValidationError{Name: "output", err: errors.New(`generated: missing required field "output"`)}
+		return &ValidationError{Name: "output", err: errors.New(`generated: missing required field "CodingTestCaseData.output"`)}
 	}
 	if _, ok := ctcdc.mutation.TestCaseID(); !ok {
-		return &ValidationError{Name: "test_case", err: errors.New("generated: missing required edge \"test_case\"")}
+		return &ValidationError{Name: "test_case", err: errors.New(`generated: missing required edge "CodingTestCaseData.test_case"`)}
 	}
 	return nil
 }
@@ -265,7 +265,7 @@ func (u *CodingTestCaseDataUpsert) UpdateOutput() *CodingTestCaseDataUpsert {
 	return u
 }
 
-// UpdateNewValues updates the fields using the new values that were set on create.
+// UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
 //	client.CodingTestCaseData.Create().
@@ -496,7 +496,7 @@ type CodingTestCaseDataUpsertBulk struct {
 	create *CodingTestCaseDataCreateBulk
 }
 
-// UpdateNewValues updates the fields using the new values that
+// UpdateNewValues updates the mutable fields using the new values that
 // were set on create. Using this option is equivalent to using:
 //
 //	client.CodingTestCaseData.Create().

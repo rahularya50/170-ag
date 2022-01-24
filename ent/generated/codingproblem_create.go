@@ -190,23 +190,23 @@ func (cpc *CodingProblemCreate) defaults() error {
 // check runs all checks and user-defined validators on the builder.
 func (cpc *CodingProblemCreate) check() error {
 	if _, ok := cpc.mutation.Name(); !ok {
-		return &ValidationError{Name: "name", err: errors.New(`generated: missing required field "name"`)}
+		return &ValidationError{Name: "name", err: errors.New(`generated: missing required field "CodingProblem.name"`)}
 	}
 	if v, ok := cpc.mutation.Name(); ok {
 		if err := codingproblem.NameValidator(v); err != nil {
-			return &ValidationError{Name: "name", err: fmt.Errorf(`generated: validator failed for field "name": %w`, err)}
+			return &ValidationError{Name: "name", err: fmt.Errorf(`generated: validator failed for field "CodingProblem.name": %w`, err)}
 		}
 	}
 	if _, ok := cpc.mutation.Statement(); !ok {
-		return &ValidationError{Name: "statement", err: errors.New(`generated: missing required field "statement"`)}
+		return &ValidationError{Name: "statement", err: errors.New(`generated: missing required field "CodingProblem.statement"`)}
 	}
 	if v, ok := cpc.mutation.Statement(); ok {
 		if err := codingproblem.StatementValidator(v); err != nil {
-			return &ValidationError{Name: "statement", err: fmt.Errorf(`generated: validator failed for field "statement": %w`, err)}
+			return &ValidationError{Name: "statement", err: fmt.Errorf(`generated: validator failed for field "CodingProblem.statement": %w`, err)}
 		}
 	}
 	if _, ok := cpc.mutation.Released(); !ok {
-		return &ValidationError{Name: "released", err: errors.New(`generated: missing required field "released"`)}
+		return &ValidationError{Name: "released", err: errors.New(`generated: missing required field "CodingProblem.released"`)}
 	}
 	return nil
 }
@@ -407,7 +407,7 @@ func (u *CodingProblemUpsert) UpdateReleased() *CodingProblemUpsert {
 	return u
 }
 
-// UpdateNewValues updates the fields using the new values that were set on create.
+// UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
 //	client.CodingProblem.Create().
@@ -653,7 +653,7 @@ type CodingProblemUpsertBulk struct {
 	create *CodingProblemCreateBulk
 }
 
-// UpdateNewValues updates the fields using the new values that
+// UpdateNewValues updates the mutable fields using the new values that
 // were set on create. Using this option is equivalent to using:
 //
 //	client.CodingProblem.Create().

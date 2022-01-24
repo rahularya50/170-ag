@@ -168,21 +168,21 @@ func (csc *CodingSubmissionCreate) defaults() error {
 // check runs all checks and user-defined validators on the builder.
 func (csc *CodingSubmissionCreate) check() error {
 	if _, ok := csc.mutation.Code(); !ok {
-		return &ValidationError{Name: "code", err: errors.New(`generated: missing required field "code"`)}
+		return &ValidationError{Name: "code", err: errors.New(`generated: missing required field "CodingSubmission.code"`)}
 	}
 	if _, ok := csc.mutation.Status(); !ok {
-		return &ValidationError{Name: "status", err: errors.New(`generated: missing required field "status"`)}
+		return &ValidationError{Name: "status", err: errors.New(`generated: missing required field "CodingSubmission.status"`)}
 	}
 	if v, ok := csc.mutation.Status(); ok {
 		if err := codingsubmission.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf(`generated: validator failed for field "status": %w`, err)}
+			return &ValidationError{Name: "status", err: fmt.Errorf(`generated: validator failed for field "CodingSubmission.status": %w`, err)}
 		}
 	}
 	if _, ok := csc.mutation.AuthorID(); !ok {
-		return &ValidationError{Name: "author", err: errors.New("generated: missing required edge \"author\"")}
+		return &ValidationError{Name: "author", err: errors.New(`generated: missing required edge "CodingSubmission.author"`)}
 	}
 	if _, ok := csc.mutation.CodingProblemID(); !ok {
-		return &ValidationError{Name: "coding_problem", err: errors.New("generated: missing required edge \"coding_problem\"")}
+		return &ValidationError{Name: "coding_problem", err: errors.New(`generated: missing required edge "CodingSubmission.coding_problem"`)}
 	}
 	return nil
 }
@@ -366,7 +366,7 @@ func (u *CodingSubmissionUpsert) UpdateStatus() *CodingSubmissionUpsert {
 	return u
 }
 
-// UpdateNewValues updates the fields using the new values that were set on create.
+// UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
 //	client.CodingSubmission.Create().
@@ -598,7 +598,7 @@ type CodingSubmissionUpsertBulk struct {
 	create *CodingSubmissionCreateBulk
 }
 
-// UpdateNewValues updates the fields using the new values that
+// UpdateNewValues updates the mutable fields using the new values that
 // were set on create. Using this option is equivalent to using:
 //
 //	client.CodingSubmission.Create().

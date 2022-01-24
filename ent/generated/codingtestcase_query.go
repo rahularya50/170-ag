@@ -487,6 +487,10 @@ func (ctcq *CodingTestCaseQuery) sqlAll(ctx context.Context) ([]*CodingTestCase,
 
 func (ctcq *CodingTestCaseQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := ctcq.querySpec()
+	_spec.Node.Columns = ctcq.fields
+	if len(ctcq.fields) > 0 {
+		_spec.Unique = ctcq.unique != nil && *ctcq.unique
+	}
 	return sqlgraph.CountNodes(ctx, ctcq.driver, _spec)
 }
 
@@ -557,6 +561,9 @@ func (ctcq *CodingTestCaseQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	if ctcq.sql != nil {
 		selector = ctcq.sql
 		selector.Select(selector.Columns(columns...)...)
+	}
+	if ctcq.unique != nil && *ctcq.unique {
+		selector.Distinct()
 	}
 	for _, p := range ctcq.predicates {
 		p(selector)
@@ -836,9 +843,7 @@ func (ctcgb *CodingTestCaseGroupBy) sqlQuery() *sql.Selector {
 		for _, f := range ctcgb.fields {
 			columns = append(columns, selector.C(f))
 		}
-		for _, c := range aggregation {
-			columns = append(columns, c)
-		}
+		columns = append(columns, aggregation...)
 		selector.Select(columns...)
 	}
 	return selector.GroupBy(selector.Columns(ctcgb.fields...)...)

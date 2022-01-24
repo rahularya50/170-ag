@@ -136,18 +136,18 @@ func (ctcc *CodingTestCaseCreate) ExecX(ctx context.Context) {
 // check runs all checks and user-defined validators on the builder.
 func (ctcc *CodingTestCaseCreate) check() error {
 	if _, ok := ctcc.mutation.Points(); !ok {
-		return &ValidationError{Name: "points", err: errors.New(`generated: missing required field "points"`)}
+		return &ValidationError{Name: "points", err: errors.New(`generated: missing required field "CodingTestCase.points"`)}
 	}
 	if v, ok := ctcc.mutation.Points(); ok {
 		if err := codingtestcase.PointsValidator(v); err != nil {
-			return &ValidationError{Name: "points", err: fmt.Errorf(`generated: validator failed for field "points": %w`, err)}
+			return &ValidationError{Name: "points", err: fmt.Errorf(`generated: validator failed for field "CodingTestCase.points": %w`, err)}
 		}
 	}
 	if _, ok := ctcc.mutation.Public(); !ok {
-		return &ValidationError{Name: "public", err: errors.New(`generated: missing required field "public"`)}
+		return &ValidationError{Name: "public", err: errors.New(`generated: missing required field "CodingTestCase.public"`)}
 	}
 	if _, ok := ctcc.mutation.CodingProblemID(); !ok {
-		return &ValidationError{Name: "coding_problem", err: errors.New("generated: missing required edge \"coding_problem\"")}
+		return &ValidationError{Name: "coding_problem", err: errors.New(`generated: missing required edge "CodingTestCase.coding_problem"`)}
 	}
 	return nil
 }
@@ -299,6 +299,12 @@ func (u *CodingTestCaseUpsert) UpdatePoints() *CodingTestCaseUpsert {
 	return u
 }
 
+// AddPoints adds v to the "points" field.
+func (u *CodingTestCaseUpsert) AddPoints(v int) *CodingTestCaseUpsert {
+	u.Add(codingtestcase.FieldPoints, v)
+	return u
+}
+
 // SetPublic sets the "public" field.
 func (u *CodingTestCaseUpsert) SetPublic(v bool) *CodingTestCaseUpsert {
 	u.Set(codingtestcase.FieldPublic, v)
@@ -311,7 +317,7 @@ func (u *CodingTestCaseUpsert) UpdatePublic() *CodingTestCaseUpsert {
 	return u
 }
 
-// UpdateNewValues updates the fields using the new values that were set on create.
+// UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
 //	client.CodingTestCase.Create().
@@ -357,6 +363,13 @@ func (u *CodingTestCaseUpsertOne) Update(set func(*CodingTestCaseUpsert)) *Codin
 func (u *CodingTestCaseUpsertOne) SetPoints(v int) *CodingTestCaseUpsertOne {
 	return u.Update(func(s *CodingTestCaseUpsert) {
 		s.SetPoints(v)
+	})
+}
+
+// AddPoints adds v to the "points" field.
+func (u *CodingTestCaseUpsertOne) AddPoints(v int) *CodingTestCaseUpsertOne {
+	return u.Update(func(s *CodingTestCaseUpsert) {
+		s.AddPoints(v)
 	})
 }
 
@@ -542,7 +555,7 @@ type CodingTestCaseUpsertBulk struct {
 	create *CodingTestCaseCreateBulk
 }
 
-// UpdateNewValues updates the fields using the new values that
+// UpdateNewValues updates the mutable fields using the new values that
 // were set on create. Using this option is equivalent to using:
 //
 //	client.CodingTestCase.Create().
@@ -588,6 +601,13 @@ func (u *CodingTestCaseUpsertBulk) Update(set func(*CodingTestCaseUpsert)) *Codi
 func (u *CodingTestCaseUpsertBulk) SetPoints(v int) *CodingTestCaseUpsertBulk {
 	return u.Update(func(s *CodingTestCaseUpsert) {
 		s.SetPoints(v)
+	})
+}
+
+// AddPoints adds v to the "points" field.
+func (u *CodingTestCaseUpsertBulk) AddPoints(v int) *CodingTestCaseUpsertBulk {
+	return u.Update(func(s *CodingTestCaseUpsert) {
+		s.AddPoints(v)
 	})
 }
 

@@ -1,5 +1,5 @@
 // @flow
-import type { ProblemSaveDraftMutation } from "./__generated__/ProblemSaveDraftMutation.graphql";
+import type { ProblemEditorSaveDraftMutation } from "./__generated__/ProblemEditorSaveDraftMutation.graphql";
 import type { ProblemEditor_problem$key } from "./__generated__/ProblemEditor_problem.graphql";
 
 import * as React from "react";
@@ -9,7 +9,7 @@ import { useFragment, useMutation } from "react-relay/hooks";
 import { useParams } from "react-router-dom";
 import AceEditor from "react-ace";
 import { Button, Stack } from "react-bootstrap";
-import { useDebounced, useDebouncedCallback } from "./useDebounced";
+import { useDebouncedCallback } from "./useDebounced";
 
 import "ace-builds/src-noconflict/mode-javascript";
 import "ace-builds/src-noconflict/mode-java";
@@ -39,7 +39,7 @@ export default function ProblemEditor(props: Props): React.Node {
     props.problem
   );
 
-  const [saveDraft, isSaving] = useMutation<ProblemSaveDraftMutation>(
+  const [saveDraft, isSaving] = useMutation<ProblemEditorSaveDraftMutation>(
     graphql`
       mutation ProblemEditorSaveDraftMutation($input: CodingDraftInput!) {
         save_draft(input: $input) {
