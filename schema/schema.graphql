@@ -40,6 +40,7 @@ type Query {
     last: Int
     include_unreleased: Boolean! = false
   ): CodingProblemConnection!
+  test_case(id: ID!): CodingTestCase!
 }
 
 type Mutation {
@@ -107,7 +108,7 @@ type CodingTestCase implements Node {
   id: ID!
   points: Int!
   public: Boolean!
-  data: CodingTestCaseData
+  data: CodingTestCaseData!
   public_data: CodingTestCaseData
   coding_problem: CodingProblem!
 }

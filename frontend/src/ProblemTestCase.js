@@ -8,10 +8,12 @@ import * as React from "react";
 import { useState } from "react";
 import graphql from "babel-plugin-relay/macro";
 import { useFragment, useMutation } from "react-relay/hooks";
-import { Button, Form, Stack } from "react-bootstrap";
+import { Button, Form, Modal, Stack } from "react-bootstrap";
 import LoadingButton from "./LoadingButton";
+import ProblemTestDataEditor from "./ProblemTestDataEditor";
 
 type Props = {
+  name: string,
   viewer: ProblemTestCase_viewer$key,
   testCase: ProblemTestCase_testCase$key,
 };
@@ -36,6 +38,7 @@ export default function TestCase(props: Props): React.Node {
           input
           output
         }
+        ...ProblemTestDataEditor_testCase
       }
     `,
     props.testCase
@@ -64,6 +67,10 @@ export default function TestCase(props: Props): React.Node {
   const [points, setPoints] = useState(testCase.points);
   const [isPublic, setPublic] = useState(testCase.public);
 
+  const [showDataEditor, setShowDataEditor] = useState(false);
+  const [input, setInput] = useState(null);
+  const [output, setOutput] = useState(null);
+
   const handleSave = () => {
     updateTestCase({
       variables: {
@@ -71,6 +78,8 @@ export default function TestCase(props: Props): React.Node {
           id: testCase.id,
           points,
           public: isPublic,
+          input,
+          output,
         },
       },
       onCompleted: () => {
@@ -119,13 +128,15 @@ export default function TestCase(props: Props): React.Node {
         </div>
       ) : (
         <div>
-          <h6>Case XYZ: {testCase.points} Points</h6>
+          <h6>
+            Case {props.name}: {testCase.points} Points
+          </h6>
           {testCase.public_data ? (
             <div>
               Input:
               <pre>{testCase.public_data.input}</pre>
               Expected output:
-              <pre>{testCase.public_data.input}</pre>
+              <pre>{testCase.public_data.output}</pre>
             </div>
           ) : (
             <div>(Inputs hidden)</div>
@@ -143,6 +154,9 @@ export default function TestCase(props: Props): React.Node {
               >
                 Save
               </LoadingButton>
+              <Button onClick={() => setShowDataEditor(true)} size="sm">
+                Edit Data
+              </Button>
               <LoadingButton
                 isUpdating={isDeleting}
                 onClick={handleDelete}
@@ -158,6 +172,25 @@ export default function TestCase(props: Props): React.Node {
             </Button>
           ))}
       </p>
+      <Modal
+        show={showDataEditor}
+        onHide={() => setShowDataEditor(false)}
+        size="lg"
+      >
+        <Modal.Body>
+          {showDataEditor && (
+            <React.Suspense fallback={null}>
+              <ProblemTestDataEditor
+                testCase={testCase}
+                input={input}
+                onInputChange={setInput}
+                output={output}
+                onOutputChange={setOutput}
+              />
+            </React.Suspense>
+          )}
+        </Modal.Body>
+      </Modal>
     </div>
   );
 }

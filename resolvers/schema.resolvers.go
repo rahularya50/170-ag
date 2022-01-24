@@ -255,6 +255,10 @@ func (r *queryResolver) CodingProblems(ctx context.Context, after *ent.Cursor, f
 	return query.Paginate(ctx, after, first, before, last)
 }
 
+func (r *queryResolver) TestCase(ctx context.Context, id int) (*ent.CodingTestCase, error) {
+	return r.client.CodingTestCase.Get(ctx, id)
+}
+
 // CodingProblem returns resolvers.CodingProblemResolver implementation.
 func (r *Resolver) CodingProblem() resolvers.CodingProblemResolver { return &codingProblemResolver{r} }
 

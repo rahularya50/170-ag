@@ -73,9 +73,10 @@ export default function ProblemTestCases(props: Props): React.Node {
           </LoadingButton>
         )}
       </h3>
-      {problem.test_cases.map((testCase) => (
+      {problem.test_cases.map((testCase, i) => (
         <ProblemTestCase
           key={testCase.id}
+          name={(i + 1).toString()}
           viewer={viewer}
           testCase={testCase}
         />
