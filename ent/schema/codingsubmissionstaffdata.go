@@ -3,6 +3,7 @@ package schema
 import (
 	"170-ag/ent/generated/privacy"
 	"170-ag/privacyrules"
+	"170-ag/site/policy"
 
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
@@ -57,8 +58,8 @@ func (CodingSubmissionStaffData) Policy() ent.Policy {
 		Query: privacy.QueryPolicy{
 			privacyrules.AllowWithPrivacyAccessToken(privacyrules.JudgeScalingServerAccessToken),
 			privacyrules.AllowWithPrivacyAccessToken(privacyrules.SubmissionEnqueuingAccessToken),
-			privacyrules.DenyIfNoViewer(),
-			privacyrules.AllowIfViewerIsStaff(),
+			policy.DenyIfNoViewer(),
+			policy.AllowIfViewerIsStaff(),
 			privacy.AlwaysDenyRule(),
 		},
 	}

@@ -4,6 +4,7 @@ import (
 	"170-ag/ent/generated"
 	"170-ag/ent/generated/privacy"
 	"170-ag/privacyrules"
+	"170-ag/site/policy"
 	"context"
 
 	"entgo.io/contrib/entgql"
@@ -70,14 +71,14 @@ func allowCodingProblemQueryIfReleased() privacy.CodingProblemQueryRuleFunc {
 func (CodingProblem) Policy() ent.Policy {
 	return privacy.Policy{
 		Mutation: privacy.MutationPolicy{
-			privacyrules.DenyIfNoViewer(),
-			privacyrules.AllowIfViewerIsStaff(),
+			policy.DenyIfNoViewer(),
+			policy.AllowIfViewerIsStaff(),
 			privacy.AlwaysDenyRule(),
 		},
 		Query: privacy.QueryPolicy{
 			privacyrules.AllowWithPrivacyAccessToken(privacyrules.JudgeScalingServerAccessToken),
-			privacyrules.DenyIfNoViewer(),
-			privacyrules.AllowIfViewerIsStaff(),
+			policy.DenyIfNoViewer(),
+			policy.AllowIfViewerIsStaff(),
 			allowCodingProblemQueryIfReleased(),
 			privacy.AlwaysDenyRule(),
 		},

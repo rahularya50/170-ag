@@ -1,14 +1,14 @@
-package privacyrules
+package policy
 
 import (
 	"170-ag/ent/generated/privacy"
-	"170-ag/site"
+	"170-ag/site/web"
 	"context"
 )
 
 func AllowIfViewerIsStaff() privacy.QueryMutationRule {
 	return privacy.ContextQueryMutationRule(func(c context.Context) error {
-		viewer, ok := site.ViewerFromContext(c)
+		viewer, ok := web.ViewerFromContext(c)
 		if !ok {
 			return privacy.Skip
 		}

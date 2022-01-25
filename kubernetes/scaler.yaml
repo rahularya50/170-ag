@@ -4,8 +4,12 @@ metadata:
   name: judge-scaler
 spec:
   ports:
-    - port: 6000
+    - name: grader
+      port: 6000
       targetPort: 6000
+    - name: scaler
+      port: 6001
+      targetPort: 6001
   selector:
     app: judge-scaler
 ---
@@ -29,8 +33,12 @@ spec:
           env:
             - name: ENV
               value: prod
+          envFrom:
+            - secretRef:
+                name: judge-secrets
           ports:
             - containerPort: 6000
+            - containerPort: 6001
         - name: cloud-sql-proxy
           image: gcr.io/cloudsql-docker/gce-proxy:1.28.0
           command:

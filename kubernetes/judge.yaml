@@ -20,11 +20,12 @@ spec:
             volumeMounts:
               - name: workdir
                 mountPath: /workdir
-              - name: secrets
-                mountPath: /secrets
             env:
               - name: MODE
                 value: SUBSCRIBE
+            envFrom:
+              - secretRef:
+                  name: judge-secrets
           - name: judge-executor
             image: gcr.io/formidable-gate-337712/autograder-judge:latest
             volumeMounts:
@@ -46,13 +47,12 @@ spec:
             volumeMounts:
               - name: workdir
                 mountPath: /workdir
-              - name: secrets
-                mountPath: /secrets
             env:
               - name: MODE
                 value: PUBLISH
-              - name: GOOGLE_APPLICATION_CREDENTIALS
-                value: /secrets/credentials.json
+            envFrom:
+              - secretRef:
+                  name: judge-secrets
         restartPolicy: Never
         volumes:
           - name: workdir
@@ -68,7 +68,7 @@ spec:
   triggers:
     - type: external
       metadata:
-        scalerAddress: "judge-scaler.default.svc.cluster.local:6000"
+        scalerAddress: "judge-scaler.default.svc.cluster.local:6001"
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy

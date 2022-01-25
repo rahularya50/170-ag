@@ -3,8 +3,8 @@ package schema
 import (
 	"170-ag/ent/generated"
 	"170-ag/ent/generated/privacy"
-	"170-ag/privacyrules"
-	"170-ag/site"
+	"170-ag/site/policy"
+	"170-ag/site/web"
 	"context"
 
 	"entgo.io/ent"
@@ -52,7 +52,7 @@ func allowUserMutateIfEmailMatchesContext() privacy.UserMutationRuleFunc {
 		if !m.Op().Is(ent.OpCreate) {
 			return privacy.Skip
 		}
-		email, ok := site.EmailFromContext(ctx)
+		email, ok := web.EmailFromContext(ctx)
 		if !ok {
 			return privacy.Skip
 		}
@@ -74,8 +74,8 @@ func (User) Policy() ent.Policy {
 			privacy.AlwaysDenyRule(),
 		},
 		Query: privacy.QueryPolicy{
-			privacyrules.DenyIfNoViewer(),
-			privacyrules.AllowQueryIfIDsMatchViewer(func(c context.Context, q generated.Query) ([]int, error) {
+			policy.DenyIfNoViewer(),
+			policy.AllowQueryIfIDsMatchViewer(func(c context.Context, q generated.Query) ([]int, error) {
 				return q.(*generated.UserQuery).Clone().IDs(c)
 			}),
 			privacy.AlwaysDenyRule(),

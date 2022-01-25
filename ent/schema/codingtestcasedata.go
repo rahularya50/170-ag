@@ -5,6 +5,7 @@ import (
 	"170-ag/ent/generated/codingtestcase"
 	"170-ag/ent/generated/privacy"
 	"170-ag/privacyrules"
+	"170-ag/site/policy"
 	"context"
 
 	"entgo.io/contrib/entgql"
@@ -62,8 +63,8 @@ func allowIfTestCaseIsPublic() privacy.QueryRule {
 func (CodingTestCaseData) Policy() ent.Policy {
 	return privacy.Policy{
 		Mutation: privacy.MutationPolicy{
-			privacyrules.DenyIfNoViewer(),
-			privacyrules.AllowIfViewerIsStaff(),
+			policy.DenyIfNoViewer(),
+			policy.AllowIfViewerIsStaff(),
 			privacy.AlwaysDenyRule(),
 		},
 		Query: privacy.QueryPolicy{
@@ -78,9 +79,9 @@ func (CodingTestCaseData) Policy() ent.Policy {
 			),
 			// The judge service account can always read test case data
 			privacyrules.AllowWithPrivacyAccessToken(privacyrules.JudgeScalingServerAccessToken),
-			privacyrules.DenyIfNoViewer(),
+			policy.DenyIfNoViewer(),
 			// staff can see private test data
-			privacyrules.AllowIfViewerIsStaff(),
+			policy.AllowIfViewerIsStaff(),
 			// if the case is public, we can show its data to anyone who can see the case
 			allowIfTestCaseIsPublic(),
 			// we also need to read its contents when sending a submission to the judge

@@ -14,12 +14,13 @@ import (
 	resolvers "170-ag/resolvers/generated"
 	model "170-ag/schema/generated"
 	"170-ag/site"
+	"170-ag/site/web"
 	"context"
 	"fmt"
 )
 
 func (r *codingProblemResolver) MyDraft(ctx context.Context, obj *ent.CodingProblem) (*ent.CodingDraft, error) {
-	viewer, ok := site.ViewerFromContext(ctx)
+	viewer, ok := web.ViewerFromContext(ctx)
 	if !ok {
 		return nil, fmt.Errorf("viewer not found")
 	}
@@ -27,7 +28,7 @@ func (r *codingProblemResolver) MyDraft(ctx context.Context, obj *ent.CodingProb
 }
 
 func (r *codingProblemResolver) MySubmissions(ctx context.Context, obj *ent.CodingProblem, after *ent.Cursor, first *int, before *ent.Cursor, last *int) (*ent.CodingSubmissionConnection, error) {
-	viewer, ok := site.ViewerFromContext(ctx)
+	viewer, ok := web.ViewerFromContext(ctx)
 	if !ok {
 		return nil, fmt.Errorf("viewer not found")
 	}
@@ -70,7 +71,7 @@ func (r *mutationResolver) NewProblem(ctx context.Context, input model.CodingPro
 }
 
 func (r *mutationResolver) SaveDraft(ctx context.Context, input model.CodingDraftInput) (*ent.CodingDraft, error) {
-	viewer, ok := site.ViewerFromContext(ctx)
+	viewer, ok := web.ViewerFromContext(ctx)
 	if !ok {
 		return nil, fmt.Errorf("viewer not found")
 	}
@@ -88,7 +89,7 @@ func (r *mutationResolver) SaveDraft(ctx context.Context, input model.CodingDraf
 }
 
 func (r *mutationResolver) CreateSubmission(ctx context.Context, input model.CodingSubmissionInput) (*ent.CodingSubmission, error) {
-	viewer, ok := site.ViewerFromContext(ctx)
+	viewer, ok := web.ViewerFromContext(ctx)
 	if !ok {
 		return nil, fmt.Errorf("viewer not found")
 	}
@@ -230,7 +231,7 @@ func (r *mutationResolver) DeleteTestCase(ctx context.Context, input model.Delet
 }
 
 func (r *queryResolver) Viewer(ctx context.Context) (*ent.User, error) {
-	viewer, ok := site.ViewerFromContext(ctx)
+	viewer, ok := web.ViewerFromContext(ctx)
 	if ok {
 		return viewer, nil
 	} else {

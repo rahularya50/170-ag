@@ -3,6 +3,7 @@ package judge
 import (
 	"170-ag/proto/schemas"
 	"context"
+	"os"
 )
 
 func PushToGradingQueue(ctx context.Context) error {
@@ -16,6 +17,7 @@ func PushToGradingQueue(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	response.Token = os.Getenv("SCALER_TOKEN")
 
 	client := schemas.NewJudgingServerClient(conn)
 

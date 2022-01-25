@@ -8,6 +8,8 @@ import (
 	"170-ag/ent/models"
 	"170-ag/privacyrules"
 	"170-ag/site"
+	"170-ag/site/policy"
+	"170-ag/site/web"
 	"context"
 	"time"
 
@@ -65,7 +67,7 @@ func (CodingSubmission) Indexes() []ent.Index {
 
 func denyIfRecentViewerSubmissionExistsSinceThreshold(threshold time.Duration) privacy.QueryMutationRule {
 	return privacy.ContextQueryMutationRule(func(c context.Context) error {
-		viewer, ok := site.ViewerFromContext(c)
+		viewer, ok := web.ViewerFromContext(c)
 		if !ok {
 			return privacy.Deny
 		}
@@ -87,8 +89,8 @@ func (CodingSubmission) Policy() ent.Policy {
 	return privacy.Policy{
 		Mutation: privacy.MutationPolicy{
 			privacyrules.AllowWithPrivacyAccessToken(privacyrules.JudgeScalingServerAccessToken),
-			privacyrules.DenyIfNoViewer(),
-			privacyrules.AllowIfViewerIsStaff(),
+			policy.DenyIfNoViewer(),
+			policy.AllowIfViewerIsStaff(),
 			// students can only create submissions
 			privacy.CodingSubmissionMutationRuleFunc(func(c context.Context, cdm *generated.CodingSubmissionMutation) error {
 				if !cdm.Op().Is(ent.OpCreate) {
@@ -117,7 +119,7 @@ func (CodingSubmission) Policy() ent.Policy {
 				return privacy.Skip
 			}),
 			denyIfRecentViewerSubmissionExistsSinceThreshold(time.Minute),
-			privacyrules.FilterToViewerID(func(c context.Context, f privacy.Filter, user_id int) error {
+			policy.FilterToViewerID(func(c context.Context, f privacy.Filter, user_id int) error {
 				f.(*generated.CodingSubmissionFilter).WhereHasAuthorWith(user.ID(user_id))
 				return privacy.Allow
 			}),
@@ -125,9 +127,9 @@ func (CodingSubmission) Policy() ent.Policy {
 		},
 		Query: privacy.QueryPolicy{
 			privacyrules.AllowWithPrivacyAccessToken(privacyrules.JudgeScalingServerAccessToken),
-			privacyrules.DenyIfNoViewer(),
-			privacyrules.AllowIfViewerIsStaff(),
-			privacyrules.AllowQueryIfIDsMatchViewer(func(c context.Context, q ent.Query) ([]int, error) {
+			policy.DenyIfNoViewer(),
+			policy.AllowIfViewerIsStaff(),
+			policy.AllowQueryIfIDsMatchViewer(func(c context.Context, q ent.Query) ([]int, error) {
 				return q.(*generated.CodingSubmissionQuery).Clone().QueryAuthor().IDs(c)
 			}),
 			privacy.AlwaysDenyRule(),

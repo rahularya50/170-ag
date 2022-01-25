@@ -5,6 +5,7 @@ import (
 	_ "170-ag/ent/generated/runtime"
 	"170-ag/resolvers"
 	"170-ag/site"
+	"170-ag/site/web"
 	"context"
 	"log"
 	"net/http"
@@ -37,14 +38,14 @@ func main() {
 	}
 
 	var srv http.Handler = handler.NewDefaultServer(resolvers.NewSchema(client))
-	srv = site.HandlerWithViewerContext(srv, client)
+	srv = web.HandlerWithViewerContext(srv, client)
 	srv = site.HandleWithEntClient(srv, client)
 
 	http.Handle("/playground", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)
 
-	http.Handle("/login", site.LoginHandler(client))
-	http.HandleFunc("/logout", site.HandleLogout)
+	http.Handle("/login", web.LoginHandler(client))
+	http.HandleFunc("/logout", web.HandleLogout)
 
 	log.Printf("connect to http://localhost:%s/playground for GraphQL playground", port)
 

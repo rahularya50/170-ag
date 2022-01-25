@@ -1,4 +1,4 @@
-package site
+package web
 
 import (
 	ent "170-ag/ent/generated"

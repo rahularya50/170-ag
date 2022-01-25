@@ -8,13 +8,14 @@ message JudgingRequest {
   fixed64 id_nonce = 3;
 }
 
-message GetJudgingRequestParams {}
+message GetJudgingRequestParams { string token = 1; }
 
 message GradingResponse {
   fixed64 id_nonce = 1;
   string stdout = 2;
   string stderr = 3;
   string error_code = 4;
+  string token = 5;
 }
 
 message GradingReply {}

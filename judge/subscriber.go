@@ -3,6 +3,7 @@ package judge
 import (
 	"170-ag/proto/schemas"
 	"context"
+	"os"
 )
 
 func PopFromJudgingQueue(ctx context.Context) error {
@@ -13,7 +14,9 @@ func PopFromJudgingQueue(ctx context.Context) error {
 	defer conn.Close()
 
 	client := schemas.NewJudgingServerClient(conn)
-	judgingRequest, err := client.GetJudgingRequest(ctx, &schemas.GetJudgingRequestParams{})
+	judgingRequest, err := client.GetJudgingRequest(ctx, &schemas.GetJudgingRequestParams{
+		Token: os.Getenv("SCALER_TOKEN"),
+	})
 	if err != nil {
 		return err
 	}

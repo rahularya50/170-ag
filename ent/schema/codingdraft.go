@@ -4,7 +4,7 @@ import (
 	"170-ag/ent/generated"
 	"170-ag/ent/generated/privacy"
 	"170-ag/ent/generated/user"
-	"170-ag/privacyrules"
+	"170-ag/site/policy"
 	"context"
 
 	"entgo.io/contrib/entgql"
@@ -50,18 +50,18 @@ func (CodingDraft) Indexes() []ent.Index {
 func (CodingDraft) Policy() ent.Policy {
 	return privacy.Policy{
 		Mutation: privacy.MutationPolicy{
-			privacyrules.DenyIfNoViewer(),
-			privacyrules.AllowIfViewerIsStaff(),
-			privacyrules.FilterToViewerID(func(c context.Context, f privacy.Filter, user_id int) error {
+			policy.DenyIfNoViewer(),
+			policy.AllowIfViewerIsStaff(),
+			policy.FilterToViewerID(func(c context.Context, f privacy.Filter, user_id int) error {
 				f.(*generated.CodingDraftFilter).WhereHasAuthorWith(user.ID(user_id))
 				return privacy.Allow
 			}),
 			privacy.AlwaysDenyRule(),
 		},
 		Query: privacy.QueryPolicy{
-			privacyrules.DenyIfNoViewer(),
-			privacyrules.AllowIfViewerIsStaff(),
-			privacyrules.AllowQueryIfIDsMatchViewer(func(c context.Context, q ent.Query) ([]int, error) {
+			policy.DenyIfNoViewer(),
+			policy.AllowIfViewerIsStaff(),
+			policy.AllowQueryIfIDsMatchViewer(func(c context.Context, q ent.Query) ([]int, error) {
 				return q.(*generated.CodingDraftQuery).Clone().QueryAuthor().IDs(c)
 			}),
 			privacy.AlwaysDenyRule(),
