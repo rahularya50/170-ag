@@ -1,47 +1,3 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: judge-scaler
-spec:
-  ports:
-    - port: 6000
-      targetPort: 6000
-  selector:
-    app: judge-scaler
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: judge-scaler
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: judge-scaler
-  template:
-    metadata:
-      labels:
-        app: judge-scaler
-    spec:
-      containers:
-        - name: scaler
-          image: gcr.io/formidable-gate-337712/autograder-judge-scaler:latest
-          env:
-            - name: ENV
-              value: prod
-          ports:
-            - containerPort: 6000
-        - name: cloud-sql-proxy
-          image: gcr.io/cloudsql-docker/gce-proxy:1.28.0
-          command:
-            - "/cloud_sql_proxy"
-            - "-instances=formidable-gate-337712:us-west2:cs170-db=tcp:5432"
-            - "-enable_iam_login"
-            - "-ip_address_types=PRIVATE"
-          securityContext:
-            runAsNonRoot: true
-      serviceAccountName: autograder-web
----
 apiVersion: keda.sh/v1alpha1
 kind: ScaledJob
 metadata:
@@ -53,6 +9,9 @@ spec:
     activeDeadlineSeconds: 60
     backoffLimit: 0
     template:
+      metadata:
+        labels:
+          app: scaled-judge-worker
       spec:
         runtimeClassName: gvisor
         initContainers:
@@ -110,3 +69,30 @@ spec:
     - type: external
       metadata:
         scalerAddress: "judge-scaler.default.svc.cluster.local:6000"
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: judge-worker-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: scaled-judge-worker
+  policyTypes:
+    - Ingress
+    - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: judge-scaler
+      ports:
+        - protocol: TCP
+          port: 6000
+    - to:
+      - namespaceSelector:
+          matchLabels:
+            name: kube-system
+      ports:
+      - port: 53
+        protocol: UDP
