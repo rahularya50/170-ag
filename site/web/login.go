@@ -6,7 +6,6 @@ import (
 	"170-ag/ent/generated/user"
 	"context"
 	"crypto/hmac"
-	"fmt"
 	"net/http"
 	"os"
 
@@ -128,10 +127,7 @@ func (handler *loginHandler) ServeHTTP(resp http.ResponseWriter, req *http.Reque
 		panic("failed to update session store")
 	}
 
-	_, err = resp.Write([]byte(fmt.Sprintf("Logged in with email %s and name %s", email, *name)))
-	if err != nil {
-		panic("failed to write back to client")
-	}
+	http.Redirect(resp, req, "/", http.StatusFound)
 }
 
 func HandleLogout(resp http.ResponseWriter, req *http.Request) {
