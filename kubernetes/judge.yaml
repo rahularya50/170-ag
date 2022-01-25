@@ -4,8 +4,8 @@ metadata:
   name: judge-scaler
 spec:
   ports:
-  - port: 6000
-    targetPort: 6000
+    - port: 6000
+      targetPort: 6000
   selector:
     app: judge-scaler
 ---
@@ -24,22 +24,22 @@ spec:
         app: judge-scaler
     spec:
       containers:
-      - name: scaler
-        image: gcr.io/formidable-gate-337712/autograder-judge-scaler:latest
-        env:
-          - name: ENV
-            value: prod
-        ports:
-        - containerPort: 6000
-      - name: cloud-sql-proxy
-        image: gcr.io/cloudsql-docker/gce-proxy:1.28.0
-        command:
-          - "/cloud_sql_proxy"
-          - "-instances=formidable-gate-337712:us-west2:cs170-db=tcp:5432"
-          - "-enable_iam_login"
-          - "-ip_address_types=PRIVATE"
-        securityContext:
-          runAsNonRoot: true
+        - name: scaler
+          image: gcr.io/formidable-gate-337712/autograder-judge-scaler:latest
+          env:
+            - name: ENV
+              value: prod
+          ports:
+            - containerPort: 6000
+        - name: cloud-sql-proxy
+          image: gcr.io/cloudsql-docker/gce-proxy:1.28.0
+          command:
+            - "/cloud_sql_proxy"
+            - "-instances=formidable-gate-337712:us-west2:cs170-db=tcp:5432"
+            - "-enable_iam_login"
+            - "-ip_address_types=PRIVATE"
+          securityContext:
+            runAsNonRoot: true
       serviceAccountName: autograder-web
 ---
 apiVersion: keda.sh/v1alpha1
@@ -74,6 +74,13 @@ spec:
             env:
               - name: MODE
                 value: JUDGE
+            resources:
+              limits:
+                cpu: 500m
+                memory: 1G
+              requests:
+                cpu: 500m
+                memory: 1G
         containers:
           - name: judge-publisher
             image: gcr.io/formidable-gate-337712/autograder-judge:latest
