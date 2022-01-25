@@ -11,6 +11,7 @@ import {
 import useInterval from "use-interval";
 import type { ProblemSubmissions_problem$key } from "./__generated__/ProblemSubmissions_problem.graphql";
 import ProblemSubmissionsRefetchQuery from "./__generated__/ProblemSubmissionsRefetchQuery.graphql";
+import { Table } from "react-bootstrap";
 
 type Props = {
   problem: ProblemSubmissions_problem$key,
@@ -27,6 +28,8 @@ export default function ProblemSubmissions(props: Props): React.Node {
             node {
               id
               status
+              create_time
+              points
             }
           }
         }
@@ -53,10 +56,35 @@ export default function ProblemSubmissions(props: Props): React.Node {
   useInterval(refresh, 5000);
 
   return (
-    <>
-      {my_submissions.edges.map(({ node: submission }) => (
-        <p key={submission.id}>Submission (status={submission.status})</p>
-      ))}
-    </>
+    <Table hover>
+      <thead>
+        <tr>
+          <th>Submission Time</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {my_submissions.edges.map(({ node: submission }) => (
+          <tr key={submission.id}>
+            <td>
+              {Intl.DateTimeFormat("en-US", {
+                hour: "numeric",
+                minute: "numeric",
+                day: "numeric",
+                month: "numeric",
+                year: "numeric",
+              }).format(new Date(submission.create_time))}
+            </td>
+            <td>
+              {submission.points == null ? (
+                submission.status
+              ) : (
+                <>{submission.points} Points</>
+              )}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </Table>
   );
 }

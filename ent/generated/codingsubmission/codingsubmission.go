@@ -24,6 +24,8 @@ const (
 	FieldCode = "code"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
+	// FieldPoints holds the string denoting the points field in the database.
+	FieldPoints = "points"
 	// FieldResults holds the string denoting the results field in the database.
 	FieldResults = "results"
 	// EdgeAuthor holds the string denoting the author edge name in mutations.
@@ -64,6 +66,7 @@ var Columns = []string{
 	FieldUpdateTime,
 	FieldCode,
 	FieldStatus,
+	FieldPoints,
 	FieldResults,
 }
 

@@ -2,7 +2,6 @@ package schema
 
 import (
 	"170-ag/ent/generated"
-	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/privacy"
 	"170-ag/ent/generated/user"
 	"170-ag/ent/models"
@@ -33,6 +32,7 @@ func (CodingSubmission) Fields() []ent.Field {
 				"Completed", "COMPLETED",
 			).
 			Default("QUEUED"),
+		field.Int("points").Optional().Nillable(),
 		field.JSON("results", models.CodingSubmissionResults{}).Optional(),
 	}
 }
@@ -67,13 +67,21 @@ func (CodingSubmission) Policy() ent.Policy {
 			privacyrules.DenyIfNoViewer(),
 			privacyrules.AllowIfViewerIsStaff(),
 			privacy.CodingSubmissionMutationRuleFunc(func(c context.Context, csm *generated.CodingSubmissionMutation) error {
-				status, statusSet := csm.Status()
-
-				if csm.Op().Is(ent.OpCreate) && status == codingsubmission.DefaultStatus {
-					// this is OK
-				} else if statusSet {
-					return privacy.Denyf("Cannot explicitly set status of submission, except to initialize to default")
+				_, statusSet := csm.Status()
+				if statusSet {
+					return privacy.Deny
 				}
+
+				_, pointsSet := csm.Points()
+				if pointsSet {
+					return privacy.Deny
+				}
+
+				_, resultsSet := csm.Results()
+				if resultsSet {
+					return privacy.Deny
+				}
+
 				return privacy.Skip
 			}),
 			privacyrules.FilterToViewerID(func(c context.Context, f privacy.Filter, user_id int) error {

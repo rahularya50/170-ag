@@ -52,6 +52,33 @@ func (csu *CodingSubmissionUpdate) SetNillableStatus(c *codingsubmission.Status)
 	return csu
 }
 
+// SetPoints sets the "points" field.
+func (csu *CodingSubmissionUpdate) SetPoints(i int) *CodingSubmissionUpdate {
+	csu.mutation.ResetPoints()
+	csu.mutation.SetPoints(i)
+	return csu
+}
+
+// SetNillablePoints sets the "points" field if the given value is not nil.
+func (csu *CodingSubmissionUpdate) SetNillablePoints(i *int) *CodingSubmissionUpdate {
+	if i != nil {
+		csu.SetPoints(*i)
+	}
+	return csu
+}
+
+// AddPoints adds i to the "points" field.
+func (csu *CodingSubmissionUpdate) AddPoints(i int) *CodingSubmissionUpdate {
+	csu.mutation.AddPoints(i)
+	return csu
+}
+
+// ClearPoints clears the value of the "points" field.
+func (csu *CodingSubmissionUpdate) ClearPoints() *CodingSubmissionUpdate {
+	csu.mutation.ClearPoints()
+	return csu
+}
+
 // SetResults sets the "results" field.
 func (csu *CodingSubmissionUpdate) SetResults(msr models.CodingSubmissionResults) *CodingSubmissionUpdate {
 	csu.mutation.SetResults(msr)
@@ -259,6 +286,26 @@ func (csu *CodingSubmissionUpdate) sqlSave(ctx context.Context) (n int, err erro
 			Column: codingsubmission.FieldStatus,
 		})
 	}
+	if value, ok := csu.mutation.Points(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: codingsubmission.FieldPoints,
+		})
+	}
+	if value, ok := csu.mutation.AddedPoints(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: codingsubmission.FieldPoints,
+		})
+	}
+	if csu.mutation.PointsCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Column: codingsubmission.FieldPoints,
+		})
+	}
 	if value, ok := csu.mutation.Results(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeJSON,
@@ -413,6 +460,33 @@ func (csuo *CodingSubmissionUpdateOne) SetNillableStatus(c *codingsubmission.Sta
 	if c != nil {
 		csuo.SetStatus(*c)
 	}
+	return csuo
+}
+
+// SetPoints sets the "points" field.
+func (csuo *CodingSubmissionUpdateOne) SetPoints(i int) *CodingSubmissionUpdateOne {
+	csuo.mutation.ResetPoints()
+	csuo.mutation.SetPoints(i)
+	return csuo
+}
+
+// SetNillablePoints sets the "points" field if the given value is not nil.
+func (csuo *CodingSubmissionUpdateOne) SetNillablePoints(i *int) *CodingSubmissionUpdateOne {
+	if i != nil {
+		csuo.SetPoints(*i)
+	}
+	return csuo
+}
+
+// AddPoints adds i to the "points" field.
+func (csuo *CodingSubmissionUpdateOne) AddPoints(i int) *CodingSubmissionUpdateOne {
+	csuo.mutation.AddPoints(i)
+	return csuo
+}
+
+// ClearPoints clears the value of the "points" field.
+func (csuo *CodingSubmissionUpdateOne) ClearPoints() *CodingSubmissionUpdateOne {
+	csuo.mutation.ClearPoints()
 	return csuo
 }
 
@@ -645,6 +719,26 @@ func (csuo *CodingSubmissionUpdateOne) sqlSave(ctx context.Context) (_node *Codi
 			Type:   field.TypeEnum,
 			Value:  value,
 			Column: codingsubmission.FieldStatus,
+		})
+	}
+	if value, ok := csuo.mutation.Points(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: codingsubmission.FieldPoints,
+		})
+	}
+	if value, ok := csuo.mutation.AddedPoints(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: codingsubmission.FieldPoints,
+		})
+	}
+	if csuo.mutation.PointsCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Column: codingsubmission.FieldPoints,
 		})
 	}
 	if value, ok := csuo.mutation.Results(); ok {

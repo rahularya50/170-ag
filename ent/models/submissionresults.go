@@ -7,6 +7,7 @@ type CodingSubmissionResults struct {
 type CodingSubmissionCaseResults struct {
 	CaseName string
 	Result   CodingSubmissionResult
+	Points   int
 }
 
 type CodingSubmissionResult string

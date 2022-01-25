@@ -19,6 +19,7 @@ interface Node {
 }
 
 scalar Cursor
+scalar Time
 
 type PageInfo {
   hasNextPage: Boolean!
@@ -156,12 +157,14 @@ enum CodingSubmissionStatus
 
 type CodingSubmission implements Node {
   id: ID!
-  author: User!
+  create_time: Time!
   code: String!
-  coding_problem: CodingProblem!
   status: CodingSubmissionStatus!
   staff_data: CodingSubmissionStaffData!
-  results: CodingSubmissionResults!
+  results: CodingSubmissionResults
+  points: Int
+  author: User!
+  coding_problem: CodingProblem!
 }
 
 type CodingSubmissionResults {

@@ -74,6 +74,20 @@ func (csc *CodingSubmissionCreate) SetNillableStatus(c *codingsubmission.Status)
 	return csc
 }
 
+// SetPoints sets the "points" field.
+func (csc *CodingSubmissionCreate) SetPoints(i int) *CodingSubmissionCreate {
+	csc.mutation.SetPoints(i)
+	return csc
+}
+
+// SetNillablePoints sets the "points" field if the given value is not nil.
+func (csc *CodingSubmissionCreate) SetNillablePoints(i *int) *CodingSubmissionCreate {
+	if i != nil {
+		csc.SetPoints(*i)
+	}
+	return csc
+}
+
 // SetResults sets the "results" field.
 func (csc *CodingSubmissionCreate) SetResults(msr models.CodingSubmissionResults) *CodingSubmissionCreate {
 	csc.mutation.SetResults(msr)
@@ -313,6 +327,14 @@ func (csc *CodingSubmissionCreate) createSpec() (*CodingSubmission, *sqlgraph.Cr
 		})
 		_node.Status = value
 	}
+	if value, ok := csc.mutation.Points(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: codingsubmission.FieldPoints,
+		})
+		_node.Points = &value
+	}
 	if value, ok := csc.mutation.Results(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeJSON,
@@ -483,6 +505,30 @@ func (u *CodingSubmissionUpsert) UpdateStatus() *CodingSubmissionUpsert {
 	return u
 }
 
+// SetPoints sets the "points" field.
+func (u *CodingSubmissionUpsert) SetPoints(v int) *CodingSubmissionUpsert {
+	u.Set(codingsubmission.FieldPoints, v)
+	return u
+}
+
+// UpdatePoints sets the "points" field to the value that was provided on create.
+func (u *CodingSubmissionUpsert) UpdatePoints() *CodingSubmissionUpsert {
+	u.SetExcluded(codingsubmission.FieldPoints)
+	return u
+}
+
+// AddPoints adds v to the "points" field.
+func (u *CodingSubmissionUpsert) AddPoints(v int) *CodingSubmissionUpsert {
+	u.Add(codingsubmission.FieldPoints, v)
+	return u
+}
+
+// ClearPoints clears the value of the "points" field.
+func (u *CodingSubmissionUpsert) ClearPoints() *CodingSubmissionUpsert {
+	u.SetNull(codingsubmission.FieldPoints)
+	return u
+}
+
 // SetResults sets the "results" field.
 func (u *CodingSubmissionUpsert) SetResults(v models.CodingSubmissionResults) *CodingSubmissionUpsert {
 	u.Set(codingsubmission.FieldResults, v)
@@ -604,6 +650,34 @@ func (u *CodingSubmissionUpsertOne) SetStatus(v codingsubmission.Status) *Coding
 func (u *CodingSubmissionUpsertOne) UpdateStatus() *CodingSubmissionUpsertOne {
 	return u.Update(func(s *CodingSubmissionUpsert) {
 		s.UpdateStatus()
+	})
+}
+
+// SetPoints sets the "points" field.
+func (u *CodingSubmissionUpsertOne) SetPoints(v int) *CodingSubmissionUpsertOne {
+	return u.Update(func(s *CodingSubmissionUpsert) {
+		s.SetPoints(v)
+	})
+}
+
+// AddPoints adds v to the "points" field.
+func (u *CodingSubmissionUpsertOne) AddPoints(v int) *CodingSubmissionUpsertOne {
+	return u.Update(func(s *CodingSubmissionUpsert) {
+		s.AddPoints(v)
+	})
+}
+
+// UpdatePoints sets the "points" field to the value that was provided on create.
+func (u *CodingSubmissionUpsertOne) UpdatePoints() *CodingSubmissionUpsertOne {
+	return u.Update(func(s *CodingSubmissionUpsert) {
+		s.UpdatePoints()
+	})
+}
+
+// ClearPoints clears the value of the "points" field.
+func (u *CodingSubmissionUpsertOne) ClearPoints() *CodingSubmissionUpsertOne {
+	return u.Update(func(s *CodingSubmissionUpsert) {
+		s.ClearPoints()
 	})
 }
 
@@ -895,6 +969,34 @@ func (u *CodingSubmissionUpsertBulk) SetStatus(v codingsubmission.Status) *Codin
 func (u *CodingSubmissionUpsertBulk) UpdateStatus() *CodingSubmissionUpsertBulk {
 	return u.Update(func(s *CodingSubmissionUpsert) {
 		s.UpdateStatus()
+	})
+}
+
+// SetPoints sets the "points" field.
+func (u *CodingSubmissionUpsertBulk) SetPoints(v int) *CodingSubmissionUpsertBulk {
+	return u.Update(func(s *CodingSubmissionUpsert) {
+		s.SetPoints(v)
+	})
+}
+
+// AddPoints adds v to the "points" field.
+func (u *CodingSubmissionUpsertBulk) AddPoints(v int) *CodingSubmissionUpsertBulk {
+	return u.Update(func(s *CodingSubmissionUpsert) {
+		s.AddPoints(v)
+	})
+}
+
+// UpdatePoints sets the "points" field to the value that was provided on create.
+func (u *CodingSubmissionUpsertBulk) UpdatePoints() *CodingSubmissionUpsertBulk {
+	return u.Update(func(s *CodingSubmissionUpsert) {
+		s.UpdatePoints()
+	})
+}
+
+// ClearPoints clears the value of the "points" field.
+func (u *CodingSubmissionUpsertBulk) ClearPoints() *CodingSubmissionUpsertBulk {
+	return u.Update(func(s *CodingSubmissionUpsert) {
+		s.ClearPoints()
 	})
 }
 

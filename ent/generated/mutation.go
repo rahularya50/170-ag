@@ -1382,6 +1382,8 @@ type CodingSubmissionMutation struct {
 	update_time           *time.Time
 	code                  *string
 	status                *codingsubmission.Status
+	points                *int
+	addpoints             *int
 	results               *models.CodingSubmissionResults
 	clearedFields         map[string]struct{}
 	author                *int
@@ -1637,6 +1639,76 @@ func (m *CodingSubmissionMutation) ResetStatus() {
 	m.status = nil
 }
 
+// SetPoints sets the "points" field.
+func (m *CodingSubmissionMutation) SetPoints(i int) {
+	m.points = &i
+	m.addpoints = nil
+}
+
+// Points returns the value of the "points" field in the mutation.
+func (m *CodingSubmissionMutation) Points() (r int, exists bool) {
+	v := m.points
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPoints returns the old "points" field's value of the CodingSubmission entity.
+// If the CodingSubmission object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CodingSubmissionMutation) OldPoints(ctx context.Context) (v *int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPoints is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPoints requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPoints: %w", err)
+	}
+	return oldValue.Points, nil
+}
+
+// AddPoints adds i to the "points" field.
+func (m *CodingSubmissionMutation) AddPoints(i int) {
+	if m.addpoints != nil {
+		*m.addpoints += i
+	} else {
+		m.addpoints = &i
+	}
+}
+
+// AddedPoints returns the value that was added to the "points" field in this mutation.
+func (m *CodingSubmissionMutation) AddedPoints() (r int, exists bool) {
+	v := m.addpoints
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearPoints clears the value of the "points" field.
+func (m *CodingSubmissionMutation) ClearPoints() {
+	m.points = nil
+	m.addpoints = nil
+	m.clearedFields[codingsubmission.FieldPoints] = struct{}{}
+}
+
+// PointsCleared returns if the "points" field was cleared in this mutation.
+func (m *CodingSubmissionMutation) PointsCleared() bool {
+	_, ok := m.clearedFields[codingsubmission.FieldPoints]
+	return ok
+}
+
+// ResetPoints resets all changes to the "points" field.
+func (m *CodingSubmissionMutation) ResetPoints() {
+	m.points = nil
+	m.addpoints = nil
+	delete(m.clearedFields, codingsubmission.FieldPoints)
+}
+
 // SetResults sets the "results" field.
 func (m *CodingSubmissionMutation) SetResults(msr models.CodingSubmissionResults) {
 	m.results = &msr
@@ -1822,7 +1894,7 @@ func (m *CodingSubmissionMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CodingSubmissionMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.create_time != nil {
 		fields = append(fields, codingsubmission.FieldCreateTime)
 	}
@@ -1834,6 +1906,9 @@ func (m *CodingSubmissionMutation) Fields() []string {
 	}
 	if m.status != nil {
 		fields = append(fields, codingsubmission.FieldStatus)
+	}
+	if m.points != nil {
+		fields = append(fields, codingsubmission.FieldPoints)
 	}
 	if m.results != nil {
 		fields = append(fields, codingsubmission.FieldResults)
@@ -1854,6 +1929,8 @@ func (m *CodingSubmissionMutation) Field(name string) (ent.Value, bool) {
 		return m.Code()
 	case codingsubmission.FieldStatus:
 		return m.Status()
+	case codingsubmission.FieldPoints:
+		return m.Points()
 	case codingsubmission.FieldResults:
 		return m.Results()
 	}
@@ -1873,6 +1950,8 @@ func (m *CodingSubmissionMutation) OldField(ctx context.Context, name string) (e
 		return m.OldCode(ctx)
 	case codingsubmission.FieldStatus:
 		return m.OldStatus(ctx)
+	case codingsubmission.FieldPoints:
+		return m.OldPoints(ctx)
 	case codingsubmission.FieldResults:
 		return m.OldResults(ctx)
 	}
@@ -1912,6 +1991,13 @@ func (m *CodingSubmissionMutation) SetField(name string, value ent.Value) error 
 		}
 		m.SetStatus(v)
 		return nil
+	case codingsubmission.FieldPoints:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPoints(v)
+		return nil
 	case codingsubmission.FieldResults:
 		v, ok := value.(models.CodingSubmissionResults)
 		if !ok {
@@ -1926,13 +2012,21 @@ func (m *CodingSubmissionMutation) SetField(name string, value ent.Value) error 
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *CodingSubmissionMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addpoints != nil {
+		fields = append(fields, codingsubmission.FieldPoints)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *CodingSubmissionMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case codingsubmission.FieldPoints:
+		return m.AddedPoints()
+	}
 	return nil, false
 }
 
@@ -1941,6 +2035,13 @@ func (m *CodingSubmissionMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *CodingSubmissionMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case codingsubmission.FieldPoints:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddPoints(v)
+		return nil
 	}
 	return fmt.Errorf("unknown CodingSubmission numeric field %s", name)
 }
@@ -1949,6 +2050,9 @@ func (m *CodingSubmissionMutation) AddField(name string, value ent.Value) error 
 // mutation.
 func (m *CodingSubmissionMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(codingsubmission.FieldPoints) {
+		fields = append(fields, codingsubmission.FieldPoints)
+	}
 	if m.FieldCleared(codingsubmission.FieldResults) {
 		fields = append(fields, codingsubmission.FieldResults)
 	}
@@ -1966,6 +2070,9 @@ func (m *CodingSubmissionMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *CodingSubmissionMutation) ClearField(name string) error {
 	switch name {
+	case codingsubmission.FieldPoints:
+		m.ClearPoints()
+		return nil
 	case codingsubmission.FieldResults:
 		m.ClearResults()
 		return nil
@@ -1988,6 +2095,9 @@ func (m *CodingSubmissionMutation) ResetField(name string) error {
 		return nil
 	case codingsubmission.FieldStatus:
 		m.ResetStatus()
+		return nil
+	case codingsubmission.FieldPoints:
+		m.ResetPoints()
 		return nil
 	case codingsubmission.FieldResults:
 		m.ResetResults()

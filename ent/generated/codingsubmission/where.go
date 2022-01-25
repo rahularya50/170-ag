@@ -114,6 +114,13 @@ func Code(v string) predicate.CodingSubmission {
 	})
 }
 
+// Points applies equality check predicate on the "points" field. It's identical to PointsEQ.
+func Points(v int) predicate.CodingSubmission {
+	return predicate.CodingSubmission(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldPoints), v))
+	})
+}
+
 // CreateTimeEQ applies the EQ predicate on the "create_time" field.
 func CreateTimeEQ(v time.Time) predicate.CodingSubmission {
 	return predicate.CodingSubmission(func(s *sql.Selector) {
@@ -422,6 +429,96 @@ func StatusNotIn(vs ...Status) predicate.CodingSubmission {
 			return
 		}
 		s.Where(sql.NotIn(s.C(FieldStatus), v...))
+	})
+}
+
+// PointsEQ applies the EQ predicate on the "points" field.
+func PointsEQ(v int) predicate.CodingSubmission {
+	return predicate.CodingSubmission(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldPoints), v))
+	})
+}
+
+// PointsNEQ applies the NEQ predicate on the "points" field.
+func PointsNEQ(v int) predicate.CodingSubmission {
+	return predicate.CodingSubmission(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldPoints), v))
+	})
+}
+
+// PointsIn applies the In predicate on the "points" field.
+func PointsIn(vs ...int) predicate.CodingSubmission {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.CodingSubmission(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldPoints), v...))
+	})
+}
+
+// PointsNotIn applies the NotIn predicate on the "points" field.
+func PointsNotIn(vs ...int) predicate.CodingSubmission {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.CodingSubmission(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldPoints), v...))
+	})
+}
+
+// PointsGT applies the GT predicate on the "points" field.
+func PointsGT(v int) predicate.CodingSubmission {
+	return predicate.CodingSubmission(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldPoints), v))
+	})
+}
+
+// PointsGTE applies the GTE predicate on the "points" field.
+func PointsGTE(v int) predicate.CodingSubmission {
+	return predicate.CodingSubmission(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldPoints), v))
+	})
+}
+
+// PointsLT applies the LT predicate on the "points" field.
+func PointsLT(v int) predicate.CodingSubmission {
+	return predicate.CodingSubmission(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldPoints), v))
+	})
+}
+
+// PointsLTE applies the LTE predicate on the "points" field.
+func PointsLTE(v int) predicate.CodingSubmission {
+	return predicate.CodingSubmission(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldPoints), v))
+	})
+}
+
+// PointsIsNil applies the IsNil predicate on the "points" field.
+func PointsIsNil() predicate.CodingSubmission {
+	return predicate.CodingSubmission(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldPoints)))
+	})
+}
+
+// PointsNotNil applies the NotNil predicate on the "points" field.
+func PointsNotNil() predicate.CodingSubmission {
+	return predicate.CodingSubmission(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldPoints)))
 	})
 }
 

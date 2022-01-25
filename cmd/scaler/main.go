@@ -147,18 +147,25 @@ func (s *ScalerServer) SubmitGradingResponse(ctx context.Context, response *sche
 	if err != nil {
 		return nil, err
 	}
-	test_case_data, err := submission.
+	test_cases, err := submission.
 		QueryCodingProblem().
 		QueryTestCases().
 		Order(ent.Asc(codingtestcase.FieldCreateTime)).
-		QueryData().
+		WithData().
 		All(ctx)
 	if err != nil {
 		return nil, err
 	}
+
+	results := site.ScoreOutput(test_cases, response.Stdout)
+	points := 0
+	for _, result := range results.CaseResults {
+		points += result.Points
+	}
 	err = submission.Update().
 		SetStatus(codingsubmission.StatusCompleted).
-		SetResults(site.ScoreOutput(test_case_data, response.Stdout)).
+		SetResults(results).
+		SetPoints(points).
 		Exec(ctx)
 	if err != nil {
 		return nil, err

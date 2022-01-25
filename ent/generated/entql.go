@@ -70,6 +70,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			codingsubmission.FieldUpdateTime: {Type: field.TypeTime, Column: codingsubmission.FieldUpdateTime},
 			codingsubmission.FieldCode:       {Type: field.TypeString, Column: codingsubmission.FieldCode},
 			codingsubmission.FieldStatus:     {Type: field.TypeEnum, Column: codingsubmission.FieldStatus},
+			codingsubmission.FieldPoints:     {Type: field.TypeInt, Column: codingsubmission.FieldPoints},
 			codingsubmission.FieldResults:    {Type: field.TypeJSON, Column: codingsubmission.FieldResults},
 		},
 	}
@@ -555,6 +556,11 @@ func (f *CodingSubmissionFilter) WhereCode(p entql.StringP) {
 // WhereStatus applies the entql string predicate on the status field.
 func (f *CodingSubmissionFilter) WhereStatus(p entql.StringP) {
 	f.Where(p.Field(codingsubmission.FieldStatus))
+}
+
+// WherePoints applies the entql int predicate on the points field.
+func (f *CodingSubmissionFilter) WherePoints(p entql.IntP) {
+	f.Where(p.Field(codingsubmission.FieldPoints))
 }
 
 // WhereResults applies the entql json.RawMessage predicate on the results field.
