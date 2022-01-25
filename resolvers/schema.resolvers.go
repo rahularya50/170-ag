@@ -31,7 +31,10 @@ func (r *codingProblemResolver) MySubmissions(ctx context.Context, obj *ent.Codi
 	if !ok {
 		return nil, fmt.Errorf("viewer not found")
 	}
-	return obj.QuerySubmissions().Where(codingsubmission.HasAuthorWith(user.ID(viewer.ID))).Paginate(ctx, after, first, before, last)
+	return obj.QuerySubmissions().
+		Where(codingsubmission.HasAuthorWith(user.ID(viewer.ID))).
+		Order(ent.Desc(codingsubmission.FieldCreateTime)).
+		Paginate(ctx, after, first, before, last)
 }
 
 func (r *codingProblemResolver) AllSubmissions(ctx context.Context, obj *ent.CodingProblem, after *ent.Cursor, first *int, before *ent.Cursor, last *int) (*ent.CodingSubmissionConnection, error) {

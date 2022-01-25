@@ -2,6 +2,7 @@ package schema
 
 import (
 	"170-ag/ent/generated"
+	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/privacy"
 	"170-ag/ent/generated/user"
 	"170-ag/ent/models"
@@ -67,8 +68,10 @@ func (CodingSubmission) Policy() ent.Policy {
 			privacyrules.DenyIfNoViewer(),
 			privacyrules.AllowIfViewerIsStaff(),
 			privacy.CodingSubmissionMutationRuleFunc(func(c context.Context, csm *generated.CodingSubmissionMutation) error {
-				_, statusSet := csm.Status()
-				if statusSet {
+				status, statusSet := csm.Status()
+				if csm.Op().Is(ent.OpCreate) && status == codingsubmission.DefaultStatus {
+					// students can enqueue submissions on creation
+				} else if statusSet {
 					return privacy.Deny
 				}
 

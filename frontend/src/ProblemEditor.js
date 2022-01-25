@@ -22,6 +22,7 @@ import "ace-builds/src-noconflict/theme-github";
 
 type Props = {
   problem: ProblemEditor_problem$key,
+  onSubmit: () => mixed,
 };
 
 export default function ProblemEditor(props: Props): React.Node {
@@ -67,7 +68,7 @@ export default function ProblemEditor(props: Props): React.Node {
     submitMutation({
       variables: { input: { problem_id: id, code: studentCode } },
       onCompleted: () => {
-        alert("submitted!");
+        props.onSubmit();
       },
       onError: () => {
         alert("submission failed!");

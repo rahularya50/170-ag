@@ -68,9 +68,6 @@ export default function App(): React.Node {
                 <LinkContainer to="/problems/">
                   <Nav.Link>Problems</Nav.Link>
                 </LinkContainer>
-                <LinkContainer to="/submissions/">
-                  <Nav.Link>Submissions</Nav.Link>
-                </LinkContainer>
                 <Nav.Link href="/logout">Log Out</Nav.Link>
               </Nav>
             </Navbar.Collapse>
