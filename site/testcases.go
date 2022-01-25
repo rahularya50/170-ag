@@ -30,7 +30,11 @@ func GenerateInput(test_case_data []*ent.CodingTestCaseData) (string, error) {
 	return strconv.Itoa(totalCases) + "\n" + strings.Join(cases, "\n") + "\n", nil
 }
 
-func ScoreOutput(test_case_data []*ent.CodingTestCase, output string) models.CodingSubmissionResults {
+func ScoreOutput(
+	test_case_data []*ent.CodingTestCase,
+	output string,
+	defaultFailResult models.CodingSubmissionResult,
+) models.CodingSubmissionResults {
 	outputs := bufio.NewScanner(strings.NewReader(output))
 	results := models.CodingSubmissionResults{}
 	for i, test_case := range test_case_data {
@@ -39,8 +43,7 @@ func ScoreOutput(test_case_data []*ent.CodingTestCase, output string) models.Cod
 		points := test_case.Points
 		for expected.Scan() {
 			if !outputs.Scan() {
-				// presentation error!
-				result = models.ResultPresentationError
+				result = defaultFailResult
 				points = 0
 				break
 			}

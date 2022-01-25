@@ -2,6 +2,13 @@ syntax = "proto3";
 
 option go_package = "proto/schemas";
 
+enum ExecutionResult {
+  OK = 0;
+  TIME_LIMIT_EXCEEDED = 1;
+  MEMORY_ERROR = 2;
+  COMPILE_ERROR = 3;
+}
+
 message JudgingRequest {
   string code = 1;
   string input = 2;
@@ -16,6 +23,7 @@ message GradingResponse {
   string stderr = 3;
   string error_code = 4;
   string token = 5;
+  ExecutionResult result = 6;
 }
 
 message GradingReply {}

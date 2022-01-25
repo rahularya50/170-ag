@@ -5,6 +5,7 @@ import (
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/codingsubmissionstaffdata"
 	"170-ag/ent/generated/codingtestcase"
+	"170-ag/ent/models"
 	"170-ag/proto/schemas"
 	"170-ag/site"
 	"context"
@@ -70,7 +71,21 @@ func (s *JudgingServer) SubmitGradingResponse(ctx context.Context, response *sch
 		return nil, err
 	}
 
-	results := site.ScoreOutput(test_cases, response.Stdout)
+	var defaultFailResult = models.ResultPresentationError
+	switch response.Result {
+	case schemas.ExecutionResult_OK:
+		if response.ErrorCode != "" {
+			defaultFailResult = models.ResultRuntimeError
+		}
+	case schemas.ExecutionResult_TIME_LIMIT_EXCEEDED:
+		defaultFailResult = models.ResultTimeLimitExceeded
+	case schemas.ExecutionResult_COMPILE_ERROR:
+		defaultFailResult = models.ResultRuntimeError
+	case schemas.ExecutionResult_MEMORY_ERROR:
+		defaultFailResult = models.ResultMemoryExhausted
+	}
+
+	results := site.ScoreOutput(test_cases, response.Stdout, defaultFailResult)
 	points := 0
 	for _, result := range results.CaseResults {
 		points += result.Points
