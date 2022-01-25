@@ -67,7 +67,6 @@ func (CodingTestCaseData) Policy() ent.Policy {
 			privacy.AlwaysDenyRule(),
 		},
 		Query: privacy.QueryPolicy{
-			privacyrules.DenyIfNoViewer(),
 			// the associated test cases must be visible to the viewer
 			privacyrules.DenyQueryIfSubPolicyFails(
 				privacyrules.AllowQueryIfDelegatesVisible(func(allow_ctx context.Context, q generated.Query) ([]int, error) {
@@ -77,11 +76,14 @@ func (CodingTestCaseData) Policy() ent.Policy {
 				}),
 				privacy.AlwaysDenyRule(),
 			),
+			// The judge service account can always read test case data
+			privacyrules.AllowWithPrivacyAccessToken(privacyrules.JudgeScalingServerAccessToken),
+			privacyrules.DenyIfNoViewer(),
 			// staff can see private test data
 			privacyrules.AllowIfViewerIsStaff(),
 			// if the case is public, we can show its data to anyone who can see the case
 			allowIfTestCaseIsPublic(),
-			// we also need to read its contents when sending a submision to the judge
+			// we also need to read its contents when sending a submission to the judge
 			privacyrules.AllowWithPrivacyAccessToken(privacyrules.SubmissionEnqueuingAccessToken),
 			privacy.AlwaysDenyRule(),
 		},

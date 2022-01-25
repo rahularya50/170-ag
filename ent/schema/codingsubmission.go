@@ -5,6 +5,7 @@ import (
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/privacy"
 	"170-ag/ent/generated/user"
+	"170-ag/ent/models"
 	"170-ag/privacyrules"
 	"context"
 
@@ -32,6 +33,7 @@ func (CodingSubmission) Fields() []ent.Field {
 				"Completed", "COMPLETED",
 			).
 			Default("QUEUED"),
+		field.JSON("results", models.CodingSubmissionResults{}).Optional(),
 	}
 }
 

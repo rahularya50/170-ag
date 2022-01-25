@@ -75,6 +75,7 @@ func (CodingProblem) Policy() ent.Policy {
 			privacy.AlwaysDenyRule(),
 		},
 		Query: privacy.QueryPolicy{
+			privacyrules.AllowWithPrivacyAccessToken(privacyrules.JudgeScalingServerAccessToken),
 			privacyrules.DenyIfNoViewer(),
 			privacyrules.AllowIfViewerIsStaff(),
 			allowCodingProblemQueryIfReleased(),

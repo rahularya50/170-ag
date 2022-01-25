@@ -18,6 +18,7 @@ resolver:
 
 autobind:
   - 170-ag/ent/generated
+  - 170-ag/ent/models
 
 models:
   ID:

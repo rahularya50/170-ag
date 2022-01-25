@@ -7,6 +7,8 @@ import (
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/codingsubmissionstaffdata"
 	"170-ag/ent/generated/user"
+	"170-ag/ent/models"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -27,6 +29,8 @@ type CodingSubmission struct {
 	Code string `json:"code,omitempty"`
 	// Status holds the value of the "status" field.
 	Status codingsubmission.Status `json:"status,omitempty"`
+	// Results holds the value of the "results" field.
+	Results models.CodingSubmissionResults `json:"results,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CodingSubmissionQuery when eager-loading is set.
 	Edges                                          CodingSubmissionEdges `json:"edges"`
@@ -95,6 +99,8 @@ func (*CodingSubmission) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case codingsubmission.FieldResults:
+			values[i] = new([]byte)
 		case codingsubmission.FieldID:
 			values[i] = new(sql.NullInt64)
 		case codingsubmission.FieldCode, codingsubmission.FieldStatus:
@@ -151,6 +157,14 @@ func (cs *CodingSubmission) assignValues(columns []string, values []interface{})
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
 				cs.Status = codingsubmission.Status(value.String)
+			}
+		case codingsubmission.FieldResults:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field results", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &cs.Results); err != nil {
+					return fmt.Errorf("unmarshal field results: %w", err)
+				}
 			}
 		case codingsubmission.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -224,6 +238,8 @@ func (cs *CodingSubmission) String() string {
 	builder.WriteString(cs.Code)
 	builder.WriteString(", status=")
 	builder.WriteString(fmt.Sprintf("%v", cs.Status))
+	builder.WriteString(", results=")
+	builder.WriteString(fmt.Sprintf("%v", cs.Results))
 	builder.WriteByte(')')
 	return builder.String()
 }

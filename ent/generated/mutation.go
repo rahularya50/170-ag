@@ -11,6 +11,7 @@ import (
 	"170-ag/ent/generated/codingtestcasedata"
 	"170-ag/ent/generated/predicate"
 	"170-ag/ent/generated/user"
+	"170-ag/ent/models"
 	"context"
 	"errors"
 	"fmt"
@@ -1381,6 +1382,7 @@ type CodingSubmissionMutation struct {
 	update_time           *time.Time
 	code                  *string
 	status                *codingsubmission.Status
+	results               *models.CodingSubmissionResults
 	clearedFields         map[string]struct{}
 	author                *int
 	clearedauthor         bool
@@ -1635,6 +1637,55 @@ func (m *CodingSubmissionMutation) ResetStatus() {
 	m.status = nil
 }
 
+// SetResults sets the "results" field.
+func (m *CodingSubmissionMutation) SetResults(msr models.CodingSubmissionResults) {
+	m.results = &msr
+}
+
+// Results returns the value of the "results" field in the mutation.
+func (m *CodingSubmissionMutation) Results() (r models.CodingSubmissionResults, exists bool) {
+	v := m.results
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldResults returns the old "results" field's value of the CodingSubmission entity.
+// If the CodingSubmission object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CodingSubmissionMutation) OldResults(ctx context.Context) (v models.CodingSubmissionResults, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldResults is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldResults requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldResults: %w", err)
+	}
+	return oldValue.Results, nil
+}
+
+// ClearResults clears the value of the "results" field.
+func (m *CodingSubmissionMutation) ClearResults() {
+	m.results = nil
+	m.clearedFields[codingsubmission.FieldResults] = struct{}{}
+}
+
+// ResultsCleared returns if the "results" field was cleared in this mutation.
+func (m *CodingSubmissionMutation) ResultsCleared() bool {
+	_, ok := m.clearedFields[codingsubmission.FieldResults]
+	return ok
+}
+
+// ResetResults resets all changes to the "results" field.
+func (m *CodingSubmissionMutation) ResetResults() {
+	m.results = nil
+	delete(m.clearedFields, codingsubmission.FieldResults)
+}
+
 // SetAuthorID sets the "author" edge to the User entity by id.
 func (m *CodingSubmissionMutation) SetAuthorID(id int) {
 	m.author = &id
@@ -1771,7 +1822,7 @@ func (m *CodingSubmissionMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CodingSubmissionMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
 	if m.create_time != nil {
 		fields = append(fields, codingsubmission.FieldCreateTime)
 	}
@@ -1783,6 +1834,9 @@ func (m *CodingSubmissionMutation) Fields() []string {
 	}
 	if m.status != nil {
 		fields = append(fields, codingsubmission.FieldStatus)
+	}
+	if m.results != nil {
+		fields = append(fields, codingsubmission.FieldResults)
 	}
 	return fields
 }
@@ -1800,6 +1854,8 @@ func (m *CodingSubmissionMutation) Field(name string) (ent.Value, bool) {
 		return m.Code()
 	case codingsubmission.FieldStatus:
 		return m.Status()
+	case codingsubmission.FieldResults:
+		return m.Results()
 	}
 	return nil, false
 }
@@ -1817,6 +1873,8 @@ func (m *CodingSubmissionMutation) OldField(ctx context.Context, name string) (e
 		return m.OldCode(ctx)
 	case codingsubmission.FieldStatus:
 		return m.OldStatus(ctx)
+	case codingsubmission.FieldResults:
+		return m.OldResults(ctx)
 	}
 	return nil, fmt.Errorf("unknown CodingSubmission field %s", name)
 }
@@ -1854,6 +1912,13 @@ func (m *CodingSubmissionMutation) SetField(name string, value ent.Value) error 
 		}
 		m.SetStatus(v)
 		return nil
+	case codingsubmission.FieldResults:
+		v, ok := value.(models.CodingSubmissionResults)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetResults(v)
+		return nil
 	}
 	return fmt.Errorf("unknown CodingSubmission field %s", name)
 }
@@ -1883,7 +1948,11 @@ func (m *CodingSubmissionMutation) AddField(name string, value ent.Value) error 
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *CodingSubmissionMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(codingsubmission.FieldResults) {
+		fields = append(fields, codingsubmission.FieldResults)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -1896,6 +1965,11 @@ func (m *CodingSubmissionMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *CodingSubmissionMutation) ClearField(name string) error {
+	switch name {
+	case codingsubmission.FieldResults:
+		m.ClearResults()
+		return nil
+	}
 	return fmt.Errorf("unknown CodingSubmission nullable field %s", name)
 }
 
@@ -1914,6 +1988,9 @@ func (m *CodingSubmissionMutation) ResetField(name string) error {
 		return nil
 	case codingsubmission.FieldStatus:
 		m.ResetStatus()
+		return nil
+	case codingsubmission.FieldResults:
+		m.ResetResults()
 		return nil
 	}
 	return fmt.Errorf("unknown CodingSubmission field %s", name)

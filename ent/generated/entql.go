@@ -70,6 +70,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			codingsubmission.FieldUpdateTime: {Type: field.TypeTime, Column: codingsubmission.FieldUpdateTime},
 			codingsubmission.FieldCode:       {Type: field.TypeString, Column: codingsubmission.FieldCode},
 			codingsubmission.FieldStatus:     {Type: field.TypeEnum, Column: codingsubmission.FieldStatus},
+			codingsubmission.FieldResults:    {Type: field.TypeJSON, Column: codingsubmission.FieldResults},
 		},
 	}
 	graph.Nodes[3] = &sqlgraph.Node{
@@ -554,6 +555,11 @@ func (f *CodingSubmissionFilter) WhereCode(p entql.StringP) {
 // WhereStatus applies the entql string predicate on the status field.
 func (f *CodingSubmissionFilter) WhereStatus(p entql.StringP) {
 	f.Where(p.Field(codingsubmission.FieldStatus))
+}
+
+// WhereResults applies the entql json.RawMessage predicate on the results field.
+func (f *CodingSubmissionFilter) WhereResults(p entql.BytesP) {
+	f.Where(p.Field(codingsubmission.FieldResults))
 }
 
 // WhereHasAuthor applies a predicate to check if query has an edge author.

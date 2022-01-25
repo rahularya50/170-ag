@@ -425,6 +425,20 @@ func StatusNotIn(vs ...Status) predicate.CodingSubmission {
 	})
 }
 
+// ResultsIsNil applies the IsNil predicate on the "results" field.
+func ResultsIsNil() predicate.CodingSubmission {
+	return predicate.CodingSubmission(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldResults)))
+	})
+}
+
+// ResultsNotNil applies the NotNil predicate on the "results" field.
+func ResultsNotNil() predicate.CodingSubmission {
+	return predicate.CodingSubmission(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldResults)))
+	})
+}
+
 // HasAuthor applies the HasEdge predicate on the "author" edge.
 func HasAuthor() predicate.CodingSubmission {
 	return predicate.CodingSubmission(func(s *sql.Selector) {

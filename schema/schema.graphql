@@ -161,6 +161,25 @@ type CodingSubmission implements Node {
   coding_problem: CodingProblem!
   status: CodingSubmissionStatus!
   staff_data: CodingSubmissionStaffData!
+  results: CodingSubmissionResults!
+}
+
+type CodingSubmissionResults {
+  case_results: [CodingSubmissionCaseResults!]
+}
+
+type CodingSubmissionCaseResults {
+  case_name: String!
+  result: CodingSubmissionResult!
+}
+
+enum CodingSubmissionResult {
+  ACCEPTED
+  WRONG_ANSWER
+  TIME_LIMIT_EXCEEDED
+  MEMORY_EXHAUSTED
+  RUNTIME_ERROR
+  PRESENTATION_ERROR
 }
 
 input CodingSubmissionInput {

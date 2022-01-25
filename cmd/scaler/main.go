@@ -2,6 +2,7 @@ package main
 
 import (
 	"170-ag/ent/generated/codingsubmissionstaffdata"
+	"170-ag/ent/generated/codingtestcase"
 	_ "170-ag/ent/generated/runtime"
 	"170-ag/privacyrules"
 	"170-ag/proto/schemas"
@@ -25,8 +26,13 @@ type ScalerServer struct {
 	client *ent.Client
 }
 
+func withJudgingContext(ctx context.Context, client *ent.Client) context.Context {
+	ctx = privacyrules.NewContextWithAccessToken(ctx, privacyrules.JudgeScalingServerAccessToken)
+	ctx = site.ContextWithEntClient(ctx, client)
+	return ctx
+}
+
 func countEnqueuedSubmissions(c context.Context, client *ent.Client) (int, error) {
-	c = privacyrules.NewContextWithAccessToken(c, privacyrules.JudgeScalingServerAccessToken)
 	return client.CodingSubmission.
 		Query().
 		Where(codingsubmission.StatusEQ(codingsubmission.StatusQueued)).
@@ -34,7 +40,6 @@ func countEnqueuedSubmissions(c context.Context, client *ent.Client) (int, error
 }
 
 func dequeueSubmission(c context.Context, client *ent.Client) (*ent.CodingSubmission, *ent.CodingSubmissionStaffData, error) {
-	c = privacyrules.NewContextWithAccessToken(c, privacyrules.JudgeScalingServerAccessToken)
 	tx, err := client.Tx(c)
 	if err != nil {
 		return nil, nil, err
@@ -71,8 +76,9 @@ func dequeueSubmission(c context.Context, client *ent.Client) (*ent.CodingSubmis
 	return submission.Unwrap(), staff_data.Unwrap(), nil
 }
 
-func (s *ScalerServer) IsActive(c context.Context, _ *schemas.ScaledObjectRef) (*schemas.IsActiveResponse, error) {
-	count, err := countEnqueuedSubmissions(c, s.client)
+func (s *ScalerServer) IsActive(ctx context.Context, _ *schemas.ScaledObjectRef) (*schemas.IsActiveResponse, error) {
+	ctx = withJudgingContext(ctx, s.client)
+	count, err := countEnqueuedSubmissions(ctx, s.client)
 	if err != nil {
 		return nil, err
 	}
@@ -88,8 +94,9 @@ func (*ScalerServer) GetMetricSpec(context.Context, *schemas.ScaledObjectRef) (*
 	}, nil
 }
 
-func (s *ScalerServer) GetMetrics(c context.Context, req *schemas.GetMetricsRequest) (*schemas.GetMetricsResponse, error) {
-	count, err := countEnqueuedSubmissions(c, s.client)
+func (s *ScalerServer) GetMetrics(ctx context.Context, req *schemas.GetMetricsRequest) (*schemas.GetMetricsResponse, error) {
+	ctx = withJudgingContext(ctx, s.client)
+	count, err := countEnqueuedSubmissions(ctx, s.client)
 	if err != nil {
 		return nil, err
 	}
@@ -102,6 +109,7 @@ func (s *ScalerServer) GetMetrics(c context.Context, req *schemas.GetMetricsRequ
 }
 
 func (s *ScalerServer) GetJudgingRequest(ctx context.Context, _ *schemas.GetJudgingRequestParams) (*schemas.JudgingRequest, error) {
+	ctx = withJudgingContext(ctx, s.client)
 	submission, staff_data, err := dequeueSubmission(ctx, s.client)
 	if err != nil {
 		return nil, err
@@ -114,22 +122,20 @@ func (s *ScalerServer) GetJudgingRequest(ctx context.Context, _ *schemas.GetJudg
 }
 
 func (s *ScalerServer) SubmitGradingResponse(ctx context.Context, response *schemas.GradingResponse) (*schemas.GradingReply, error) {
+	ctx = withJudgingContext(ctx, s.client)
 	nonce := int64(response.IdNonce)
-	ctx = privacyrules.NewContextWithAccessToken(ctx, privacyrules.JudgeScalingServerAccessToken)
 	tx, err := s.client.Tx(ctx)
 	if err != nil {
 		return nil, err
 	}
 	defer tx.Rollback()
-	staff_data, err := tx.CodingSubmissionStaffData.Query().Where(codingsubmissionstaffdata.ExecutionID(nonce)).Only(ctx)
+	staff_data, err := tx.CodingSubmissionStaffData.Query().
+		Where(codingsubmissionstaffdata.ExecutionID(nonce)).
+		Only(ctx)
 	if err != nil {
 		return nil, err
 	}
 	submission, err := staff_data.CodingSubmission(ctx)
-	if err != nil {
-		return nil, err
-	}
-	err = submission.Update().SetStatus(codingsubmission.StatusCompleted).Exec(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +147,22 @@ func (s *ScalerServer) SubmitGradingResponse(ctx context.Context, response *sche
 	if err != nil {
 		return nil, err
 	}
-	// TODO: actually grade the output against the input
+	test_case_data, err := submission.
+		QueryCodingProblem().
+		QueryTestCases().
+		Order(ent.Asc(codingtestcase.FieldCreateTime)).
+		QueryData().
+		All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	err = submission.Update().
+		SetStatus(codingsubmission.StatusCompleted).
+		SetResults(site.ScoreOutput(test_case_data, response.Stdout)).
+		Exec(ctx)
+	if err != nil {
+		return nil, err
+	}
 	if err = tx.Commit(); err != nil {
 		return nil, err
 	}

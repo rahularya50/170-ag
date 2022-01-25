@@ -8,6 +8,7 @@ import (
 	"170-ag/ent/generated/codingsubmissionstaffdata"
 	"170-ag/ent/generated/predicate"
 	"170-ag/ent/generated/user"
+	"170-ag/ent/models"
 	"context"
 	"errors"
 	"fmt"
@@ -48,6 +49,26 @@ func (csu *CodingSubmissionUpdate) SetNillableStatus(c *codingsubmission.Status)
 	if c != nil {
 		csu.SetStatus(*c)
 	}
+	return csu
+}
+
+// SetResults sets the "results" field.
+func (csu *CodingSubmissionUpdate) SetResults(msr models.CodingSubmissionResults) *CodingSubmissionUpdate {
+	csu.mutation.SetResults(msr)
+	return csu
+}
+
+// SetNillableResults sets the "results" field if the given value is not nil.
+func (csu *CodingSubmissionUpdate) SetNillableResults(msr *models.CodingSubmissionResults) *CodingSubmissionUpdate {
+	if msr != nil {
+		csu.SetResults(*msr)
+	}
+	return csu
+}
+
+// ClearResults clears the value of the "results" field.
+func (csu *CodingSubmissionUpdate) ClearResults() *CodingSubmissionUpdate {
+	csu.mutation.ClearResults()
 	return csu
 }
 
@@ -238,6 +259,19 @@ func (csu *CodingSubmissionUpdate) sqlSave(ctx context.Context) (n int, err erro
 			Column: codingsubmission.FieldStatus,
 		})
 	}
+	if value, ok := csu.mutation.Results(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
+			Value:  value,
+			Column: codingsubmission.FieldResults,
+		})
+	}
+	if csu.mutation.ResultsCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
+			Column: codingsubmission.FieldResults,
+		})
+	}
 	if csu.mutation.AuthorCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -379,6 +413,26 @@ func (csuo *CodingSubmissionUpdateOne) SetNillableStatus(c *codingsubmission.Sta
 	if c != nil {
 		csuo.SetStatus(*c)
 	}
+	return csuo
+}
+
+// SetResults sets the "results" field.
+func (csuo *CodingSubmissionUpdateOne) SetResults(msr models.CodingSubmissionResults) *CodingSubmissionUpdateOne {
+	csuo.mutation.SetResults(msr)
+	return csuo
+}
+
+// SetNillableResults sets the "results" field if the given value is not nil.
+func (csuo *CodingSubmissionUpdateOne) SetNillableResults(msr *models.CodingSubmissionResults) *CodingSubmissionUpdateOne {
+	if msr != nil {
+		csuo.SetResults(*msr)
+	}
+	return csuo
+}
+
+// ClearResults clears the value of the "results" field.
+func (csuo *CodingSubmissionUpdateOne) ClearResults() *CodingSubmissionUpdateOne {
+	csuo.mutation.ClearResults()
 	return csuo
 }
 
@@ -591,6 +645,19 @@ func (csuo *CodingSubmissionUpdateOne) sqlSave(ctx context.Context) (_node *Codi
 			Type:   field.TypeEnum,
 			Value:  value,
 			Column: codingsubmission.FieldStatus,
+		})
+	}
+	if value, ok := csuo.mutation.Results(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
+			Value:  value,
+			Column: codingsubmission.FieldResults,
+		})
+	}
+	if csuo.mutation.ResultsCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
+			Column: codingsubmission.FieldResults,
 		})
 	}
 	if csuo.mutation.AuthorCleared() {

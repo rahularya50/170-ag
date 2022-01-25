@@ -98,7 +98,7 @@ spec:
   maxReplicaCount: 10
   rolloutStrategy: gradual
   successfulJobsHistoryLimit: 5
-  successfulJobsHistoryLimit: 5
+  failedJobsHistoryLimit: 5
   triggers:
     - type: external
       metadata:

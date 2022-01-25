@@ -7,6 +7,7 @@ import (
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/codingsubmissionstaffdata"
 	"170-ag/ent/generated/user"
+	"170-ag/ent/models"
 	"context"
 	"errors"
 	"fmt"
@@ -69,6 +70,20 @@ func (csc *CodingSubmissionCreate) SetStatus(c codingsubmission.Status) *CodingS
 func (csc *CodingSubmissionCreate) SetNillableStatus(c *codingsubmission.Status) *CodingSubmissionCreate {
 	if c != nil {
 		csc.SetStatus(*c)
+	}
+	return csc
+}
+
+// SetResults sets the "results" field.
+func (csc *CodingSubmissionCreate) SetResults(msr models.CodingSubmissionResults) *CodingSubmissionCreate {
+	csc.mutation.SetResults(msr)
+	return csc
+}
+
+// SetNillableResults sets the "results" field if the given value is not nil.
+func (csc *CodingSubmissionCreate) SetNillableResults(msr *models.CodingSubmissionResults) *CodingSubmissionCreate {
+	if msr != nil {
+		csc.SetResults(*msr)
 	}
 	return csc
 }
@@ -298,6 +313,14 @@ func (csc *CodingSubmissionCreate) createSpec() (*CodingSubmission, *sqlgraph.Cr
 		})
 		_node.Status = value
 	}
+	if value, ok := csc.mutation.Results(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
+			Value:  value,
+			Column: codingsubmission.FieldResults,
+		})
+		_node.Results = value
+	}
 	if nodes := csc.mutation.AuthorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -460,6 +483,24 @@ func (u *CodingSubmissionUpsert) UpdateStatus() *CodingSubmissionUpsert {
 	return u
 }
 
+// SetResults sets the "results" field.
+func (u *CodingSubmissionUpsert) SetResults(v models.CodingSubmissionResults) *CodingSubmissionUpsert {
+	u.Set(codingsubmission.FieldResults, v)
+	return u
+}
+
+// UpdateResults sets the "results" field to the value that was provided on create.
+func (u *CodingSubmissionUpsert) UpdateResults() *CodingSubmissionUpsert {
+	u.SetExcluded(codingsubmission.FieldResults)
+	return u
+}
+
+// ClearResults clears the value of the "results" field.
+func (u *CodingSubmissionUpsert) ClearResults() *CodingSubmissionUpsert {
+	u.SetNull(codingsubmission.FieldResults)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
@@ -563,6 +604,27 @@ func (u *CodingSubmissionUpsertOne) SetStatus(v codingsubmission.Status) *Coding
 func (u *CodingSubmissionUpsertOne) UpdateStatus() *CodingSubmissionUpsertOne {
 	return u.Update(func(s *CodingSubmissionUpsert) {
 		s.UpdateStatus()
+	})
+}
+
+// SetResults sets the "results" field.
+func (u *CodingSubmissionUpsertOne) SetResults(v models.CodingSubmissionResults) *CodingSubmissionUpsertOne {
+	return u.Update(func(s *CodingSubmissionUpsert) {
+		s.SetResults(v)
+	})
+}
+
+// UpdateResults sets the "results" field to the value that was provided on create.
+func (u *CodingSubmissionUpsertOne) UpdateResults() *CodingSubmissionUpsertOne {
+	return u.Update(func(s *CodingSubmissionUpsert) {
+		s.UpdateResults()
+	})
+}
+
+// ClearResults clears the value of the "results" field.
+func (u *CodingSubmissionUpsertOne) ClearResults() *CodingSubmissionUpsertOne {
+	return u.Update(func(s *CodingSubmissionUpsert) {
+		s.ClearResults()
 	})
 }
 
@@ -833,6 +895,27 @@ func (u *CodingSubmissionUpsertBulk) SetStatus(v codingsubmission.Status) *Codin
 func (u *CodingSubmissionUpsertBulk) UpdateStatus() *CodingSubmissionUpsertBulk {
 	return u.Update(func(s *CodingSubmissionUpsert) {
 		s.UpdateStatus()
+	})
+}
+
+// SetResults sets the "results" field.
+func (u *CodingSubmissionUpsertBulk) SetResults(v models.CodingSubmissionResults) *CodingSubmissionUpsertBulk {
+	return u.Update(func(s *CodingSubmissionUpsert) {
+		s.SetResults(v)
+	})
+}
+
+// UpdateResults sets the "results" field to the value that was provided on create.
+func (u *CodingSubmissionUpsertBulk) UpdateResults() *CodingSubmissionUpsertBulk {
+	return u.Update(func(s *CodingSubmissionUpsert) {
+		s.UpdateResults()
+	})
+}
+
+// ClearResults clears the value of the "results" field.
+func (u *CodingSubmissionUpsertBulk) ClearResults() *CodingSubmissionUpsertBulk {
+	return u.Update(func(s *CodingSubmissionUpsert) {
+		s.ClearResults()
 	})
 }
 

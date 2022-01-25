@@ -24,6 +24,8 @@ const (
 	FieldCode = "code"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
+	// FieldResults holds the string denoting the results field in the database.
+	FieldResults = "results"
 	// EdgeAuthor holds the string denoting the author edge name in mutations.
 	EdgeAuthor = "author"
 	// EdgeCodingProblem holds the string denoting the coding_problem edge name in mutations.
@@ -62,6 +64,7 @@ var Columns = []string{
 	FieldUpdateTime,
 	FieldCode,
 	FieldStatus,
+	FieldResults,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "coding_submissions"
