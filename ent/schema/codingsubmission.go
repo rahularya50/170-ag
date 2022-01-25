@@ -7,7 +7,9 @@ import (
 	"170-ag/ent/generated/user"
 	"170-ag/ent/models"
 	"170-ag/privacyrules"
+	"170-ag/site"
 	"context"
+	"time"
 
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
@@ -61,15 +63,42 @@ func (CodingSubmission) Indexes() []ent.Index {
 	}
 }
 
+func denyIfRecentViewerSubmissionExistsSinceThreshold(threshold time.Duration) privacy.QueryMutationRule {
+	return privacy.ContextQueryMutationRule(func(c context.Context) error {
+		viewer, ok := site.ViewerFromContext(c)
+		if !ok {
+			return privacy.Deny
+		}
+		recent_exists, err := site.EntClientFromContext(c).
+			CodingSubmission.
+			Query().
+			Where(
+				codingsubmission.HasAuthorWith(user.IDEQ(viewer.ID)),
+				codingsubmission.CreateTimeGT(time.Now().Add(-threshold)),
+			).Exist(c)
+		if recent_exists || err != nil {
+			return privacy.Deny
+		}
+		return privacy.Skip
+	})
+}
+
 func (CodingSubmission) Policy() ent.Policy {
 	return privacy.Policy{
 		Mutation: privacy.MutationPolicy{
 			privacyrules.AllowWithPrivacyAccessToken(privacyrules.JudgeScalingServerAccessToken),
 			privacyrules.DenyIfNoViewer(),
 			privacyrules.AllowIfViewerIsStaff(),
+			// students can only create submissions
+			privacy.CodingSubmissionMutationRuleFunc(func(c context.Context, cdm *generated.CodingSubmissionMutation) error {
+				if !cdm.Op().Is(ent.OpCreate) {
+					return privacy.Deny
+				}
+				return privacy.Skip
+			}),
 			privacy.CodingSubmissionMutationRuleFunc(func(c context.Context, csm *generated.CodingSubmissionMutation) error {
 				status, statusSet := csm.Status()
-				if csm.Op().Is(ent.OpCreate) && status == codingsubmission.DefaultStatus {
+				if status == codingsubmission.DefaultStatus {
 					// students can enqueue submissions on creation
 				} else if statusSet {
 					return privacy.Deny
@@ -87,6 +116,7 @@ func (CodingSubmission) Policy() ent.Policy {
 
 				return privacy.Skip
 			}),
+			denyIfRecentViewerSubmissionExistsSinceThreshold(time.Minute),
 			privacyrules.FilterToViewerID(func(c context.Context, f privacy.Filter, user_id int) error {
 				f.(*generated.CodingSubmissionFilter).WhereHasAuthorWith(user.ID(user_id))
 				return privacy.Allow
