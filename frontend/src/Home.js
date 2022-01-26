@@ -27,9 +27,11 @@ export default function Home(): React.Node {
         <p className="col-md-8 fs-4">
           {viewer?.name != null && <>Welcome, {viewer.name}!</>}
         </p>
-        <p className="col-md-8 fs-4">
-          <Link to="/problems/">See Problems!</Link>
-        </p>
+        {viewer != null && (
+          <p className="col-md-8 fs-4">
+            <Link to="/problems/">See Problems!</Link>
+          </p>
+        )}
         {!viewer && <LoginButton />}
       </Container>
     </div>

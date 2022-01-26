@@ -55,7 +55,7 @@ func ScoreOutput(
 		results.CaseResults = append(
 			results.CaseResults,
 			models.CodingSubmissionCaseResults{
-				CaseName: fmt.Sprintf("Case %d", i),
+				CaseName: fmt.Sprintf("Case %d", i+1),
 				Result:   result,
 				Points:   points,
 			},

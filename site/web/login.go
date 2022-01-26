@@ -69,7 +69,11 @@ func getSessionStore() *sessions.CookieStore {
 	if !exists {
 		panic("Session key envvar not set!")
 	}
-	return sessions.NewCookieStore([]byte(session_key))
+	store := sessions.NewCookieStore([]byte(session_key))
+	store.Options.HttpOnly = true
+	store.Options.SameSite = http.SameSiteLaxMode
+	store.Options.Secure = true
+	return store
 }
 
 func LoginHandler(client *ent.Client) *loginHandler {

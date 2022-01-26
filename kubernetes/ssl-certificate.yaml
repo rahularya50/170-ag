@@ -5,3 +5,4 @@ metadata:
 spec:
   domains:
     - judge.rahularya.org
+    - judge.cs170.org

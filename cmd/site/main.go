@@ -13,7 +13,9 @@ import (
 	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
 const defaultPort = "8080"
@@ -37,8 +39,13 @@ func main() {
 		log.Fatal("running schema migration", err)
 	}
 
-	var srv http.Handler = handler.NewDefaultServer(resolvers.NewSchema(client))
-	srv = web.HandlerWithViewerContext(srv, client)
+	gqlServer := handler.NewDefaultServer(resolvers.NewSchema(client))
+	gqlServer.SetErrorPresenter(func(ctx context.Context, err error) *gqlerror.Error {
+		return gqlerror.Errorf("something went wrong")
+	})
+	gqlServer.Use(extension.FixedComplexityLimit(250))
+
+	srv := web.HandlerWithViewerContext(gqlServer, client)
 	srv = site.HandleWithEntClient(srv, client)
 
 	http.Handle("/playground", playground.Handler("GraphQL playground", "/query"))
