@@ -33,7 +33,7 @@ func JudgeLoadedRequest(ctx context.Context) error {
 	if exit_err != nil {
 		stderr = string(exit_err.Stderr)
 		errorCode = err.Error()
-		if strings.Contains(stderr, "memory") {
+		if strings.Contains(strings.ToLower(stderr), "memory") {
 			result = schemas.ExecutionResult_MEMORY_ERROR
 		}
 	}

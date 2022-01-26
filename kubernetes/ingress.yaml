@@ -6,9 +6,19 @@ metadata:
     kubernetes.io/ingress.global-static-ip-name: web-frontend
     networking.gke.io/managed-certificates: managed-cert
     kubernetes.io/ingress.class: "gce"
+    networking.gke.io/v1beta1.FrontendConfig: frontend-config
 spec:
   defaultBackend:
     service:
       name: web-frontend
       port:
         number: 80
+---
+apiVersion: networking.gke.io/v1beta1
+kind: FrontendConfig
+metadata:
+  name: frontend-config
+spec:
+  redirectToHttps:
+    enabled: true
+    responseCodeName: MOVED_PERMANENTLY_DEFAULT

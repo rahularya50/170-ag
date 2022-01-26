@@ -75,6 +75,7 @@ func (User) Policy() ent.Policy {
 		},
 		Query: privacy.QueryPolicy{
 			policy.DenyIfNoViewer(),
+			policy.AllowIfViewerIsStaff(),
 			policy.AllowQueryIfIDsMatchViewer(func(c context.Context, q generated.Query) ([]int, error) {
 				return q.(*generated.UserQuery).Clone().IDs(c)
 			}),
