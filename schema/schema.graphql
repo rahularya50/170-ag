@@ -42,6 +42,7 @@ type Query {
     include_unreleased: Boolean! = false
   ): CodingProblemConnection!
   test_case(id: ID!): CodingTestCase!
+  coding_submission(id: ID!): CodingSubmission
 }
 
 type Mutation {
@@ -161,19 +162,20 @@ type CodingSubmission implements Node {
   code: String!
   status: CodingSubmissionStatus!
   staff_data: CodingSubmissionStaffData!
-  results: CodingSubmissionResults
+  results: CodingSubmissionResults!
   points: Int
   author: User!
   coding_problem: CodingProblem!
 }
 
 type CodingSubmissionResults {
-  case_results: [CodingSubmissionCaseResults!]
+  case_results: [CodingSubmissionCaseResults!]!
 }
 
 type CodingSubmissionCaseResults {
   case_name: String!
   result: CodingSubmissionResult!
+  points: Int!
 }
 
 enum CodingSubmissionResult {

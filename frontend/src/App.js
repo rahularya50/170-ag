@@ -11,6 +11,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Problems from "./Problems";
 import { LinkContainer } from "react-router-bootstrap";
 import Problem from "./Problem";
+import Submission from "./Submission";
 
 export default function App(): React.Node {
   const { viewer } = useLazyLoadQuery(
@@ -43,6 +44,7 @@ export default function App(): React.Node {
         <Route path="/" element={<Home />} />
         <Route path="/problems" element={<Problems />} />
         <Route path="/problem/:id" element={<Problem />} />
+        <Route path="/submission/:id" element={<Submission />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     );
