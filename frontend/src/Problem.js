@@ -1,15 +1,15 @@
 // @flow
 
+import graphql from "babel-plugin-relay/macro";
 import * as React from "react";
 import { useState } from "react";
-import graphql from "babel-plugin-relay/macro";
-import { useLazyLoadQuery } from "react-relay/hooks";
-import { Navigate, useParams } from "react-router-dom";
-import { Link } from "react-router-dom";
 import { Col, Container, Row, Tab, Tabs } from "react-bootstrap";
+import { useLazyLoadQuery } from "react-relay/hooks";
+import { Link,Navigate, useParams  } from "react-router-dom";
+
 import ProblemEditor from "./ProblemEditor";
-import ProblemSubmissions from "./ProblemSubmissions";
 import ProblemStatement from "./ProblemStatement";
+import ProblemSubmissions from "./ProblemSubmissions";
 import ProblemTestCases from "./ProblemTestCases";
 
 export default function Problem(): React.Node {

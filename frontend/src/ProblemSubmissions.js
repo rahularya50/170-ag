@@ -1,13 +1,14 @@
 // @flow
 
+import graphql from "babel-plugin-relay/macro";
 import * as React from "react";
 import { useMemo } from "react";
-import graphql from "babel-plugin-relay/macro";
+import { Table } from "react-bootstrap";
 import { useFragment } from "react-relay/hooks";
+import { generatePath, Link } from "react-router-dom";
+
 import type { ProblemSubmissions_problem$key } from "./__generated__/ProblemSubmissions_problem.graphql";
 import ProblemSubmissionsRefetchQuery from "./__generated__/ProblemSubmissionsRefetchQuery.graphql";
-import { Table } from "react-bootstrap";
-import { generatePath, Link } from "react-router-dom";
 import { useRefreshingQuery } from "./useRefreshingQuery";
 
 type Props = {

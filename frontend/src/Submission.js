@@ -1,14 +1,14 @@
 // @flow
 
+import graphql from "babel-plugin-relay/macro";
 import * as React from "react";
 import { useMemo } from "react";
-import graphql from "babel-plugin-relay/macro";
-import { useLazyLoadQuery } from "react-relay/hooks";
-import { generatePath, Navigate, useParams } from "react-router-dom";
-import { Link } from "react-router-dom";
 import { Col, Container, Row, Table } from "react-bootstrap";
-import { useRefreshingQuery } from "./useRefreshingQuery";
+import { useLazyLoadQuery } from "react-relay/hooks";
+import { generatePath, Link,Navigate, useParams  } from "react-router-dom";
+
 import SubmissionQuery from "./__generated__/SubmissionQuery.graphql";
+import { useRefreshingQuery } from "./useRefreshingQuery";
 
 export default function Submission(): React.Node {
   const { id } = useParams();

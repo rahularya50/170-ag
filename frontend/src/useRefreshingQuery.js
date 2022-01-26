@@ -1,13 +1,12 @@
 // @flow
 
-import type {
-  VariablesOf,
-  OperationType,
-  GraphQLTaggedNode,
-} from "relay-runtime";
-
 import { useCallback, useState } from "react";
-import { useRelayEnvironment, fetchQuery } from "react-relay";
+import { fetchQuery,useRelayEnvironment } from "react-relay";
+import type {
+  GraphQLTaggedNode,
+  OperationType,
+  VariablesOf,
+} from "relay-runtime";
 import useInterval from "use-interval";
 
 export function useRefreshingQuery<T: OperationType>(

@@ -30,8 +30,10 @@ func main() {
 	}
 
 	scalerServer := grpc.NewServer(
-		grpc.UnaryInterceptor(roles.AddGradingContext(client)),
-		grpc.UnaryInterceptor(grading.InterceptErrors),
+		grpc.ChainUnaryInterceptor(
+			roles.AddGradingContext(client),
+			grading.InterceptErrors,
+		),
 	)
 	schemas.RegisterExternalScalerServer(scalerServer, &scaling.ExternalScalerServer{Client: client})
 	go serveOnPort(scalerServer, 6001)

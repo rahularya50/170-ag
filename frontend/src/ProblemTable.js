@@ -1,10 +1,11 @@
 // @flow
 
-import * as React from "react";
 import graphql from "babel-plugin-relay/macro";
-import { useFragment } from "react-relay/hooks";
+import * as React from "react";
 import { Table } from "react-bootstrap";
+import { useFragment } from "react-relay/hooks";
 import { generatePath, Link } from "react-router-dom";
+
 import type { ProblemTable$key } from "./__generated__/ProblemTable.graphql";
 
 type Props = {

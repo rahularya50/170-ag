@@ -1,14 +1,14 @@
 // @flow
 
-import type { ProblemTestCase_viewer$key } from "./__generated__/ProblemTestCase_viewer.graphql";
-import type { ProblemTestCase_testCase$key } from "./__generated__/ProblemTestCase_testCase.graphql";
-import type { ProblemTestCaseUpdateMutation } from "./__generated__/ProblemTestCaseUpdateMutation.graphql";
-
+import graphql from "babel-plugin-relay/macro";
 import * as React from "react";
 import { useState } from "react";
-import graphql from "babel-plugin-relay/macro";
-import { useFragment, useMutation } from "react-relay/hooks";
 import { Button, Form, Modal, Stack } from "react-bootstrap";
+import { useFragment, useMutation } from "react-relay/hooks";
+
+import type { ProblemTestCase_testCase$key } from "./__generated__/ProblemTestCase_testCase.graphql";
+import type { ProblemTestCase_viewer$key } from "./__generated__/ProblemTestCase_viewer.graphql";
+import type { ProblemTestCaseUpdateMutation } from "./__generated__/ProblemTestCaseUpdateMutation.graphql";
 import LoadingButton from "./LoadingButton";
 import ProblemTestDataEditor from "./ProblemTestDataEditor";
 

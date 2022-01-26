@@ -1,15 +1,15 @@
 // @flow
 
-import type { ProblemStatement_viewer$key } from "./__generated__/ProblemStatement_viewer.graphql";
-import type { ProblemStatement_problem$key } from "./__generated__/ProblemStatement_problem.graphql";
-import type { ProblemStatementUpdateMutation } from "./__generated__/ProblemStatementUpdateMutation.graphql";
-
+import graphql from "babel-plugin-relay/macro";
 import * as React from "react";
 import { useState } from "react";
-import graphql from "babel-plugin-relay/macro";
-import { useFragment, useMutation } from "react-relay/hooks";
 import { Button, Col, Form, Row } from "react-bootstrap";
 import ReactMarkdown from "react-markdown";
+import { useFragment, useMutation } from "react-relay/hooks";
+
+import type { ProblemStatement_problem$key } from "./__generated__/ProblemStatement_problem.graphql";
+import type { ProblemStatement_viewer$key } from "./__generated__/ProblemStatement_viewer.graphql";
+import type { ProblemStatementUpdateMutation } from "./__generated__/ProblemStatementUpdateMutation.graphql";
 import LoadingButton from "./LoadingButton";
 
 type Props = {

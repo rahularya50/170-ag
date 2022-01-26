@@ -1,11 +1,12 @@
 // @flow
 
-import * as React from "react";
 import graphql from "babel-plugin-relay/macro";
+import * as React from "react";
 import Container from "react-bootstrap/Container";
-import LoginButton from "./LoginButton";
 import { useLazyLoadQuery } from "react-relay/hooks";
 import { Link } from "react-router-dom";
+
+import LoginButton from "./LoginButton";
 
 export default function Home(): React.Node {
   const { viewer } = useLazyLoadQuery(

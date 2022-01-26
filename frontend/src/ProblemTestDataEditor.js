@@ -1,12 +1,12 @@
 // @flow
 
-import type { ProblemTestDataEditor_testCase$key } from "./__generated__/ProblemTestDataEditor_testCase.graphql";
-
-import * as React from "react";
 import graphql from "babel-plugin-relay/macro";
-import { useFragment, useLazyLoadQuery } from "react-relay/hooks";
-import { Col, Container, Row } from "react-bootstrap";
+import * as React from "react";
 import AceEditor from "react-ace";
+import { Col, Container, Row } from "react-bootstrap";
+import { useFragment, useLazyLoadQuery } from "react-relay/hooks";
+
+import type { ProblemTestDataEditor_testCase$key } from "./__generated__/ProblemTestDataEditor_testCase.graphql";
 
 type Props = {
   testCase: ProblemTestDataEditor_testCase$key,

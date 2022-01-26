@@ -1,16 +1,17 @@
 // @flow
 
-import * as React from "react";
 import graphql from "babel-plugin-relay/macro";
-import { useLazyLoadQuery } from "react-relay";
+import * as React from "react";
 import Container from "react-bootstrap/Container";
-import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
-import Home from "./Home";
-import { Routes, Route, Navigate } from "react-router-dom";
-import Problems from "./Problems";
+import Navbar from "react-bootstrap/Navbar";
+import { useLazyLoadQuery } from "react-relay";
 import { LinkContainer } from "react-router-bootstrap";
+import { Navigate,Route, Routes } from "react-router-dom";
+
+import Home from "./Home";
 import Problem from "./Problem";
+import Problems from "./Problems";
 import Submission from "./Submission";
 
 export default function App(): React.Node {
