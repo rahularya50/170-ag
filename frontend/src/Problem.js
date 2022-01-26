@@ -21,6 +21,7 @@ export default function Problem(): React.Node {
         viewer {
           ...ProblemStatement_viewer
           ...ProblemTestCases_viewer
+          ...ProblemEditor_viewer
         }
         coding_problem(id: $id) {
           ...ProblemStatement_problem
@@ -56,6 +57,7 @@ export default function Problem(): React.Node {
         </Col>
         <Col>
           <ProblemEditor
+            viewer={viewer}
             problem={coding_problem}
             onSubmit={() => setTab("submissions")}
           />

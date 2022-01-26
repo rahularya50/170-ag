@@ -21,6 +21,8 @@ const (
 	FieldName = "name"
 	// FieldStatement holds the string denoting the statement field in the database.
 	FieldStatement = "statement"
+	// FieldSkeleton holds the string denoting the skeleton field in the database.
+	FieldSkeleton = "skeleton"
 	// FieldReleased holds the string denoting the released field in the database.
 	FieldReleased = "released"
 	// EdgeDrafts holds the string denoting the drafts edge name in mutations.
@@ -61,6 +63,7 @@ var Columns = []string{
 	FieldUpdateTime,
 	FieldName,
 	FieldStatement,
+	FieldSkeleton,
 	FieldReleased,
 }
 
@@ -89,12 +92,16 @@ var (
 	DefaultUpdateTime func() time.Time
 	// UpdateDefaultUpdateTime holds the default value on update for the "update_time" field.
 	UpdateDefaultUpdateTime func() time.Time
+	// DefaultName holds the default value on creation for the "name" field.
+	DefaultName string
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
 	// DefaultStatement holds the default value on creation for the "statement" field.
 	DefaultStatement string
 	// StatementValidator is a validator for the "statement" field. It is called by the builders before save.
 	StatementValidator func(string) error
+	// DefaultSkeleton holds the default value on creation for the "skeleton" field.
+	DefaultSkeleton string
 	// DefaultReleased holds the default value on creation for the "released" field.
 	DefaultReleased bool
 )

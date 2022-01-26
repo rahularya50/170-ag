@@ -67,6 +67,7 @@ type CodingProblem implements Node {
   id: ID!
   name: String!
   statement: String!
+  skeleton: String!
   released: Boolean!
   my_draft: CodingDraft
   my_submissions(
@@ -96,9 +97,10 @@ type CodingProblemEdge {
 }
 
 input CodingProblemInput {
-  name: String!
-  statement: String!
-  released: Boolean!
+  name: String
+  statement: String
+  skeleton: String
+  released: Boolean
 }
 
 input UpdateCodingProblemInput {

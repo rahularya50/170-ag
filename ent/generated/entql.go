@@ -52,6 +52,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			codingproblem.FieldUpdateTime: {Type: field.TypeTime, Column: codingproblem.FieldUpdateTime},
 			codingproblem.FieldName:       {Type: field.TypeString, Column: codingproblem.FieldName},
 			codingproblem.FieldStatement:  {Type: field.TypeString, Column: codingproblem.FieldStatement},
+			codingproblem.FieldSkeleton:   {Type: field.TypeString, Column: codingproblem.FieldSkeleton},
 			codingproblem.FieldReleased:   {Type: field.TypeBool, Column: codingproblem.FieldReleased},
 		},
 	}
@@ -450,6 +451,11 @@ func (f *CodingProblemFilter) WhereName(p entql.StringP) {
 // WhereStatement applies the entql string predicate on the statement field.
 func (f *CodingProblemFilter) WhereStatement(p entql.StringP) {
 	f.Where(p.Field(codingproblem.FieldStatement))
+}
+
+// WhereSkeleton applies the entql string predicate on the skeleton field.
+func (f *CodingProblemFilter) WhereSkeleton(p entql.StringP) {
+	f.Where(p.Field(codingproblem.FieldSkeleton))
 }
 
 // WhereReleased applies the entql bool predicate on the released field.

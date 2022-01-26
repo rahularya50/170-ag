@@ -59,6 +59,14 @@ func (cpc *CodingProblemCreate) SetName(s string) *CodingProblemCreate {
 	return cpc
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (cpc *CodingProblemCreate) SetNillableName(s *string) *CodingProblemCreate {
+	if s != nil {
+		cpc.SetName(*s)
+	}
+	return cpc
+}
+
 // SetStatement sets the "statement" field.
 func (cpc *CodingProblemCreate) SetStatement(s string) *CodingProblemCreate {
 	cpc.mutation.SetStatement(s)
@@ -69,6 +77,20 @@ func (cpc *CodingProblemCreate) SetStatement(s string) *CodingProblemCreate {
 func (cpc *CodingProblemCreate) SetNillableStatement(s *string) *CodingProblemCreate {
 	if s != nil {
 		cpc.SetStatement(*s)
+	}
+	return cpc
+}
+
+// SetSkeleton sets the "skeleton" field.
+func (cpc *CodingProblemCreate) SetSkeleton(s string) *CodingProblemCreate {
+	cpc.mutation.SetSkeleton(s)
+	return cpc
+}
+
+// SetNillableSkeleton sets the "skeleton" field if the given value is not nil.
+func (cpc *CodingProblemCreate) SetNillableSkeleton(s *string) *CodingProblemCreate {
+	if s != nil {
+		cpc.SetSkeleton(*s)
 	}
 	return cpc
 }
@@ -219,9 +241,17 @@ func (cpc *CodingProblemCreate) defaults() error {
 		v := codingproblem.DefaultUpdateTime()
 		cpc.mutation.SetUpdateTime(v)
 	}
+	if _, ok := cpc.mutation.Name(); !ok {
+		v := codingproblem.DefaultName
+		cpc.mutation.SetName(v)
+	}
 	if _, ok := cpc.mutation.Statement(); !ok {
 		v := codingproblem.DefaultStatement
 		cpc.mutation.SetStatement(v)
+	}
+	if _, ok := cpc.mutation.Skeleton(); !ok {
+		v := codingproblem.DefaultSkeleton
+		cpc.mutation.SetSkeleton(v)
 	}
 	if _, ok := cpc.mutation.Released(); !ok {
 		v := codingproblem.DefaultReleased
@@ -253,6 +283,9 @@ func (cpc *CodingProblemCreate) check() error {
 		if err := codingproblem.StatementValidator(v); err != nil {
 			return &ValidationError{Name: "statement", err: fmt.Errorf(`generated: validator failed for field "CodingProblem.statement": %w`, err)}
 		}
+	}
+	if _, ok := cpc.mutation.Skeleton(); !ok {
+		return &ValidationError{Name: "skeleton", err: errors.New(`generated: missing required field "CodingProblem.skeleton"`)}
 	}
 	if _, ok := cpc.mutation.Released(); !ok {
 		return &ValidationError{Name: "released", err: errors.New(`generated: missing required field "CodingProblem.released"`)}
@@ -316,6 +349,14 @@ func (cpc *CodingProblemCreate) createSpec() (*CodingProblem, *sqlgraph.CreateSp
 			Column: codingproblem.FieldStatement,
 		})
 		_node.Statement = value
+	}
+	if value, ok := cpc.mutation.Skeleton(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: codingproblem.FieldSkeleton,
+		})
+		_node.Skeleton = value
 	}
 	if value, ok := cpc.mutation.Released(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -484,6 +525,18 @@ func (u *CodingProblemUpsert) UpdateStatement() *CodingProblemUpsert {
 	return u
 }
 
+// SetSkeleton sets the "skeleton" field.
+func (u *CodingProblemUpsert) SetSkeleton(v string) *CodingProblemUpsert {
+	u.Set(codingproblem.FieldSkeleton, v)
+	return u
+}
+
+// UpdateSkeleton sets the "skeleton" field to the value that was provided on create.
+func (u *CodingProblemUpsert) UpdateSkeleton() *CodingProblemUpsert {
+	u.SetExcluded(codingproblem.FieldSkeleton)
+	return u
+}
+
 // SetReleased sets the "released" field.
 func (u *CodingProblemUpsert) SetReleased(v bool) *CodingProblemUpsert {
 	u.Set(codingproblem.FieldReleased, v)
@@ -596,6 +649,20 @@ func (u *CodingProblemUpsertOne) SetStatement(v string) *CodingProblemUpsertOne 
 func (u *CodingProblemUpsertOne) UpdateStatement() *CodingProblemUpsertOne {
 	return u.Update(func(s *CodingProblemUpsert) {
 		s.UpdateStatement()
+	})
+}
+
+// SetSkeleton sets the "skeleton" field.
+func (u *CodingProblemUpsertOne) SetSkeleton(v string) *CodingProblemUpsertOne {
+	return u.Update(func(s *CodingProblemUpsert) {
+		s.SetSkeleton(v)
+	})
+}
+
+// UpdateSkeleton sets the "skeleton" field to the value that was provided on create.
+func (u *CodingProblemUpsertOne) UpdateSkeleton() *CodingProblemUpsertOne {
+	return u.Update(func(s *CodingProblemUpsert) {
+		s.UpdateSkeleton()
 	})
 }
 
@@ -877,6 +944,20 @@ func (u *CodingProblemUpsertBulk) SetStatement(v string) *CodingProblemUpsertBul
 func (u *CodingProblemUpsertBulk) UpdateStatement() *CodingProblemUpsertBulk {
 	return u.Update(func(s *CodingProblemUpsert) {
 		s.UpdateStatement()
+	})
+}
+
+// SetSkeleton sets the "skeleton" field.
+func (u *CodingProblemUpsertBulk) SetSkeleton(v string) *CodingProblemUpsertBulk {
+	return u.Update(func(s *CodingProblemUpsert) {
+		s.SetSkeleton(v)
+	})
+}
+
+// UpdateSkeleton sets the "skeleton" field to the value that was provided on create.
+func (u *CodingProblemUpsertBulk) UpdateSkeleton() *CodingProblemUpsertBulk {
+	return u.Update(func(s *CodingProblemUpsert) {
+		s.UpdateSkeleton()
 	})
 }
 

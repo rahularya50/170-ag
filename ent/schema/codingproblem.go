@@ -23,8 +23,9 @@ type CodingProblem struct {
 // Fields of the CodingProblem.
 func (CodingProblem) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("name").NotEmpty().MaxLen(128),
+		field.String("name").Default("Untitled Problem").NotEmpty().MaxLen(128),
 		field.Text("statement").Default("This is the problem statement").NotEmpty(),
+		field.Text("skeleton").Default(""),
 		field.Bool("released").Default(false),
 	}
 }

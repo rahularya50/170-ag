@@ -596,6 +596,7 @@ type CodingProblemMutation struct {
 	update_time        *time.Time
 	name               *string
 	statement          *string
+	skeleton           *string
 	released           *bool
 	clearedFields      map[string]struct{}
 	drafts             map[int]struct{}
@@ -854,6 +855,42 @@ func (m *CodingProblemMutation) ResetStatement() {
 	m.statement = nil
 }
 
+// SetSkeleton sets the "skeleton" field.
+func (m *CodingProblemMutation) SetSkeleton(s string) {
+	m.skeleton = &s
+}
+
+// Skeleton returns the value of the "skeleton" field in the mutation.
+func (m *CodingProblemMutation) Skeleton() (r string, exists bool) {
+	v := m.skeleton
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSkeleton returns the old "skeleton" field's value of the CodingProblem entity.
+// If the CodingProblem object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CodingProblemMutation) OldSkeleton(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSkeleton is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSkeleton requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSkeleton: %w", err)
+	}
+	return oldValue.Skeleton, nil
+}
+
+// ResetSkeleton resets all changes to the "skeleton" field.
+func (m *CodingProblemMutation) ResetSkeleton() {
+	m.skeleton = nil
+}
+
 // SetReleased sets the "released" field.
 func (m *CodingProblemMutation) SetReleased(b bool) {
 	m.released = &b
@@ -1071,7 +1108,7 @@ func (m *CodingProblemMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CodingProblemMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.create_time != nil {
 		fields = append(fields, codingproblem.FieldCreateTime)
 	}
@@ -1083,6 +1120,9 @@ func (m *CodingProblemMutation) Fields() []string {
 	}
 	if m.statement != nil {
 		fields = append(fields, codingproblem.FieldStatement)
+	}
+	if m.skeleton != nil {
+		fields = append(fields, codingproblem.FieldSkeleton)
 	}
 	if m.released != nil {
 		fields = append(fields, codingproblem.FieldReleased)
@@ -1103,6 +1143,8 @@ func (m *CodingProblemMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case codingproblem.FieldStatement:
 		return m.Statement()
+	case codingproblem.FieldSkeleton:
+		return m.Skeleton()
 	case codingproblem.FieldReleased:
 		return m.Released()
 	}
@@ -1122,6 +1164,8 @@ func (m *CodingProblemMutation) OldField(ctx context.Context, name string) (ent.
 		return m.OldName(ctx)
 	case codingproblem.FieldStatement:
 		return m.OldStatement(ctx)
+	case codingproblem.FieldSkeleton:
+		return m.OldSkeleton(ctx)
 	case codingproblem.FieldReleased:
 		return m.OldReleased(ctx)
 	}
@@ -1160,6 +1204,13 @@ func (m *CodingProblemMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetStatement(v)
+		return nil
+	case codingproblem.FieldSkeleton:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSkeleton(v)
 		return nil
 	case codingproblem.FieldReleased:
 		v, ok := value.(bool)
@@ -1228,6 +1279,9 @@ func (m *CodingProblemMutation) ResetField(name string) error {
 		return nil
 	case codingproblem.FieldStatement:
 		m.ResetStatement()
+		return nil
+	case codingproblem.FieldSkeleton:
+		m.ResetSkeleton()
 		return nil
 	case codingproblem.FieldReleased:
 		m.ResetReleased()

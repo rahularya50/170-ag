@@ -72,6 +72,8 @@ func init() {
 	codingproblem.UpdateDefaultUpdateTime = codingproblemDescUpdateTime.UpdateDefault.(func() time.Time)
 	// codingproblemDescName is the schema descriptor for name field.
 	codingproblemDescName := codingproblemFields[0].Descriptor()
+	// codingproblem.DefaultName holds the default value on creation for the name field.
+	codingproblem.DefaultName = codingproblemDescName.Default.(string)
 	// codingproblem.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	codingproblem.NameValidator = func() func(string) error {
 		validators := codingproblemDescName.Validators
@@ -94,8 +96,12 @@ func init() {
 	codingproblem.DefaultStatement = codingproblemDescStatement.Default.(string)
 	// codingproblem.StatementValidator is a validator for the "statement" field. It is called by the builders before save.
 	codingproblem.StatementValidator = codingproblemDescStatement.Validators[0].(func(string) error)
+	// codingproblemDescSkeleton is the schema descriptor for skeleton field.
+	codingproblemDescSkeleton := codingproblemFields[2].Descriptor()
+	// codingproblem.DefaultSkeleton holds the default value on creation for the skeleton field.
+	codingproblem.DefaultSkeleton = codingproblemDescSkeleton.Default.(string)
 	// codingproblemDescReleased is the schema descriptor for released field.
-	codingproblemDescReleased := codingproblemFields[2].Descriptor()
+	codingproblemDescReleased := codingproblemFields[3].Descriptor()
 	// codingproblem.DefaultReleased holds the default value on creation for the released field.
 	codingproblem.DefaultReleased = codingproblemDescReleased.Default.(bool)
 	codingsubmissionMixin := schema.CodingSubmission{}.Mixin()

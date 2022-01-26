@@ -2,14 +2,15 @@
 import type { ProblemEditorSaveDraftMutation } from "./__generated__/ProblemEditorSaveDraftMutation.graphql";
 import type { ProblemEditor_problem$key } from "./__generated__/ProblemEditor_problem.graphql";
 import type { ProblemEditorSubmitMutation } from "./__generated__/ProblemEditorSubmitMutation.graphql";
+import type { ProblemEditorUpdateSkeletonMutation } from "./__generated__/ProblemEditorUpdateSkeletonMutation.graphql";
+import type { ProblemEditor_viewer$key } from "./__generated__/ProblemEditor_viewer.graphql";
 
 import * as React from "react";
 import { useCallback, useEffect, useState } from "react";
 import graphql from "babel-plugin-relay/macro";
 import { useFragment, useMutation } from "react-relay/hooks";
-import { useParams } from "react-router-dom";
 import AceEditor from "react-ace";
-import { Stack } from "react-bootstrap";
+import { Button, Stack } from "react-bootstrap";
 import { useDebouncedCallback } from "./useDebounced";
 import LoadingButton from "./LoadingButton";
 
@@ -21,18 +22,30 @@ import "ace-builds/src-noconflict/mode-c_cpp";
 import "ace-builds/src-noconflict/theme-github";
 
 type Props = {
+  viewer: ProblemEditor_viewer$key,
   problem: ProblemEditor_problem$key,
   onSubmit: () => mixed,
 };
 
 export default function ProblemEditor(props: Props): React.Node {
-  const { id } = useParams();
+  const { is_staff: isStaff } = useFragment(
+    graphql`
+      fragment ProblemEditor_viewer on User {
+        is_staff
+      }
+    `,
+    props.viewer
+  );
 
-  const { my_draft: myDraft } = useFragment(
+  const {
+    id,
+    skeleton,
+    my_draft: myDraft,
+  } = useFragment(
     graphql`
       fragment ProblemEditor_problem on CodingProblem {
-        name
-        statement
+        id
+        skeleton
         my_draft {
           code
         }
@@ -50,6 +63,30 @@ export default function ProblemEditor(props: Props): React.Node {
       }
     `
   );
+
+  const [updateSkeleton, isUpdatingSkeleton] =
+    useMutation<ProblemEditorUpdateSkeletonMutation>(
+      graphql`
+        mutation ProblemEditorUpdateSkeletonMutation(
+          $input: UpdateCodingProblemInput!
+        ) {
+          update_problem(input: $input) {
+            skeleton
+          }
+        }
+      `
+    );
+
+  const handleUpdateSkeleton = () => {
+    updateSkeleton({
+      variables: {
+        input: { id, problem: { skeleton: studentCode } },
+      },
+      onError: (e) => {
+        alert(e);
+      },
+    });
+  };
 
   const [submitMutation, isSubmitting] =
     useMutation<ProblemEditorSubmitMutation>(
@@ -77,7 +114,7 @@ export default function ProblemEditor(props: Props): React.Node {
   };
 
   const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
-  const [studentCode, setStudentCode] = useState(myDraft?.code ?? "");
+  const [studentCode, setStudentCode] = useState(myDraft?.code ?? skeleton);
   const [savedStudentCode, setSavedStudentCode] = useState("");
 
   const isSaved = !isSaving && studentCode === savedStudentCode;
@@ -117,6 +154,23 @@ export default function ProblemEditor(props: Props): React.Node {
         value={studentCode}
       />
       <Stack direction="horizontal" gap={1}>
+        {isStaff && (
+          <LoadingButton
+            isUpdating={isUpdatingSkeleton}
+            onClick={handleUpdateSkeleton}
+            variant="danger"
+            size="sm"
+          >
+            Set as skeleton
+          </LoadingButton>
+        )}
+        <Button
+          onClick={() => setStudentCode(skeleton)}
+          variant="danger"
+          size="sm"
+        >
+          Reset to skeleton
+        </Button>
         <LoadingButton
           isUpdating={isSaving}
           onClick={() => immediatelyForceSave(studentCode)}

@@ -24,6 +24,8 @@ type CodingProblem struct {
 	Name string `json:"name,omitempty"`
 	// Statement holds the value of the "statement" field.
 	Statement string `json:"statement,omitempty"`
+	// Skeleton holds the value of the "skeleton" field.
+	Skeleton string `json:"skeleton,omitempty"`
 	// Released holds the value of the "released" field.
 	Released bool `json:"released,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -80,7 +82,7 @@ func (*CodingProblem) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullBool)
 		case codingproblem.FieldID:
 			values[i] = new(sql.NullInt64)
-		case codingproblem.FieldName, codingproblem.FieldStatement:
+		case codingproblem.FieldName, codingproblem.FieldStatement, codingproblem.FieldSkeleton:
 			values[i] = new(sql.NullString)
 		case codingproblem.FieldCreateTime, codingproblem.FieldUpdateTime:
 			values[i] = new(sql.NullTime)
@@ -128,6 +130,12 @@ func (cp *CodingProblem) assignValues(columns []string, values []interface{}) er
 				return fmt.Errorf("unexpected type %T for field statement", values[i])
 			} else if value.Valid {
 				cp.Statement = value.String
+			}
+		case codingproblem.FieldSkeleton:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field skeleton", values[i])
+			} else if value.Valid {
+				cp.Skeleton = value.String
 			}
 		case codingproblem.FieldReleased:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -186,6 +194,8 @@ func (cp *CodingProblem) String() string {
 	builder.WriteString(cp.Name)
 	builder.WriteString(", statement=")
 	builder.WriteString(cp.Statement)
+	builder.WriteString(", skeleton=")
+	builder.WriteString(cp.Skeleton)
 	builder.WriteString(", released=")
 	builder.WriteString(fmt.Sprintf("%v", cp.Released))
 	builder.WriteByte(')')

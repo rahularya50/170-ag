@@ -64,9 +64,10 @@ func (r *mutationResolver) NewUser(ctx context.Context, name string) (*ent.User,
 func (r *mutationResolver) NewProblem(ctx context.Context, input model.CodingProblemInput) (*ent.CodingProblem, error) {
 	return r.client.CodingProblem.
 		Create().
-		SetName(input.Name).
-		SetStatement(input.Statement).
-		SetReleased(input.Released).
+		SetNillableName(input.Name).
+		SetNillableStatement(input.Statement).
+		SetNillableSkeleton(input.Skeleton).
+		SetNillableReleased(input.Released).
 		Save(ctx)
 }
 
@@ -146,9 +147,10 @@ func (r *mutationResolver) UpdateProblem(ctx context.Context, input model.Update
 		return nil, err
 	}
 	return problem.Update().
-		SetName(input.Problem.Name).
-		SetStatement(input.Problem.Statement).
-		SetReleased(input.Problem.Released).
+		SetNillableName(input.Problem.Name).
+		SetNillableStatement(input.Problem.Statement).
+		SetNillableSkeleton(input.Problem.Skeleton).
+		SetNillableReleased(input.Problem.Released).
 		Save(ctx)
 }
 
@@ -187,27 +189,18 @@ func (r *mutationResolver) UpdateTestCase(ctx context.Context, input model.Updat
 	if err != nil {
 		return nil, err
 	}
-	data_updater := data.Update()
-	if input.Input != nil {
-		data_updater.SetInput(*input.Input)
-	}
-	if input.Output != nil {
-		data_updater.SetOutput(*input.Output)
-	}
-	err = data_updater.Exec(ctx)
+	err = data.Update().
+		SetNillableInput(input.Input).
+		SetNillableOutput(input.Output).
+		Exec(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	case_updater := test_case.Update()
-	if input.Points != nil {
-		case_updater.SetPoints(*input.Points)
-	}
-	if input.Public != nil {
-		case_updater.SetPublic(*input.Public)
-	}
-
-	test_case, err = case_updater.Save(ctx)
+	test_case, err = test_case.Update().
+		SetNillablePoints(input.Points).
+		SetNillablePublic(input.Public).
+		Save(ctx)
 	if err != nil {
 		return nil, err
 	}

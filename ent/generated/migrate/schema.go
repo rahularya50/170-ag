@@ -49,8 +49,9 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "create_time", Type: field.TypeTime},
 		{Name: "update_time", Type: field.TypeTime},
-		{Name: "name", Type: field.TypeString, Size: 128},
+		{Name: "name", Type: field.TypeString, Size: 128, Default: "Untitled Problem"},
 		{Name: "statement", Type: field.TypeString, Size: 2147483647, Default: "This is the problem statement"},
+		{Name: "skeleton", Type: field.TypeString, Size: 2147483647, Default: ""},
 		{Name: "released", Type: field.TypeBool, Default: false},
 	}
 	// CodingProblemsTable holds the schema information for the "coding_problems" table.

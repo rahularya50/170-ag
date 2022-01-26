@@ -43,6 +43,14 @@ func (cpu *CodingProblemUpdate) SetName(s string) *CodingProblemUpdate {
 	return cpu
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (cpu *CodingProblemUpdate) SetNillableName(s *string) *CodingProblemUpdate {
+	if s != nil {
+		cpu.SetName(*s)
+	}
+	return cpu
+}
+
 // SetStatement sets the "statement" field.
 func (cpu *CodingProblemUpdate) SetStatement(s string) *CodingProblemUpdate {
 	cpu.mutation.SetStatement(s)
@@ -53,6 +61,20 @@ func (cpu *CodingProblemUpdate) SetStatement(s string) *CodingProblemUpdate {
 func (cpu *CodingProblemUpdate) SetNillableStatement(s *string) *CodingProblemUpdate {
 	if s != nil {
 		cpu.SetStatement(*s)
+	}
+	return cpu
+}
+
+// SetSkeleton sets the "skeleton" field.
+func (cpu *CodingProblemUpdate) SetSkeleton(s string) *CodingProblemUpdate {
+	cpu.mutation.SetSkeleton(s)
+	return cpu
+}
+
+// SetNillableSkeleton sets the "skeleton" field if the given value is not nil.
+func (cpu *CodingProblemUpdate) SetNillableSkeleton(s *string) *CodingProblemUpdate {
+	if s != nil {
+		cpu.SetSkeleton(*s)
 	}
 	return cpu
 }
@@ -313,6 +335,13 @@ func (cpu *CodingProblemUpdate) sqlSave(ctx context.Context) (n int, err error) 
 			Column: codingproblem.FieldStatement,
 		})
 	}
+	if value, ok := cpu.mutation.Skeleton(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: codingproblem.FieldSkeleton,
+		})
+	}
 	if value, ok := cpu.mutation.Released(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeBool,
@@ -513,6 +542,14 @@ func (cpuo *CodingProblemUpdateOne) SetName(s string) *CodingProblemUpdateOne {
 	return cpuo
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (cpuo *CodingProblemUpdateOne) SetNillableName(s *string) *CodingProblemUpdateOne {
+	if s != nil {
+		cpuo.SetName(*s)
+	}
+	return cpuo
+}
+
 // SetStatement sets the "statement" field.
 func (cpuo *CodingProblemUpdateOne) SetStatement(s string) *CodingProblemUpdateOne {
 	cpuo.mutation.SetStatement(s)
@@ -523,6 +560,20 @@ func (cpuo *CodingProblemUpdateOne) SetStatement(s string) *CodingProblemUpdateO
 func (cpuo *CodingProblemUpdateOne) SetNillableStatement(s *string) *CodingProblemUpdateOne {
 	if s != nil {
 		cpuo.SetStatement(*s)
+	}
+	return cpuo
+}
+
+// SetSkeleton sets the "skeleton" field.
+func (cpuo *CodingProblemUpdateOne) SetSkeleton(s string) *CodingProblemUpdateOne {
+	cpuo.mutation.SetSkeleton(s)
+	return cpuo
+}
+
+// SetNillableSkeleton sets the "skeleton" field if the given value is not nil.
+func (cpuo *CodingProblemUpdateOne) SetNillableSkeleton(s *string) *CodingProblemUpdateOne {
+	if s != nil {
+		cpuo.SetSkeleton(*s)
 	}
 	return cpuo
 }
@@ -805,6 +856,13 @@ func (cpuo *CodingProblemUpdateOne) sqlSave(ctx context.Context) (_node *CodingP
 			Type:   field.TypeString,
 			Value:  value,
 			Column: codingproblem.FieldStatement,
+		})
+	}
+	if value, ok := cpuo.mutation.Skeleton(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: codingproblem.FieldSkeleton,
 		})
 	}
 	if value, ok := cpuo.mutation.Released(); ok {

@@ -121,6 +121,13 @@ func Statement(v string) predicate.CodingProblem {
 	})
 }
 
+// Skeleton applies equality check predicate on the "skeleton" field. It's identical to SkeletonEQ.
+func Skeleton(v string) predicate.CodingProblem {
+	return predicate.CodingProblem(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldSkeleton), v))
+	})
+}
+
 // Released applies equality check predicate on the "released" field. It's identical to ReleasedEQ.
 func Released(v bool) predicate.CodingProblem {
 	return predicate.CodingProblem(func(s *sql.Selector) {
@@ -499,6 +506,117 @@ func StatementEqualFold(v string) predicate.CodingProblem {
 func StatementContainsFold(v string) predicate.CodingProblem {
 	return predicate.CodingProblem(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldStatement), v))
+	})
+}
+
+// SkeletonEQ applies the EQ predicate on the "skeleton" field.
+func SkeletonEQ(v string) predicate.CodingProblem {
+	return predicate.CodingProblem(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldSkeleton), v))
+	})
+}
+
+// SkeletonNEQ applies the NEQ predicate on the "skeleton" field.
+func SkeletonNEQ(v string) predicate.CodingProblem {
+	return predicate.CodingProblem(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldSkeleton), v))
+	})
+}
+
+// SkeletonIn applies the In predicate on the "skeleton" field.
+func SkeletonIn(vs ...string) predicate.CodingProblem {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.CodingProblem(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldSkeleton), v...))
+	})
+}
+
+// SkeletonNotIn applies the NotIn predicate on the "skeleton" field.
+func SkeletonNotIn(vs ...string) predicate.CodingProblem {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.CodingProblem(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldSkeleton), v...))
+	})
+}
+
+// SkeletonGT applies the GT predicate on the "skeleton" field.
+func SkeletonGT(v string) predicate.CodingProblem {
+	return predicate.CodingProblem(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldSkeleton), v))
+	})
+}
+
+// SkeletonGTE applies the GTE predicate on the "skeleton" field.
+func SkeletonGTE(v string) predicate.CodingProblem {
+	return predicate.CodingProblem(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldSkeleton), v))
+	})
+}
+
+// SkeletonLT applies the LT predicate on the "skeleton" field.
+func SkeletonLT(v string) predicate.CodingProblem {
+	return predicate.CodingProblem(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldSkeleton), v))
+	})
+}
+
+// SkeletonLTE applies the LTE predicate on the "skeleton" field.
+func SkeletonLTE(v string) predicate.CodingProblem {
+	return predicate.CodingProblem(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldSkeleton), v))
+	})
+}
+
+// SkeletonContains applies the Contains predicate on the "skeleton" field.
+func SkeletonContains(v string) predicate.CodingProblem {
+	return predicate.CodingProblem(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldSkeleton), v))
+	})
+}
+
+// SkeletonHasPrefix applies the HasPrefix predicate on the "skeleton" field.
+func SkeletonHasPrefix(v string) predicate.CodingProblem {
+	return predicate.CodingProblem(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldSkeleton), v))
+	})
+}
+
+// SkeletonHasSuffix applies the HasSuffix predicate on the "skeleton" field.
+func SkeletonHasSuffix(v string) predicate.CodingProblem {
+	return predicate.CodingProblem(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldSkeleton), v))
+	})
+}
+
+// SkeletonEqualFold applies the EqualFold predicate on the "skeleton" field.
+func SkeletonEqualFold(v string) predicate.CodingProblem {
+	return predicate.CodingProblem(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldSkeleton), v))
+	})
+}
+
+// SkeletonContainsFold applies the ContainsFold predicate on the "skeleton" field.
+func SkeletonContainsFold(v string) predicate.CodingProblem {
+	return predicate.CodingProblem(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldSkeleton), v))
 	})
 }
 
