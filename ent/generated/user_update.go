@@ -4,6 +4,7 @@ package generated
 
 import (
 	"170-ag/ent/generated/codingdraft"
+	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/predicate"
 	"170-ag/ent/generated/user"
 	"context"
@@ -84,6 +85,21 @@ func (uu *UserUpdate) AddDrafts(c ...*CodingDraft) *UserUpdate {
 	return uu.AddDraftIDs(ids...)
 }
 
+// AddSubmissionIDs adds the "submissions" edge to the CodingSubmission entity by IDs.
+func (uu *UserUpdate) AddSubmissionIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddSubmissionIDs(ids...)
+	return uu
+}
+
+// AddSubmissions adds the "submissions" edges to the CodingSubmission entity.
+func (uu *UserUpdate) AddSubmissions(c ...*CodingSubmission) *UserUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uu.AddSubmissionIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
@@ -108,6 +124,27 @@ func (uu *UserUpdate) RemoveDrafts(c ...*CodingDraft) *UserUpdate {
 		ids[i] = c[i].ID
 	}
 	return uu.RemoveDraftIDs(ids...)
+}
+
+// ClearSubmissions clears all "submissions" edges to the CodingSubmission entity.
+func (uu *UserUpdate) ClearSubmissions() *UserUpdate {
+	uu.mutation.ClearSubmissions()
+	return uu
+}
+
+// RemoveSubmissionIDs removes the "submissions" edge to CodingSubmission entities by IDs.
+func (uu *UserUpdate) RemoveSubmissionIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveSubmissionIDs(ids...)
+	return uu
+}
+
+// RemoveSubmissions removes "submissions" edges to CodingSubmission entities.
+func (uu *UserUpdate) RemoveSubmissions(c ...*CodingSubmission) *UserUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uu.RemoveSubmissionIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -294,6 +331,60 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if uu.mutation.SubmissionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.SubmissionsTable,
+			Columns: []string{user.SubmissionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingsubmission.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedSubmissionsIDs(); len(nodes) > 0 && !uu.mutation.SubmissionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.SubmissionsTable,
+			Columns: []string{user.SubmissionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingsubmission.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.SubmissionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.SubmissionsTable,
+			Columns: []string{user.SubmissionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingsubmission.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
@@ -368,6 +459,21 @@ func (uuo *UserUpdateOne) AddDrafts(c ...*CodingDraft) *UserUpdateOne {
 	return uuo.AddDraftIDs(ids...)
 }
 
+// AddSubmissionIDs adds the "submissions" edge to the CodingSubmission entity by IDs.
+func (uuo *UserUpdateOne) AddSubmissionIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddSubmissionIDs(ids...)
+	return uuo
+}
+
+// AddSubmissions adds the "submissions" edges to the CodingSubmission entity.
+func (uuo *UserUpdateOne) AddSubmissions(c ...*CodingSubmission) *UserUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uuo.AddSubmissionIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
@@ -392,6 +498,27 @@ func (uuo *UserUpdateOne) RemoveDrafts(c ...*CodingDraft) *UserUpdateOne {
 		ids[i] = c[i].ID
 	}
 	return uuo.RemoveDraftIDs(ids...)
+}
+
+// ClearSubmissions clears all "submissions" edges to the CodingSubmission entity.
+func (uuo *UserUpdateOne) ClearSubmissions() *UserUpdateOne {
+	uuo.mutation.ClearSubmissions()
+	return uuo
+}
+
+// RemoveSubmissionIDs removes the "submissions" edge to CodingSubmission entities by IDs.
+func (uuo *UserUpdateOne) RemoveSubmissionIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveSubmissionIDs(ids...)
+	return uuo
+}
+
+// RemoveSubmissions removes "submissions" edges to CodingSubmission entities.
+func (uuo *UserUpdateOne) RemoveSubmissions(c ...*CodingSubmission) *UserUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uuo.RemoveSubmissionIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -594,6 +721,60 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: codingdraft.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.SubmissionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.SubmissionsTable,
+			Columns: []string{user.SubmissionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingsubmission.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedSubmissionsIDs(); len(nodes) > 0 && !uuo.mutation.SubmissionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.SubmissionsTable,
+			Columns: []string{user.SubmissionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingsubmission.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.SubmissionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.SubmissionsTable,
+			Columns: []string{user.SubmissionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingsubmission.FieldID,
 				},
 			},
 		}

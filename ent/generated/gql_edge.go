@@ -107,3 +107,11 @@ func (u *User) Drafts(ctx context.Context) ([]*CodingDraft, error) {
 	}
 	return result, err
 }
+
+func (u *User) Submissions(ctx context.Context) ([]*CodingSubmission, error) {
+	result, err := u.Edges.SubmissionsOrErr()
+	if IsNotLoaded(err) {
+		result, err = u.QuerySubmissions().All(ctx)
+	}
+	return result, err
+}

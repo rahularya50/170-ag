@@ -244,6 +244,10 @@ func (r *queryResolver) User(ctx context.Context, id int) (*ent.User, error) {
 	return r.client.User.Get(ctx, id)
 }
 
+func (r *queryResolver) Users(ctx context.Context, after *ent.Cursor, first *int, before *ent.Cursor, last *int) (*ent.UserConnection, error) {
+	return r.client.User.Query().Paginate(ctx, after, first, before, last)
+}
+
 func (r *queryResolver) CodingProblem(ctx context.Context, id int) (*ent.CodingProblem, error) {
 	return r.client.CodingProblem.Get(ctx, id)
 }

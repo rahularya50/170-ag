@@ -4274,21 +4274,24 @@ func (m *CodingTestCaseDataMutation) ResetEdge(name string) error {
 // UserMutation represents an operation that mutates the User nodes in the graph.
 type UserMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int
-	create_time   *time.Time
-	update_time   *time.Time
-	email         *string
-	name          *string
-	is_staff      *bool
-	clearedFields map[string]struct{}
-	drafts        map[int]struct{}
-	removeddrafts map[int]struct{}
-	cleareddrafts bool
-	done          bool
-	oldValue      func(context.Context) (*User, error)
-	predicates    []predicate.User
+	op                 Op
+	typ                string
+	id                 *int
+	create_time        *time.Time
+	update_time        *time.Time
+	email              *string
+	name               *string
+	is_staff           *bool
+	clearedFields      map[string]struct{}
+	drafts             map[int]struct{}
+	removeddrafts      map[int]struct{}
+	cleareddrafts      bool
+	submissions        map[int]struct{}
+	removedsubmissions map[int]struct{}
+	clearedsubmissions bool
+	done               bool
+	oldValue           func(context.Context) (*User, error)
+	predicates         []predicate.User
 }
 
 var _ ent.Mutation = (*UserMutation)(nil)
@@ -4636,6 +4639,60 @@ func (m *UserMutation) ResetDrafts() {
 	m.removeddrafts = nil
 }
 
+// AddSubmissionIDs adds the "submissions" edge to the CodingSubmission entity by ids.
+func (m *UserMutation) AddSubmissionIDs(ids ...int) {
+	if m.submissions == nil {
+		m.submissions = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.submissions[ids[i]] = struct{}{}
+	}
+}
+
+// ClearSubmissions clears the "submissions" edge to the CodingSubmission entity.
+func (m *UserMutation) ClearSubmissions() {
+	m.clearedsubmissions = true
+}
+
+// SubmissionsCleared reports if the "submissions" edge to the CodingSubmission entity was cleared.
+func (m *UserMutation) SubmissionsCleared() bool {
+	return m.clearedsubmissions
+}
+
+// RemoveSubmissionIDs removes the "submissions" edge to the CodingSubmission entity by IDs.
+func (m *UserMutation) RemoveSubmissionIDs(ids ...int) {
+	if m.removedsubmissions == nil {
+		m.removedsubmissions = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.submissions, ids[i])
+		m.removedsubmissions[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedSubmissions returns the removed IDs of the "submissions" edge to the CodingSubmission entity.
+func (m *UserMutation) RemovedSubmissionsIDs() (ids []int) {
+	for id := range m.removedsubmissions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// SubmissionsIDs returns the "submissions" edge IDs in the mutation.
+func (m *UserMutation) SubmissionsIDs() (ids []int) {
+	for id := range m.submissions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetSubmissions resets all changes to the "submissions" edge.
+func (m *UserMutation) ResetSubmissions() {
+	m.submissions = nil
+	m.clearedsubmissions = false
+	m.removedsubmissions = nil
+}
+
 // Where appends a list predicates to the UserMutation builder.
 func (m *UserMutation) Where(ps ...predicate.User) {
 	m.predicates = append(m.predicates, ps...)
@@ -4831,9 +4888,12 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.drafts != nil {
 		edges = append(edges, user.EdgeDrafts)
+	}
+	if m.submissions != nil {
+		edges = append(edges, user.EdgeSubmissions)
 	}
 	return edges
 }
@@ -4848,15 +4908,24 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeSubmissions:
+		ids := make([]ent.Value, 0, len(m.submissions))
+		for id := range m.submissions {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.removeddrafts != nil {
 		edges = append(edges, user.EdgeDrafts)
+	}
+	if m.removedsubmissions != nil {
+		edges = append(edges, user.EdgeSubmissions)
 	}
 	return edges
 }
@@ -4871,15 +4940,24 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeSubmissions:
+		ids := make([]ent.Value, 0, len(m.removedsubmissions))
+		for id := range m.removedsubmissions {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.cleareddrafts {
 		edges = append(edges, user.EdgeDrafts)
+	}
+	if m.clearedsubmissions {
+		edges = append(edges, user.EdgeSubmissions)
 	}
 	return edges
 }
@@ -4890,6 +4968,8 @@ func (m *UserMutation) EdgeCleared(name string) bool {
 	switch name {
 	case user.EdgeDrafts:
 		return m.cleareddrafts
+	case user.EdgeSubmissions:
+		return m.clearedsubmissions
 	}
 	return false
 }
@@ -4908,6 +4988,9 @@ func (m *UserMutation) ResetEdge(name string) error {
 	switch name {
 	case user.EdgeDrafts:
 		m.ResetDrafts()
+		return nil
+	case user.EdgeSubmissions:
+		m.ResetSubmissions()
 		return nil
 	}
 	return fmt.Errorf("unknown User edge %s", name)

@@ -1,10 +1,5 @@
 // @flow
-import "ace-builds/src-noconflict/mode-javascript";
-import "ace-builds/src-noconflict/mode-java";
-import "ace-builds/src-noconflict/mode-python";
-import "ace-builds/src-noconflict/mode-golang";
-import "ace-builds/src-noconflict/mode-c_cpp";
-import "ace-builds/src-noconflict/theme-github";
+/* eslint-disable simple-import-sort/imports */
 
 import graphql from "babel-plugin-relay/macro";
 import * as React from "react";
@@ -20,6 +15,8 @@ import type { ProblemEditorSubmitMutation } from "./__generated__/ProblemEditorS
 import type { ProblemEditorUpdateSkeletonMutation } from "./__generated__/ProblemEditorUpdateSkeletonMutation.graphql";
 import LoadingButton from "./LoadingButton";
 import { useDebouncedCallback } from "./useDebounced";
+
+import "ace-builds/src-noconflict/mode-python";
 
 type Props = {
   viewer: ProblemEditor_viewer$key,

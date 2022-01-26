@@ -35,9 +35,11 @@ type User struct {
 type UserEdges struct {
 	// Drafts holds the value of the drafts edge.
 	Drafts []*CodingDraft `json:"drafts,omitempty"`
+	// Submissions holds the value of the submissions edge.
+	Submissions []*CodingSubmission `json:"submissions,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // DraftsOrErr returns the Drafts value or an error if the edge
@@ -47,6 +49,15 @@ func (e UserEdges) DraftsOrErr() ([]*CodingDraft, error) {
 		return e.Drafts, nil
 	}
 	return nil, &NotLoadedError{edge: "drafts"}
+}
+
+// SubmissionsOrErr returns the Submissions value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) SubmissionsOrErr() ([]*CodingSubmission, error) {
+	if e.loadedTypes[1] {
+		return e.Submissions, nil
+	}
+	return nil, &NotLoadedError{edge: "submissions"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -121,6 +132,11 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 // QueryDrafts queries the "drafts" edge of the User entity.
 func (u *User) QueryDrafts() *CodingDraftQuery {
 	return (&UserClient{config: u.config}).QueryDrafts(u)
+}
+
+// QuerySubmissions queries the "submissions" edge of the User entity.
+func (u *User) QuerySubmissions() *CodingSubmissionQuery {
+	return (&UserClient{config: u.config}).QuerySubmissions(u)
 }
 
 // Update returns a builder for updating this User.

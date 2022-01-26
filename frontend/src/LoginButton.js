@@ -23,7 +23,7 @@ export default function LoginButton(): React.Node {
       theme: "outline",
       size: "large",
     });
-  });
+  }, []);
 
   return <div ref={buttonRef}></div>;
 }

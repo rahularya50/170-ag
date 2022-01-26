@@ -47,7 +47,7 @@ func ScoreOutput(
 				points = 0
 				break
 			}
-			if expected.Text() != outputs.Text() {
+			if strings.Trim(expected.Text(), " ") != strings.Trim(outputs.Text(), " ") {
 				result = models.ResultWrongAnswer
 				points = 0
 			}

@@ -303,6 +303,18 @@ var schemaGraph = func() *sqlgraph.Schema {
 		"User",
 		"CodingDraft",
 	)
+	graph.MustAddE(
+		"submissions",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.SubmissionsTable,
+			Columns: []string{user.SubmissionsColumn},
+			Bidi:    false,
+		},
+		"User",
+		"CodingSubmission",
+	)
 	return graph
 }()
 
@@ -936,6 +948,20 @@ func (f *UserFilter) WhereHasDrafts() {
 // WhereHasDraftsWith applies a predicate to check if query has an edge drafts with a given conditions (other predicates).
 func (f *UserFilter) WhereHasDraftsWith(preds ...predicate.CodingDraft) {
 	f.Where(entql.HasEdgeWith("drafts", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasSubmissions applies a predicate to check if query has an edge submissions.
+func (f *UserFilter) WhereHasSubmissions() {
+	f.Where(entql.HasEdge("submissions"))
+}
+
+// WhereHasSubmissionsWith applies a predicate to check if query has an edge submissions with a given conditions (other predicates).
+func (f *UserFilter) WhereHasSubmissionsWith(preds ...predicate.CodingSubmission) {
+	f.Where(entql.HasEdgeWith("submissions", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}

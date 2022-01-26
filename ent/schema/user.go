@@ -32,6 +32,7 @@ func (User) Fields() []ent.Field {
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("drafts", CodingDraft.Type).Ref("author"),
+		edge.From("submissions", CodingSubmission.Type).Ref("author"),
 	}
 }
 

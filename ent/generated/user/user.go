@@ -25,6 +25,8 @@ const (
 	FieldIsStaff = "is_staff"
 	// EdgeDrafts holds the string denoting the drafts edge name in mutations.
 	EdgeDrafts = "drafts"
+	// EdgeSubmissions holds the string denoting the submissions edge name in mutations.
+	EdgeSubmissions = "submissions"
 	// Table holds the table name of the user in the database.
 	Table = "users"
 	// DraftsTable is the table that holds the drafts relation/edge.
@@ -34,6 +36,13 @@ const (
 	DraftsInverseTable = "coding_drafts"
 	// DraftsColumn is the table column denoting the drafts relation/edge.
 	DraftsColumn = "coding_draft_author"
+	// SubmissionsTable is the table that holds the submissions relation/edge.
+	SubmissionsTable = "coding_submissions"
+	// SubmissionsInverseTable is the table name for the CodingSubmission entity.
+	// It exists in this package in order to avoid circular dependency with the "codingsubmission" package.
+	SubmissionsInverseTable = "coding_submissions"
+	// SubmissionsColumn is the table column denoting the submissions relation/edge.
+	SubmissionsColumn = "coding_submission_author"
 )
 
 // Columns holds all SQL columns for user fields.
