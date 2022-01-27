@@ -7,7 +7,7 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import { useLazyLoadQuery } from "react-relay";
 import { LinkContainer } from "react-router-bootstrap";
-import { Navigate,Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 
 import Home from "./Home";
 import Problem from "./Problem";
@@ -19,9 +19,6 @@ export default function App(): React.Node {
     graphql`
       query AppQuery {
         viewer {
-          __typename
-        }
-        coding_problem(id: "5") {
           __typename
         }
       }
