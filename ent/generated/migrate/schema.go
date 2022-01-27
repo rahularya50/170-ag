@@ -123,9 +123,9 @@ var (
 		{Name: "update_time", Type: field.TypeTime},
 		{Name: "execution_id", Type: field.TypeInt64, Nullable: true},
 		{Name: "input", Type: field.TypeString, Size: 2147483647},
-		{Name: "output", Type: field.TypeString, Nullable: true, Size: 65535},
-		{Name: "stderr", Type: field.TypeString, Nullable: true, Size: 65535},
-		{Name: "exit_error", Type: field.TypeString, Nullable: true, Size: 65535},
+		{Name: "output", Type: field.TypeString, Nullable: true, Size: 8388607},
+		{Name: "stderr", Type: field.TypeString, Nullable: true, Size: 262143},
+		{Name: "exit_error", Type: field.TypeString, Nullable: true, Size: 262143},
 	}
 	// CodingSubmissionStaffDataTable holds the schema information for the "coding_submission_staff_data" table.
 	CodingSubmissionStaffDataTable = &schema.Table{

@@ -7,6 +7,7 @@ import (
 	"170-ag/site/web"
 	"context"
 
+	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
@@ -31,8 +32,8 @@ func (User) Fields() []ent.Field {
 // Edges of the User.
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("drafts", CodingDraft.Type).Ref("author"),
-		edge.From("submissions", CodingSubmission.Type).Ref("author"),
+		edge.From("drafts", CodingDraft.Type).Ref("author").Annotations(entgql.Bind()),
+		edge.From("submissions", CodingSubmission.Type).Ref("author").Annotations(entgql.Bind()),
 	}
 }
 

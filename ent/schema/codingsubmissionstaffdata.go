@@ -23,9 +23,9 @@ func (CodingSubmissionStaffData) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int64("execution_id").Nillable().Optional(),
 		field.Text("input"),
-		field.Text("output").MaxLen(65535).Nillable().Optional(),
-		field.Text("stderr").MaxLen(65535).Nillable().Optional(),
-		field.Text("exit_error").MaxLen(65535).Nillable().Optional(),
+		field.Text("output").MaxLen(8388607).Nillable().Optional(),
+		field.Text("stderr").MaxLen(262143).Nillable().Optional(),
+		field.Text("exit_error").MaxLen(262143).Nillable().Optional(),
 	}
 }
 

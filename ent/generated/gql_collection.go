@@ -161,5 +161,17 @@ func (u *UserQuery) CollectFields(ctx context.Context, satisfies ...string) *Use
 }
 
 func (u *UserQuery) collectField(ctx *graphql.OperationContext, field graphql.CollectedField, satisfies ...string) *UserQuery {
+	for _, field := range graphql.CollectFields(ctx, field.Selections, satisfies) {
+		switch field.Name {
+		case "drafts":
+			u = u.WithDrafts(func(query *CodingDraftQuery) {
+				query.collectField(ctx, field)
+			})
+		case "submissions":
+			u = u.WithSubmissions(func(query *CodingSubmissionQuery) {
+				query.collectField(ctx, field)
+			})
+		}
+	}
 	return u
 }
