@@ -36,9 +36,15 @@ func ScoreOutput(
 	defaultFailResult models.CodingSubmissionResult,
 ) models.CodingSubmissionResults {
 	outputs := bufio.NewScanner(strings.NewReader(output))
+	maxSize := len(output) + 5
+	buffer := make([]byte, 0, maxSize)
+	outputs.Buffer(buffer, maxSize)
 	results := models.CodingSubmissionResults{}
 	for i, test_case := range test_case_data {
 		expected := bufio.NewScanner(strings.NewReader(test_case.Edges.Data.Output))
+		maxSize := len(test_case.Edges.Data.Output) + 5
+		buffer := make([]byte, 0, maxSize)
+		expected.Buffer(buffer, maxSize)
 		result := models.ResultAccepted
 		points := test_case.Points
 		for expected.Scan() {
