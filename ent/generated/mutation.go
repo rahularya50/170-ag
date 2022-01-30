@@ -3102,7 +3102,7 @@ type CodingTestCaseMutation struct {
 	update_time           *time.Time
 	points                *int
 	addpoints             *int
-	public                *bool
+	visibility            *codingtestcase.Visibility
 	clearedFields         map[string]struct{}
 	coding_problem        *int
 	clearedcoding_problem bool
@@ -3339,40 +3339,40 @@ func (m *CodingTestCaseMutation) ResetPoints() {
 	m.addpoints = nil
 }
 
-// SetPublic sets the "public" field.
-func (m *CodingTestCaseMutation) SetPublic(b bool) {
-	m.public = &b
+// SetVisibility sets the "visibility" field.
+func (m *CodingTestCaseMutation) SetVisibility(c codingtestcase.Visibility) {
+	m.visibility = &c
 }
 
-// Public returns the value of the "public" field in the mutation.
-func (m *CodingTestCaseMutation) Public() (r bool, exists bool) {
-	v := m.public
+// Visibility returns the value of the "visibility" field in the mutation.
+func (m *CodingTestCaseMutation) Visibility() (r codingtestcase.Visibility, exists bool) {
+	v := m.visibility
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldPublic returns the old "public" field's value of the CodingTestCase entity.
+// OldVisibility returns the old "visibility" field's value of the CodingTestCase entity.
 // If the CodingTestCase object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CodingTestCaseMutation) OldPublic(ctx context.Context) (v bool, err error) {
+func (m *CodingTestCaseMutation) OldVisibility(ctx context.Context) (v codingtestcase.Visibility, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldPublic is only allowed on UpdateOne operations")
+		return v, errors.New("OldVisibility is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldPublic requires an ID field in the mutation")
+		return v, errors.New("OldVisibility requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPublic: %w", err)
+		return v, fmt.Errorf("querying old value for OldVisibility: %w", err)
 	}
-	return oldValue.Public, nil
+	return oldValue.Visibility, nil
 }
 
-// ResetPublic resets all changes to the "public" field.
-func (m *CodingTestCaseMutation) ResetPublic() {
-	m.public = nil
+// ResetVisibility resets all changes to the "visibility" field.
+func (m *CodingTestCaseMutation) ResetVisibility() {
+	m.visibility = nil
 }
 
 // SetCodingProblemID sets the "coding_problem" edge to the CodingProblem entity by id.
@@ -3482,8 +3482,8 @@ func (m *CodingTestCaseMutation) Fields() []string {
 	if m.points != nil {
 		fields = append(fields, codingtestcase.FieldPoints)
 	}
-	if m.public != nil {
-		fields = append(fields, codingtestcase.FieldPublic)
+	if m.visibility != nil {
+		fields = append(fields, codingtestcase.FieldVisibility)
 	}
 	return fields
 }
@@ -3499,8 +3499,8 @@ func (m *CodingTestCaseMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdateTime()
 	case codingtestcase.FieldPoints:
 		return m.Points()
-	case codingtestcase.FieldPublic:
-		return m.Public()
+	case codingtestcase.FieldVisibility:
+		return m.Visibility()
 	}
 	return nil, false
 }
@@ -3516,8 +3516,8 @@ func (m *CodingTestCaseMutation) OldField(ctx context.Context, name string) (ent
 		return m.OldUpdateTime(ctx)
 	case codingtestcase.FieldPoints:
 		return m.OldPoints(ctx)
-	case codingtestcase.FieldPublic:
-		return m.OldPublic(ctx)
+	case codingtestcase.FieldVisibility:
+		return m.OldVisibility(ctx)
 	}
 	return nil, fmt.Errorf("unknown CodingTestCase field %s", name)
 }
@@ -3548,12 +3548,12 @@ func (m *CodingTestCaseMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetPoints(v)
 		return nil
-	case codingtestcase.FieldPublic:
-		v, ok := value.(bool)
+	case codingtestcase.FieldVisibility:
+		v, ok := value.(codingtestcase.Visibility)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetPublic(v)
+		m.SetVisibility(v)
 		return nil
 	}
 	return fmt.Errorf("unknown CodingTestCase field %s", name)
@@ -3628,8 +3628,8 @@ func (m *CodingTestCaseMutation) ResetField(name string) error {
 	case codingtestcase.FieldPoints:
 		m.ResetPoints()
 		return nil
-	case codingtestcase.FieldPublic:
-		m.ResetPublic()
+	case codingtestcase.FieldVisibility:
+		m.ResetVisibility()
 		return nil
 	}
 	return fmt.Errorf("unknown CodingTestCase field %s", name)

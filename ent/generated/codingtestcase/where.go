@@ -114,13 +114,6 @@ func Points(v int) predicate.CodingTestCase {
 	})
 }
 
-// Public applies equality check predicate on the "public" field. It's identical to PublicEQ.
-func Public(v bool) predicate.CodingTestCase {
-	return predicate.CodingTestCase(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldPublic), v))
-	})
-}
-
 // CreateTimeEQ applies the EQ predicate on the "create_time" field.
 func CreateTimeEQ(v time.Time) predicate.CodingTestCase {
 	return predicate.CodingTestCase(func(s *sql.Selector) {
@@ -349,17 +342,51 @@ func PointsLTE(v int) predicate.CodingTestCase {
 	})
 }
 
-// PublicEQ applies the EQ predicate on the "public" field.
-func PublicEQ(v bool) predicate.CodingTestCase {
+// VisibilityEQ applies the EQ predicate on the "visibility" field.
+func VisibilityEQ(v Visibility) predicate.CodingTestCase {
 	return predicate.CodingTestCase(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldPublic), v))
+		s.Where(sql.EQ(s.C(FieldVisibility), v))
 	})
 }
 
-// PublicNEQ applies the NEQ predicate on the "public" field.
-func PublicNEQ(v bool) predicate.CodingTestCase {
+// VisibilityNEQ applies the NEQ predicate on the "visibility" field.
+func VisibilityNEQ(v Visibility) predicate.CodingTestCase {
 	return predicate.CodingTestCase(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldPublic), v))
+		s.Where(sql.NEQ(s.C(FieldVisibility), v))
+	})
+}
+
+// VisibilityIn applies the In predicate on the "visibility" field.
+func VisibilityIn(vs ...Visibility) predicate.CodingTestCase {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.CodingTestCase(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldVisibility), v...))
+	})
+}
+
+// VisibilityNotIn applies the NotIn predicate on the "visibility" field.
+func VisibilityNotIn(vs ...Visibility) predicate.CodingTestCase {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.CodingTestCase(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldVisibility), v...))
 	})
 }
 

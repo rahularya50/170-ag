@@ -198,10 +198,6 @@ func init() {
 	codingtestcase.DefaultPoints = codingtestcaseDescPoints.Default.(int)
 	// codingtestcase.PointsValidator is a validator for the "points" field. It is called by the builders before save.
 	codingtestcase.PointsValidator = codingtestcaseDescPoints.Validators[0].(func(int) error)
-	// codingtestcaseDescPublic is the schema descriptor for public field.
-	codingtestcaseDescPublic := codingtestcaseFields[1].Descriptor()
-	// codingtestcase.DefaultPublic holds the default value on creation for the public field.
-	codingtestcase.DefaultPublic = codingtestcaseDescPublic.Default.(bool)
 	codingtestcasedataMixin := schema.CodingTestCaseData{}.Mixin()
 	codingtestcasedata.Policy = privacy.NewPolicies(schema.CodingTestCaseData{})
 	codingtestcasedata.Hooks[0] = func(next ent.Mutator) ent.Mutator {

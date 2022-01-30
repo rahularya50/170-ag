@@ -3,6 +3,9 @@
 package codingtestcase
 
 import (
+	"fmt"
+	"io"
+	"strconv"
 	"time"
 
 	"entgo.io/ent"
@@ -19,8 +22,8 @@ const (
 	FieldUpdateTime = "update_time"
 	// FieldPoints holds the string denoting the points field in the database.
 	FieldPoints = "points"
-	// FieldPublic holds the string denoting the public field in the database.
-	FieldPublic = "public"
+	// FieldVisibility holds the string denoting the visibility field in the database.
+	FieldVisibility = "visibility"
 	// EdgeCodingProblem holds the string denoting the coding_problem edge name in mutations.
 	EdgeCodingProblem = "coding_problem"
 	// EdgeData holds the string denoting the data edge name in mutations.
@@ -49,7 +52,7 @@ var Columns = []string{
 	FieldCreateTime,
 	FieldUpdateTime,
 	FieldPoints,
-	FieldPublic,
+	FieldVisibility,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "coding_test_cases"
@@ -93,6 +96,49 @@ var (
 	DefaultPoints int
 	// PointsValidator is a validator for the "points" field. It is called by the builders before save.
 	PointsValidator func(int) error
-	// DefaultPublic holds the default value on creation for the "public" field.
-	DefaultPublic bool
 )
+
+// Visibility defines the type for the "visibility" enum field.
+type Visibility string
+
+// VisibilityPrivate is the default value of the Visibility enum.
+const DefaultVisibility = VisibilityPrivate
+
+// Visibility values.
+const (
+	VisibilityPrivate   Visibility = "PRIVATE"
+	VisibilityCollapsed Visibility = "COLLAPSED"
+	VisibilityExpanded  Visibility = "EXPANDED"
+)
+
+func (v Visibility) String() string {
+	return string(v)
+}
+
+// VisibilityValidator is a validator for the "visibility" field enum values. It is called by the builders before save.
+func VisibilityValidator(v Visibility) error {
+	switch v {
+	case VisibilityPrivate, VisibilityCollapsed, VisibilityExpanded:
+		return nil
+	default:
+		return fmt.Errorf("codingtestcase: invalid enum value for visibility field: %q", v)
+	}
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (v Visibility) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(v.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (v *Visibility) UnmarshalGQL(val interface{}) error {
+	str, ok := val.(string)
+	if !ok {
+		return fmt.Errorf("enum %T must be a string", val)
+	}
+	*v = Visibility(str)
+	if err := VisibilityValidator(*v); err != nil {
+		return fmt.Errorf("%s is not a valid Visibility", str)
+	}
+	return nil
+}

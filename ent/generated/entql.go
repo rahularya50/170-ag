@@ -109,7 +109,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			codingtestcase.FieldCreateTime: {Type: field.TypeTime, Column: codingtestcase.FieldCreateTime},
 			codingtestcase.FieldUpdateTime: {Type: field.TypeTime, Column: codingtestcase.FieldUpdateTime},
 			codingtestcase.FieldPoints:     {Type: field.TypeInt, Column: codingtestcase.FieldPoints},
-			codingtestcase.FieldPublic:     {Type: field.TypeBool, Column: codingtestcase.FieldPublic},
+			codingtestcase.FieldVisibility: {Type: field.TypeEnum, Column: codingtestcase.FieldVisibility},
 		},
 	}
 	graph.Nodes[5] = &sqlgraph.Node{
@@ -770,9 +770,9 @@ func (f *CodingTestCaseFilter) WherePoints(p entql.IntP) {
 	f.Where(p.Field(codingtestcase.FieldPoints))
 }
 
-// WherePublic applies the entql bool predicate on the public field.
-func (f *CodingTestCaseFilter) WherePublic(p entql.BoolP) {
-	f.Where(p.Field(codingtestcase.FieldPublic))
+// WhereVisibility applies the entql string predicate on the visibility field.
+func (f *CodingTestCaseFilter) WhereVisibility(p entql.StringP) {
+	f.Where(p.Field(codingtestcase.FieldVisibility))
 }
 
 // WhereHasCodingProblem applies a predicate to check if query has an edge coding_problem.

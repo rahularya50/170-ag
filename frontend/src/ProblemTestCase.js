@@ -3,14 +3,18 @@
 import graphql from "babel-plugin-relay/macro";
 import * as React from "react";
 import { useState } from "react";
-import { Button, Form, Modal, Stack } from "react-bootstrap";
+import { Button, ButtonGroup, Form, Modal, Stack } from "react-bootstrap";
 import { useFragment, useMutation } from "react-relay/hooks";
 
 import type { ProblemTestCase_testCase$key } from "./__generated__/ProblemTestCase_testCase.graphql";
 import type { ProblemTestCase_viewer$key } from "./__generated__/ProblemTestCase_viewer.graphql";
+import type { ProblemTestCaseInputQuery } from "./__generated__/ProblemTestCaseInputQuery.graphql";
+import type { ProblemTestCaseOutputQuery } from "./__generated__/ProblemTestCaseOutputQuery.graphql";
 import type { ProblemTestCaseUpdateMutation } from "./__generated__/ProblemTestCaseUpdateMutation.graphql";
+import downloadText from "./downloadText";
 import LoadingButton from "./LoadingButton";
 import ProblemTestDataEditor from "./ProblemTestDataEditor";
+import { useQueryFetcher } from "./useQueryFetcher";
 
 type Props = {
   name: string,
@@ -33,8 +37,8 @@ export default function TestCase(props: Props): React.Node {
       fragment ProblemTestCase_testCase on CodingTestCase {
         id
         points
-        public
-        public_data {
+        visibility
+        expanded_data {
           input
           output
         }
@@ -65,7 +69,7 @@ export default function TestCase(props: Props): React.Node {
   const [isEditing, setIsEditing] = useState(false);
 
   const [points, setPoints] = useState(testCase.points);
-  const [isPublic, setPublic] = useState(testCase.public);
+  const [visibility, setVisibility] = useState(testCase.visibility);
 
   const [showDataEditor, setShowDataEditor] = useState(false);
   const [input, setInput] = useState(null);
@@ -77,7 +81,7 @@ export default function TestCase(props: Props): React.Node {
         input: {
           id: testCase.id,
           points,
-          public: isPublic,
+          visibility,
           input,
           output,
         },
@@ -104,6 +108,42 @@ export default function TestCase(props: Props): React.Node {
     });
   };
 
+  const [downloadInput, isDownloadingInput] =
+    useQueryFetcher<ProblemTestCaseInputQuery>(
+      graphql`
+        query ProblemTestCaseInputQuery($id: ID!) {
+          test_case(id: $id) {
+            data {
+              input
+            }
+          }
+        }
+      `,
+      { id: testCase.id },
+      (resp) => {
+        downloadText(resp.test_case.data.input, "input.txt");
+      },
+      alert
+    );
+
+  const [downloadOutput, isDownloadingOutput] =
+    useQueryFetcher<ProblemTestCaseOutputQuery>(
+      graphql`
+        query ProblemTestCaseOutputQuery($id: ID!) {
+          test_case(id: $id) {
+            data {
+              output
+            }
+          }
+        }
+      `,
+      { id: testCase.id },
+      (resp) => {
+        downloadText(resp.test_case.data.output, "output.txt");
+      },
+      alert
+    );
+
   return (
     <div>
       {isEditing ? (
@@ -118,12 +158,15 @@ export default function TestCase(props: Props): React.Node {
             />
           </Form.Group>
           <Form.Group className="mb-3" controlId="releaseCheckbox">
-            <Form.Check
-              type="checkbox"
-              label="Public Test Case"
-              checked={isPublic}
-              onChange={(e) => setPublic(e.target.checked)}
-            />
+            <Form.Select
+              label="Test Case Visibility"
+              value={visibility}
+              onChange={(e) => setVisibility(e.target.value)}
+            >
+              <option value="PRIVATE">Private</option>
+              <option value="COLLAPSED">Collapsed</option>
+              <option value="EXPANDED">Expanded</option>
+            </Form.Select>
           </Form.Group>
         </div>
       ) : (
@@ -131,16 +174,37 @@ export default function TestCase(props: Props): React.Node {
           <h6>
             Case {props.name}: {testCase.points} Points
           </h6>
-          {testCase.public_data ? (
-            <div>
-              Input:
-              <pre>{testCase.public_data.input}</pre>
-              Expected output:
-              <pre>{testCase.public_data.output}</pre>
-            </div>
-          ) : (
-            <div>(Inputs hidden)</div>
-          )}
+          <div class="mb-2">
+            {testCase.expanded_data ? (
+              <div>
+                Input:
+                <pre>{testCase.expanded_data.input}</pre>
+                Expected output:
+                <pre>{testCase.expanded_data.output}</pre>
+              </div>
+            ) : testCase.visibility === "PRIVATE" ? (
+              <div>(Inputs hidden)</div>
+            ) : (
+              <ButtonGroup>
+                <LoadingButton
+                  size="sm"
+                  variant="secondary"
+                  onClick={downloadInput}
+                  isUpdating={isDownloadingInput}
+                >
+                  Download Input
+                </LoadingButton>
+                <LoadingButton
+                  size="sm"
+                  variant="secondary"
+                  onClick={downloadOutput}
+                  isUpdating={isDownloadingOutput}
+                >
+                  Download Output
+                </LoadingButton>
+              </ButtonGroup>
+            )}
+          </div>
         </div>
       )}
       <p>

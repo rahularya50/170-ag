@@ -50,8 +50,8 @@ func (r *codingSubmissionStaffDataResolver) ExecutionID(ctx context.Context, obj
 	return &s, nil
 }
 
-func (r *codingTestCaseResolver) PublicData(ctx context.Context, obj *ent.CodingTestCase) (*ent.CodingTestCaseData, error) {
-	if obj.Public {
+func (r *codingTestCaseResolver) ExpandedData(ctx context.Context, obj *ent.CodingTestCase) (*ent.CodingTestCaseData, error) {
+	if obj.Visibility == codingtestcase.VisibilityExpanded {
 		return obj.QueryData().Only(ctx)
 	}
 	return nil, nil
@@ -199,7 +199,7 @@ func (r *mutationResolver) UpdateTestCase(ctx context.Context, input model.Updat
 
 	test_case, err = test_case.Update().
 		SetNillablePoints(input.Points).
-		SetNillablePublic(input.Public).
+		SetNillableVisibility(input.Visibility).
 		Save(ctx)
 	if err != nil {
 		return nil, err

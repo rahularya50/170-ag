@@ -146,7 +146,7 @@ var (
 		{Name: "create_time", Type: field.TypeTime},
 		{Name: "update_time", Type: field.TypeTime},
 		{Name: "points", Type: field.TypeInt, Default: 0},
-		{Name: "public", Type: field.TypeBool, Default: false},
+		{Name: "visibility", Type: field.TypeEnum, Enums: []string{"PRIVATE", "COLLAPSED", "EXPANDED"}, Default: "PRIVATE"},
 		{Name: "coding_problem_test_cases", Type: field.TypeInt, Nullable: true},
 		{Name: "coding_test_case_data_test_case", Type: field.TypeInt, Unique: true, Nullable: true},
 	}

@@ -66,16 +66,16 @@ func (ctcc *CodingTestCaseCreate) SetNillablePoints(i *int) *CodingTestCaseCreat
 	return ctcc
 }
 
-// SetPublic sets the "public" field.
-func (ctcc *CodingTestCaseCreate) SetPublic(b bool) *CodingTestCaseCreate {
-	ctcc.mutation.SetPublic(b)
+// SetVisibility sets the "visibility" field.
+func (ctcc *CodingTestCaseCreate) SetVisibility(c codingtestcase.Visibility) *CodingTestCaseCreate {
+	ctcc.mutation.SetVisibility(c)
 	return ctcc
 }
 
-// SetNillablePublic sets the "public" field if the given value is not nil.
-func (ctcc *CodingTestCaseCreate) SetNillablePublic(b *bool) *CodingTestCaseCreate {
-	if b != nil {
-		ctcc.SetPublic(*b)
+// SetNillableVisibility sets the "visibility" field if the given value is not nil.
+func (ctcc *CodingTestCaseCreate) SetNillableVisibility(c *codingtestcase.Visibility) *CodingTestCaseCreate {
+	if c != nil {
+		ctcc.SetVisibility(*c)
 	}
 	return ctcc
 }
@@ -201,9 +201,9 @@ func (ctcc *CodingTestCaseCreate) defaults() error {
 		v := codingtestcase.DefaultPoints
 		ctcc.mutation.SetPoints(v)
 	}
-	if _, ok := ctcc.mutation.Public(); !ok {
-		v := codingtestcase.DefaultPublic
-		ctcc.mutation.SetPublic(v)
+	if _, ok := ctcc.mutation.Visibility(); !ok {
+		v := codingtestcase.DefaultVisibility
+		ctcc.mutation.SetVisibility(v)
 	}
 	return nil
 }
@@ -224,8 +224,13 @@ func (ctcc *CodingTestCaseCreate) check() error {
 			return &ValidationError{Name: "points", err: fmt.Errorf(`generated: validator failed for field "CodingTestCase.points": %w`, err)}
 		}
 	}
-	if _, ok := ctcc.mutation.Public(); !ok {
-		return &ValidationError{Name: "public", err: errors.New(`generated: missing required field "CodingTestCase.public"`)}
+	if _, ok := ctcc.mutation.Visibility(); !ok {
+		return &ValidationError{Name: "visibility", err: errors.New(`generated: missing required field "CodingTestCase.visibility"`)}
+	}
+	if v, ok := ctcc.mutation.Visibility(); ok {
+		if err := codingtestcase.VisibilityValidator(v); err != nil {
+			return &ValidationError{Name: "visibility", err: fmt.Errorf(`generated: validator failed for field "CodingTestCase.visibility": %w`, err)}
+		}
 	}
 	if _, ok := ctcc.mutation.CodingProblemID(); !ok {
 		return &ValidationError{Name: "coding_problem", err: errors.New(`generated: missing required edge "CodingTestCase.coding_problem"`)}
@@ -282,13 +287,13 @@ func (ctcc *CodingTestCaseCreate) createSpec() (*CodingTestCase, *sqlgraph.Creat
 		})
 		_node.Points = value
 	}
-	if value, ok := ctcc.mutation.Public(); ok {
+	if value, ok := ctcc.mutation.Visibility(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeBool,
+			Type:   field.TypeEnum,
 			Value:  value,
-			Column: codingtestcase.FieldPublic,
+			Column: codingtestcase.FieldVisibility,
 		})
-		_node.Public = value
+		_node.Visibility = value
 	}
 	if nodes := ctcc.mutation.CodingProblemIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -426,15 +431,15 @@ func (u *CodingTestCaseUpsert) AddPoints(v int) *CodingTestCaseUpsert {
 	return u
 }
 
-// SetPublic sets the "public" field.
-func (u *CodingTestCaseUpsert) SetPublic(v bool) *CodingTestCaseUpsert {
-	u.Set(codingtestcase.FieldPublic, v)
+// SetVisibility sets the "visibility" field.
+func (u *CodingTestCaseUpsert) SetVisibility(v codingtestcase.Visibility) *CodingTestCaseUpsert {
+	u.Set(codingtestcase.FieldVisibility, v)
 	return u
 }
 
-// UpdatePublic sets the "public" field to the value that was provided on create.
-func (u *CodingTestCaseUpsert) UpdatePublic() *CodingTestCaseUpsert {
-	u.SetExcluded(codingtestcase.FieldPublic)
+// UpdateVisibility sets the "visibility" field to the value that was provided on create.
+func (u *CodingTestCaseUpsert) UpdateVisibility() *CodingTestCaseUpsert {
+	u.SetExcluded(codingtestcase.FieldVisibility)
 	return u
 }
 
@@ -534,17 +539,17 @@ func (u *CodingTestCaseUpsertOne) UpdatePoints() *CodingTestCaseUpsertOne {
 	})
 }
 
-// SetPublic sets the "public" field.
-func (u *CodingTestCaseUpsertOne) SetPublic(v bool) *CodingTestCaseUpsertOne {
+// SetVisibility sets the "visibility" field.
+func (u *CodingTestCaseUpsertOne) SetVisibility(v codingtestcase.Visibility) *CodingTestCaseUpsertOne {
 	return u.Update(func(s *CodingTestCaseUpsert) {
-		s.SetPublic(v)
+		s.SetVisibility(v)
 	})
 }
 
-// UpdatePublic sets the "public" field to the value that was provided on create.
-func (u *CodingTestCaseUpsertOne) UpdatePublic() *CodingTestCaseUpsertOne {
+// UpdateVisibility sets the "visibility" field to the value that was provided on create.
+func (u *CodingTestCaseUpsertOne) UpdateVisibility() *CodingTestCaseUpsertOne {
 	return u.Update(func(s *CodingTestCaseUpsert) {
-		s.UpdatePublic()
+		s.UpdateVisibility()
 	})
 }
 
@@ -808,17 +813,17 @@ func (u *CodingTestCaseUpsertBulk) UpdatePoints() *CodingTestCaseUpsertBulk {
 	})
 }
 
-// SetPublic sets the "public" field.
-func (u *CodingTestCaseUpsertBulk) SetPublic(v bool) *CodingTestCaseUpsertBulk {
+// SetVisibility sets the "visibility" field.
+func (u *CodingTestCaseUpsertBulk) SetVisibility(v codingtestcase.Visibility) *CodingTestCaseUpsertBulk {
 	return u.Update(func(s *CodingTestCaseUpsert) {
-		s.SetPublic(v)
+		s.SetVisibility(v)
 	})
 }
 
-// UpdatePublic sets the "public" field to the value that was provided on create.
-func (u *CodingTestCaseUpsertBulk) UpdatePublic() *CodingTestCaseUpsertBulk {
+// UpdateVisibility sets the "visibility" field to the value that was provided on create.
+func (u *CodingTestCaseUpsertBulk) UpdateVisibility() *CodingTestCaseUpsertBulk {
 	return u.Update(func(s *CodingTestCaseUpsert) {
-		s.UpdatePublic()
+		s.UpdateVisibility()
 	})
 }
 

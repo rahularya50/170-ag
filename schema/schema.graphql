@@ -122,12 +122,19 @@ input UpdateCodingProblemInput {
   problem: CodingProblemInput!
 }
 
+enum CodingTestCaseVisibility
+  @goModel(model: "170-ag/ent/generated/codingtestcase.Visibility") {
+  PRIVATE
+  COLLAPSED
+  EXPANDED
+}
+
 type CodingTestCase implements Node {
   id: ID!
   points: Int!
-  public: Boolean!
   data: CodingTestCaseData!
-  public_data: CodingTestCaseData
+  expanded_data: CodingTestCaseData
+  visibility: CodingTestCaseVisibility!
   coding_problem: CodingProblem!
 }
 
@@ -138,7 +145,7 @@ input CreateTestCaseInput {
 input UpdateTestCaseInput {
   id: ID!
   points: Int
-  public: Boolean
+  visibility: CodingTestCaseVisibility
   input: String
   output: String
 }

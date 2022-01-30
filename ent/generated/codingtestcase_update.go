@@ -57,16 +57,16 @@ func (ctcu *CodingTestCaseUpdate) AddPoints(i int) *CodingTestCaseUpdate {
 	return ctcu
 }
 
-// SetPublic sets the "public" field.
-func (ctcu *CodingTestCaseUpdate) SetPublic(b bool) *CodingTestCaseUpdate {
-	ctcu.mutation.SetPublic(b)
+// SetVisibility sets the "visibility" field.
+func (ctcu *CodingTestCaseUpdate) SetVisibility(c codingtestcase.Visibility) *CodingTestCaseUpdate {
+	ctcu.mutation.SetVisibility(c)
 	return ctcu
 }
 
-// SetNillablePublic sets the "public" field if the given value is not nil.
-func (ctcu *CodingTestCaseUpdate) SetNillablePublic(b *bool) *CodingTestCaseUpdate {
-	if b != nil {
-		ctcu.SetPublic(*b)
+// SetNillableVisibility sets the "visibility" field if the given value is not nil.
+func (ctcu *CodingTestCaseUpdate) SetNillableVisibility(c *codingtestcase.Visibility) *CodingTestCaseUpdate {
+	if c != nil {
+		ctcu.SetVisibility(*c)
 	}
 	return ctcu
 }
@@ -200,6 +200,11 @@ func (ctcu *CodingTestCaseUpdate) check() error {
 			return &ValidationError{Name: "points", err: fmt.Errorf(`generated: validator failed for field "CodingTestCase.points": %w`, err)}
 		}
 	}
+	if v, ok := ctcu.mutation.Visibility(); ok {
+		if err := codingtestcase.VisibilityValidator(v); err != nil {
+			return &ValidationError{Name: "visibility", err: fmt.Errorf(`generated: validator failed for field "CodingTestCase.visibility": %w`, err)}
+		}
+	}
 	if _, ok := ctcu.mutation.CodingProblemID(); ctcu.mutation.CodingProblemCleared() && !ok {
 		return errors.New(`generated: clearing a required unique edge "CodingTestCase.coding_problem"`)
 	}
@@ -245,11 +250,11 @@ func (ctcu *CodingTestCaseUpdate) sqlSave(ctx context.Context) (n int, err error
 			Column: codingtestcase.FieldPoints,
 		})
 	}
-	if value, ok := ctcu.mutation.Public(); ok {
+	if value, ok := ctcu.mutation.Visibility(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeBool,
+			Type:   field.TypeEnum,
 			Value:  value,
-			Column: codingtestcase.FieldPublic,
+			Column: codingtestcase.FieldVisibility,
 		})
 	}
 	if ctcu.mutation.CodingProblemCleared() {
@@ -368,16 +373,16 @@ func (ctcuo *CodingTestCaseUpdateOne) AddPoints(i int) *CodingTestCaseUpdateOne 
 	return ctcuo
 }
 
-// SetPublic sets the "public" field.
-func (ctcuo *CodingTestCaseUpdateOne) SetPublic(b bool) *CodingTestCaseUpdateOne {
-	ctcuo.mutation.SetPublic(b)
+// SetVisibility sets the "visibility" field.
+func (ctcuo *CodingTestCaseUpdateOne) SetVisibility(c codingtestcase.Visibility) *CodingTestCaseUpdateOne {
+	ctcuo.mutation.SetVisibility(c)
 	return ctcuo
 }
 
-// SetNillablePublic sets the "public" field if the given value is not nil.
-func (ctcuo *CodingTestCaseUpdateOne) SetNillablePublic(b *bool) *CodingTestCaseUpdateOne {
-	if b != nil {
-		ctcuo.SetPublic(*b)
+// SetNillableVisibility sets the "visibility" field if the given value is not nil.
+func (ctcuo *CodingTestCaseUpdateOne) SetNillableVisibility(c *codingtestcase.Visibility) *CodingTestCaseUpdateOne {
+	if c != nil {
+		ctcuo.SetVisibility(*c)
 	}
 	return ctcuo
 }
@@ -518,6 +523,11 @@ func (ctcuo *CodingTestCaseUpdateOne) check() error {
 			return &ValidationError{Name: "points", err: fmt.Errorf(`generated: validator failed for field "CodingTestCase.points": %w`, err)}
 		}
 	}
+	if v, ok := ctcuo.mutation.Visibility(); ok {
+		if err := codingtestcase.VisibilityValidator(v); err != nil {
+			return &ValidationError{Name: "visibility", err: fmt.Errorf(`generated: validator failed for field "CodingTestCase.visibility": %w`, err)}
+		}
+	}
 	if _, ok := ctcuo.mutation.CodingProblemID(); ctcuo.mutation.CodingProblemCleared() && !ok {
 		return errors.New(`generated: clearing a required unique edge "CodingTestCase.coding_problem"`)
 	}
@@ -580,11 +590,11 @@ func (ctcuo *CodingTestCaseUpdateOne) sqlSave(ctx context.Context) (_node *Codin
 			Column: codingtestcase.FieldPoints,
 		})
 	}
-	if value, ok := ctcuo.mutation.Public(); ok {
+	if value, ok := ctcuo.mutation.Visibility(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeBool,
+			Type:   field.TypeEnum,
 			Value:  value,
-			Column: codingtestcase.FieldPublic,
+			Column: codingtestcase.FieldVisibility,
 		})
 	}
 	if ctcuo.mutation.CodingProblemCleared() {

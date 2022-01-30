@@ -394,12 +394,12 @@ func (ctc *CodingTestCase) Node(ctx context.Context) (node *Node, err error) {
 		Name:  "points",
 		Value: string(buf),
 	}
-	if buf, err = json.Marshal(ctc.Public); err != nil {
+	if buf, err = json.Marshal(ctc.Visibility); err != nil {
 		return nil, err
 	}
 	node.Fields[3] = &Field{
-		Type:  "bool",
-		Name:  "public",
+		Type:  "codingtestcase.Visibility",
+		Name:  "visibility",
 		Value: string(buf),
 	}
 	node.Edges[0] = &Edge{

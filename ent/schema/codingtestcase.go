@@ -25,7 +25,11 @@ type CodingTestCase struct {
 func (CodingTestCase) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("points").NonNegative().Default(0),
-		field.Bool("public").Default(false),
+		field.Enum("visibility").NamedValues(
+			"Private", "PRIVATE",
+			"Collapsed", "COLLAPSED",
+			"Expanded", "EXPANDED",
+		).Default("PRIVATE"),
 	}
 }
 

@@ -24,8 +24,8 @@ type CodingTestCase struct {
 	UpdateTime time.Time `json:"update_time,omitempty"`
 	// Points holds the value of the "points" field.
 	Points int `json:"points,omitempty"`
-	// Public holds the value of the "public" field.
-	Public bool `json:"public,omitempty"`
+	// Visibility holds the value of the "visibility" field.
+	Visibility codingtestcase.Visibility `json:"visibility,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CodingTestCaseQuery when eager-loading is set.
 	Edges                           CodingTestCaseEdges `json:"edges"`
@@ -77,10 +77,10 @@ func (*CodingTestCase) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case codingtestcase.FieldPublic:
-			values[i] = new(sql.NullBool)
 		case codingtestcase.FieldID, codingtestcase.FieldPoints:
 			values[i] = new(sql.NullInt64)
+		case codingtestcase.FieldVisibility:
+			values[i] = new(sql.NullString)
 		case codingtestcase.FieldCreateTime, codingtestcase.FieldUpdateTime:
 			values[i] = new(sql.NullTime)
 		case codingtestcase.ForeignKeys[0]: // coding_problem_test_cases
@@ -126,11 +126,11 @@ func (ctc *CodingTestCase) assignValues(columns []string, values []interface{}) 
 			} else if value.Valid {
 				ctc.Points = int(value.Int64)
 			}
-		case codingtestcase.FieldPublic:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field public", values[i])
+		case codingtestcase.FieldVisibility:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field visibility", values[i])
 			} else if value.Valid {
-				ctc.Public = value.Bool
+				ctc.Visibility = codingtestcase.Visibility(value.String)
 			}
 		case codingtestcase.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -190,8 +190,8 @@ func (ctc *CodingTestCase) String() string {
 	builder.WriteString(ctc.UpdateTime.Format(time.ANSIC))
 	builder.WriteString(", points=")
 	builder.WriteString(fmt.Sprintf("%v", ctc.Points))
-	builder.WriteString(", public=")
-	builder.WriteString(fmt.Sprintf("%v", ctc.Public))
+	builder.WriteString(", visibility=")
+	builder.WriteString(fmt.Sprintf("%v", ctc.Visibility))
 	builder.WriteByte(')')
 	return builder.String()
 }

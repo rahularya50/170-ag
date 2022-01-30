@@ -52,7 +52,7 @@ func allowIfTestCaseIsPublic() privacy.QueryRule {
 			return err
 		}
 		for _, test_case := range test_cases {
-			if !test_case.Public {
+			if test_case.Visibility == codingtestcase.VisibilityPrivate {
 				return privacy.Skip
 			}
 		}
