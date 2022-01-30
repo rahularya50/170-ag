@@ -22,6 +22,8 @@ spec:
               value: prod
             - name: PORT
               value: "8080"
+            - name: ENDPOINT
+              value: "cal/cs170/sp22"
           envFrom:
             - secretRef:
                 name: web-secrets

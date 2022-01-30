@@ -4,6 +4,7 @@ import (
 	ent "170-ag/ent/generated"
 	"170-ag/ent/generated/privacy"
 	"170-ag/ent/generated/user"
+	"170-ag/site"
 	"context"
 	"crypto/hmac"
 	"net/http"
@@ -112,12 +113,16 @@ func (handler *loginHandler) ServeHTTP(resp http.ResponseWriter, req *http.Reque
 		n := raw_name.(string)
 		name = &n
 	}
+	is_staff, err := site.IsStaff(email)
+	if err != nil {
+		http.Error(resp, "Unable to determine if staff", http.StatusInternalServerError)
+		return
+	}
 	user_id := handler.client.User.
 		Create().
 		SetEmail(email).
 		SetNillableName(name).
-		// TODO: use OKPy / roster for staff determination!
-		SetIsStaff(email == "rahularya@berkeley.edu").
+		SetIsStaff(is_staff).
 		OnConflictColumns(user.FieldEmail).
 		UpdateNewValues().
 		IDX(email_ctx)
