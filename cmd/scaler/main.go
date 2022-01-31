@@ -38,7 +38,11 @@ func main() {
 	schemas.RegisterExternalScalerServer(scalerServer, &scaling.ExternalScalerServer{Client: client})
 	go serveOnPort(scalerServer, 6001)
 
-	gradingServer := grpc.NewServer()
+	gradingServer := grpc.NewServer(
+		grpc.ChainUnaryInterceptor(
+			grading.InterceptErrors,
+		),
+	)
 	schemas.RegisterJudgingServerServer(gradingServer, &grading.JudgingServer{Client: client})
 	serveOnPort(gradingServer, 6000)
 }
