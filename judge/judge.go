@@ -14,13 +14,13 @@ func JudgeLoadedRequest(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	cmd_ctx, cancel := context.WithTimeout(ctx, time.Duration(time.Second*5))
+	cmd_ctx, cancel := context.WithTimeout(ctx, time.Duration(time.Second*10))
 	defer cancel()
 	err = os.WriteFile("tmp.py", []byte(request.Code), 0644)
 	if err != nil {
 		return err
 	}
-	cmd := exec.CommandContext(cmd_ctx, "/bin/sh", "-c", "ulimit -v 500000; python3 tmp.py")
+	cmd := exec.CommandContext(cmd_ctx, "/bin/sh", "-c", "ulimit -v 500000 -t 5; python3 tmp.py")
 	cmd.Stdin = strings.NewReader(request.Input)
 	stdout, err := cmd.Output()
 	result := schemas.ExecutionResult_OK
@@ -33,8 +33,11 @@ func JudgeLoadedRequest(ctx context.Context) error {
 	if exit_err != nil {
 		stderr = string(exit_err.Stderr)
 		errorCode = err.Error()
-		if strings.Contains(strings.ToLower(stderr), "memory") {
+		switch errStr := strings.ToLower(stderr); {
+		case strings.Contains(errStr, "memory"):
 			result = schemas.ExecutionResult_MEMORY_ERROR
+		case strings.Contains(errStr, "time"):
+			result = schemas.ExecutionResult_TIME_LIMIT_EXCEEDED
 		}
 	}
 	response := &schemas.GradingResponse{
