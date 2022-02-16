@@ -66,7 +66,7 @@ var (
 		{Name: "create_time", Type: field.TypeTime},
 		{Name: "update_time", Type: field.TypeTime},
 		{Name: "code", Type: field.TypeString, Size: 65535},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"QUEUED", "RUNNING", "COMPLETED"}, Default: "QUEUED"},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"QUEUED", "RUNNING", "COMPLETED", "INTERNAL_ERROR"}, Default: "QUEUED"},
 		{Name: "points", Type: field.TypeInt, Nullable: true},
 		{Name: "results", Type: field.TypeJSON, Nullable: true},
 		{Name: "coding_submission_author", Type: field.TypeInt, Nullable: true},

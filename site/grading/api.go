@@ -9,6 +9,7 @@ import (
 	"170-ag/proto/schemas"
 	"170-ag/site"
 	"context"
+	"time"
 )
 
 type JudgingServer struct {
@@ -18,6 +19,10 @@ type JudgingServer struct {
 
 func (s *JudgingServer) GetJudgingRequest(ctx context.Context, req *schemas.GetJudgingRequestParams) (*schemas.JudgingRequest, error) {
 	ctx, err := withAuthorizedContext(ctx, s.Client, req.Token)
+	if err != nil {
+		return nil, err
+	}
+	err = site.CleanupStalled(ctx, s.Client, time.Minute*5)
 	if err != nil {
 		return nil, err
 	}

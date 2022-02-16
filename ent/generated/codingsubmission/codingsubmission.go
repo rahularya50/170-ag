@@ -120,9 +120,10 @@ const DefaultStatus = StatusQueued
 
 // Status values.
 const (
-	StatusQueued    Status = "QUEUED"
-	StatusRunning   Status = "RUNNING"
-	StatusCompleted Status = "COMPLETED"
+	StatusQueued        Status = "QUEUED"
+	StatusRunning       Status = "RUNNING"
+	StatusCompleted     Status = "COMPLETED"
+	StatusInternalError Status = "INTERNAL_ERROR"
 )
 
 func (s Status) String() string {
@@ -132,7 +133,7 @@ func (s Status) String() string {
 // StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
 func StatusValidator(s Status) error {
 	switch s {
-	case StatusQueued, StatusRunning, StatusCompleted:
+	case StatusQueued, StatusRunning, StatusCompleted, StatusInternalError:
 		return nil
 	default:
 		return fmt.Errorf("codingsubmission: invalid enum value for status field: %q", s)

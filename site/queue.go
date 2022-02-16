@@ -7,6 +7,7 @@ import (
 	"crypto/rand"
 	"math"
 	"math/big"
+	"time"
 )
 
 func NumEnqueuedSubmissions(c context.Context, client *ent.Client) (int, error) {
@@ -51,4 +52,13 @@ func DequeueSubmission(c context.Context, client *ent.Client) (*ent.CodingSubmis
 		return nil, nil, err
 	}
 	return submission.Unwrap(), staff_data.Unwrap(), nil
+}
+
+func CleanupStalled(c context.Context, client *ent.Client, timeout time.Duration) error {
+	return client.CodingSubmission.Update().
+		Where(
+			codingsubmission.StatusEQ(codingsubmission.StatusRunning),
+			codingsubmission.UpdateTimeGT(time.Now().Add(-timeout))).
+		SetStatus(codingsubmission.StatusInternalError).
+		Exec(c)
 }

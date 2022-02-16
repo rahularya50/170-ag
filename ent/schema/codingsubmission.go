@@ -35,6 +35,7 @@ func (CodingSubmission) Fields() []ent.Field {
 				"Queued", "QUEUED",
 				"Running", "RUNNING",
 				"Completed", "COMPLETED",
+				"Internal Error", "INTERNAL_ERROR",
 			).
 			Default("QUEUED"),
 		field.Int("points").Optional().Nillable(),

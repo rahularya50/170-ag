@@ -177,6 +177,7 @@ enum CodingSubmissionStatus
   QUEUED
   RUNNING
   COMPLETED
+  INTERNAL_ERROR
 }
 
 type CodingSubmission implements Node {
