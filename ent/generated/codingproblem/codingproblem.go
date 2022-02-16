@@ -25,6 +25,8 @@ const (
 	FieldSkeleton = "skeleton"
 	// FieldReleased holds the string denoting the released field in the database.
 	FieldReleased = "released"
+	// FieldDeadline holds the string denoting the deadline field in the database.
+	FieldDeadline = "deadline"
 	// EdgeDrafts holds the string denoting the drafts edge name in mutations.
 	EdgeDrafts = "drafts"
 	// EdgeTestCases holds the string denoting the test_cases edge name in mutations.
@@ -65,6 +67,7 @@ var Columns = []string{
 	FieldStatement,
 	FieldSkeleton,
 	FieldReleased,
+	FieldDeadline,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -104,4 +107,6 @@ var (
 	DefaultSkeleton string
 	// DefaultReleased holds the default value on creation for the "released" field.
 	DefaultReleased bool
+	// DefaultDeadline holds the default value on creation for the "deadline" field.
+	DefaultDeadline func() time.Time
 )

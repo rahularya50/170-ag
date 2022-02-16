@@ -104,6 +104,10 @@ func init() {
 	codingproblemDescReleased := codingproblemFields[3].Descriptor()
 	// codingproblem.DefaultReleased holds the default value on creation for the released field.
 	codingproblem.DefaultReleased = codingproblemDescReleased.Default.(bool)
+	// codingproblemDescDeadline is the schema descriptor for deadline field.
+	codingproblemDescDeadline := codingproblemFields[4].Descriptor()
+	// codingproblem.DefaultDeadline holds the default value on creation for the deadline field.
+	codingproblem.DefaultDeadline = codingproblemDescDeadline.Default.(func() time.Time)
 	codingsubmissionMixin := schema.CodingSubmission{}.Mixin()
 	codingsubmission.Policy = privacy.NewPolicies(schema.CodingSubmission{})
 	codingsubmission.Hooks[0] = func(next ent.Mutator) ent.Mutator {

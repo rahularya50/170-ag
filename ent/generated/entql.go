@@ -54,6 +54,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			codingproblem.FieldStatement:  {Type: field.TypeString, Column: codingproblem.FieldStatement},
 			codingproblem.FieldSkeleton:   {Type: field.TypeString, Column: codingproblem.FieldSkeleton},
 			codingproblem.FieldReleased:   {Type: field.TypeBool, Column: codingproblem.FieldReleased},
+			codingproblem.FieldDeadline:   {Type: field.TypeTime, Column: codingproblem.FieldDeadline},
 		},
 	}
 	graph.Nodes[2] = &sqlgraph.Node{
@@ -473,6 +474,11 @@ func (f *CodingProblemFilter) WhereSkeleton(p entql.StringP) {
 // WhereReleased applies the entql bool predicate on the released field.
 func (f *CodingProblemFilter) WhereReleased(p entql.BoolP) {
 	f.Where(p.Field(codingproblem.FieldReleased))
+}
+
+// WhereDeadline applies the entql time.Time predicate on the deadline field.
+func (f *CodingProblemFilter) WhereDeadline(p entql.TimeP) {
+	f.Where(p.Field(codingproblem.FieldDeadline))
 }
 
 // WhereHasDrafts applies a predicate to check if query has an edge drafts.

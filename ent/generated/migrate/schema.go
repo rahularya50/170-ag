@@ -53,6 +53,7 @@ var (
 		{Name: "statement", Type: field.TypeString, Size: 2147483647, Default: "This is the problem statement"},
 		{Name: "skeleton", Type: field.TypeString, Size: 2147483647, Default: ""},
 		{Name: "released", Type: field.TypeBool, Default: false},
+		{Name: "deadline", Type: field.TypeTime},
 	}
 	// CodingProblemsTable holds the schema information for the "coding_problems" table.
 	CodingProblemsTable = &schema.Table{

@@ -97,6 +97,7 @@ type CodingProblem implements Node {
     last: Int
   ): CodingSubmissionConnection!
   test_cases: [CodingTestCase!]!
+  deadline: Time!
 }
 
 type CodingProblemConnection {
@@ -115,6 +116,7 @@ input CodingProblemInput {
   statement: String
   skeleton: String
   released: Boolean
+  deadline: Time
 }
 
 input UpdateCodingProblemInput {

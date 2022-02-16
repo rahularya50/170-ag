@@ -109,6 +109,20 @@ func (cpc *CodingProblemCreate) SetNillableReleased(b *bool) *CodingProblemCreat
 	return cpc
 }
 
+// SetDeadline sets the "deadline" field.
+func (cpc *CodingProblemCreate) SetDeadline(t time.Time) *CodingProblemCreate {
+	cpc.mutation.SetDeadline(t)
+	return cpc
+}
+
+// SetNillableDeadline sets the "deadline" field if the given value is not nil.
+func (cpc *CodingProblemCreate) SetNillableDeadline(t *time.Time) *CodingProblemCreate {
+	if t != nil {
+		cpc.SetDeadline(*t)
+	}
+	return cpc
+}
+
 // AddDraftIDs adds the "drafts" edge to the CodingDraft entity by IDs.
 func (cpc *CodingProblemCreate) AddDraftIDs(ids ...int) *CodingProblemCreate {
 	cpc.mutation.AddDraftIDs(ids...)
@@ -257,6 +271,13 @@ func (cpc *CodingProblemCreate) defaults() error {
 		v := codingproblem.DefaultReleased
 		cpc.mutation.SetReleased(v)
 	}
+	if _, ok := cpc.mutation.Deadline(); !ok {
+		if codingproblem.DefaultDeadline == nil {
+			return fmt.Errorf("generated: uninitialized codingproblem.DefaultDeadline (forgotten import generated/runtime?)")
+		}
+		v := codingproblem.DefaultDeadline()
+		cpc.mutation.SetDeadline(v)
+	}
 	return nil
 }
 
@@ -289,6 +310,9 @@ func (cpc *CodingProblemCreate) check() error {
 	}
 	if _, ok := cpc.mutation.Released(); !ok {
 		return &ValidationError{Name: "released", err: errors.New(`generated: missing required field "CodingProblem.released"`)}
+	}
+	if _, ok := cpc.mutation.Deadline(); !ok {
+		return &ValidationError{Name: "deadline", err: errors.New(`generated: missing required field "CodingProblem.deadline"`)}
 	}
 	return nil
 }
@@ -365,6 +389,14 @@ func (cpc *CodingProblemCreate) createSpec() (*CodingProblem, *sqlgraph.CreateSp
 			Column: codingproblem.FieldReleased,
 		})
 		_node.Released = value
+	}
+	if value, ok := cpc.mutation.Deadline(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: codingproblem.FieldDeadline,
+		})
+		_node.Deadline = value
 	}
 	if nodes := cpc.mutation.DraftsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -549,6 +581,18 @@ func (u *CodingProblemUpsert) UpdateReleased() *CodingProblemUpsert {
 	return u
 }
 
+// SetDeadline sets the "deadline" field.
+func (u *CodingProblemUpsert) SetDeadline(v time.Time) *CodingProblemUpsert {
+	u.Set(codingproblem.FieldDeadline, v)
+	return u
+}
+
+// UpdateDeadline sets the "deadline" field to the value that was provided on create.
+func (u *CodingProblemUpsert) UpdateDeadline() *CodingProblemUpsert {
+	u.SetExcluded(codingproblem.FieldDeadline)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
@@ -677,6 +721,20 @@ func (u *CodingProblemUpsertOne) SetReleased(v bool) *CodingProblemUpsertOne {
 func (u *CodingProblemUpsertOne) UpdateReleased() *CodingProblemUpsertOne {
 	return u.Update(func(s *CodingProblemUpsert) {
 		s.UpdateReleased()
+	})
+}
+
+// SetDeadline sets the "deadline" field.
+func (u *CodingProblemUpsertOne) SetDeadline(v time.Time) *CodingProblemUpsertOne {
+	return u.Update(func(s *CodingProblemUpsert) {
+		s.SetDeadline(v)
+	})
+}
+
+// UpdateDeadline sets the "deadline" field to the value that was provided on create.
+func (u *CodingProblemUpsertOne) UpdateDeadline() *CodingProblemUpsertOne {
+	return u.Update(func(s *CodingProblemUpsert) {
+		s.UpdateDeadline()
 	})
 }
 
@@ -972,6 +1030,20 @@ func (u *CodingProblemUpsertBulk) SetReleased(v bool) *CodingProblemUpsertBulk {
 func (u *CodingProblemUpsertBulk) UpdateReleased() *CodingProblemUpsertBulk {
 	return u.Update(func(s *CodingProblemUpsert) {
 		s.UpdateReleased()
+	})
+}
+
+// SetDeadline sets the "deadline" field.
+func (u *CodingProblemUpsertBulk) SetDeadline(v time.Time) *CodingProblemUpsertBulk {
+	return u.Update(func(s *CodingProblemUpsert) {
+		s.SetDeadline(v)
+	})
+}
+
+// UpdateDeadline sets the "deadline" field to the value that was provided on create.
+func (u *CodingProblemUpsertBulk) UpdateDeadline() *CodingProblemUpsertBulk {
+	return u.Update(func(s *CodingProblemUpsert) {
+		s.UpdateDeadline()
 	})
 }
 

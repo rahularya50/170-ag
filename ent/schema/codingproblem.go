@@ -6,6 +6,7 @@ import (
 	"170-ag/privacyrules"
 	"170-ag/site/policy"
 	"context"
+	"time"
 
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
@@ -27,6 +28,7 @@ func (CodingProblem) Fields() []ent.Field {
 		field.Text("statement").Default("This is the problem statement").NotEmpty(),
 		field.Text("skeleton").Default(""),
 		field.Bool("released").Default(false),
+		field.Time("deadline").Default(time.Now),
 	}
 }
 

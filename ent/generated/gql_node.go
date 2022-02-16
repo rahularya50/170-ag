@@ -111,7 +111,7 @@ func (cp *CodingProblem) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     cp.ID,
 		Type:   "CodingProblem",
-		Fields: make([]*Field, 6),
+		Fields: make([]*Field, 7),
 		Edges:  make([]*Edge, 3),
 	}
 	var buf []byte
@@ -161,6 +161,14 @@ func (cp *CodingProblem) Node(ctx context.Context) (node *Node, err error) {
 	node.Fields[5] = &Field{
 		Type:  "bool",
 		Name:  "released",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(cp.Deadline); err != nil {
+		return nil, err
+	}
+	node.Fields[6] = &Field{
+		Type:  "time.Time",
+		Name:  "deadline",
 		Value: string(buf),
 	}
 	node.Edges[0] = &Edge{

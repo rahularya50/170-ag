@@ -28,6 +28,8 @@ type CodingProblem struct {
 	Skeleton string `json:"skeleton,omitempty"`
 	// Released holds the value of the "released" field.
 	Released bool `json:"released,omitempty"`
+	// Deadline holds the value of the "deadline" field.
+	Deadline time.Time `json:"deadline,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CodingProblemQuery when eager-loading is set.
 	Edges CodingProblemEdges `json:"edges"`
@@ -84,7 +86,7 @@ func (*CodingProblem) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullInt64)
 		case codingproblem.FieldName, codingproblem.FieldStatement, codingproblem.FieldSkeleton:
 			values[i] = new(sql.NullString)
-		case codingproblem.FieldCreateTime, codingproblem.FieldUpdateTime:
+		case codingproblem.FieldCreateTime, codingproblem.FieldUpdateTime, codingproblem.FieldDeadline:
 			values[i] = new(sql.NullTime)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type CodingProblem", columns[i])
@@ -143,6 +145,12 @@ func (cp *CodingProblem) assignValues(columns []string, values []interface{}) er
 			} else if value.Valid {
 				cp.Released = value.Bool
 			}
+		case codingproblem.FieldDeadline:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field deadline", values[i])
+			} else if value.Valid {
+				cp.Deadline = value.Time
+			}
 		}
 	}
 	return nil
@@ -198,6 +206,8 @@ func (cp *CodingProblem) String() string {
 	builder.WriteString(cp.Skeleton)
 	builder.WriteString(", released=")
 	builder.WriteString(fmt.Sprintf("%v", cp.Released))
+	builder.WriteString(", deadline=")
+	builder.WriteString(cp.Deadline.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

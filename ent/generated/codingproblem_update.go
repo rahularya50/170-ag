@@ -93,6 +93,20 @@ func (cpu *CodingProblemUpdate) SetNillableReleased(b *bool) *CodingProblemUpdat
 	return cpu
 }
 
+// SetDeadline sets the "deadline" field.
+func (cpu *CodingProblemUpdate) SetDeadline(t time.Time) *CodingProblemUpdate {
+	cpu.mutation.SetDeadline(t)
+	return cpu
+}
+
+// SetNillableDeadline sets the "deadline" field if the given value is not nil.
+func (cpu *CodingProblemUpdate) SetNillableDeadline(t *time.Time) *CodingProblemUpdate {
+	if t != nil {
+		cpu.SetDeadline(*t)
+	}
+	return cpu
+}
+
 // AddDraftIDs adds the "drafts" edge to the CodingDraft entity by IDs.
 func (cpu *CodingProblemUpdate) AddDraftIDs(ids ...int) *CodingProblemUpdate {
 	cpu.mutation.AddDraftIDs(ids...)
@@ -349,6 +363,13 @@ func (cpu *CodingProblemUpdate) sqlSave(ctx context.Context) (n int, err error) 
 			Column: codingproblem.FieldReleased,
 		})
 	}
+	if value, ok := cpu.mutation.Deadline(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: codingproblem.FieldDeadline,
+		})
+	}
 	if cpu.mutation.DraftsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -588,6 +609,20 @@ func (cpuo *CodingProblemUpdateOne) SetReleased(b bool) *CodingProblemUpdateOne 
 func (cpuo *CodingProblemUpdateOne) SetNillableReleased(b *bool) *CodingProblemUpdateOne {
 	if b != nil {
 		cpuo.SetReleased(*b)
+	}
+	return cpuo
+}
+
+// SetDeadline sets the "deadline" field.
+func (cpuo *CodingProblemUpdateOne) SetDeadline(t time.Time) *CodingProblemUpdateOne {
+	cpuo.mutation.SetDeadline(t)
+	return cpuo
+}
+
+// SetNillableDeadline sets the "deadline" field if the given value is not nil.
+func (cpuo *CodingProblemUpdateOne) SetNillableDeadline(t *time.Time) *CodingProblemUpdateOne {
+	if t != nil {
+		cpuo.SetDeadline(*t)
 	}
 	return cpuo
 }
@@ -870,6 +905,13 @@ func (cpuo *CodingProblemUpdateOne) sqlSave(ctx context.Context) (_node *CodingP
 			Type:   field.TypeBool,
 			Value:  value,
 			Column: codingproblem.FieldReleased,
+		})
+	}
+	if value, ok := cpuo.mutation.Deadline(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: codingproblem.FieldDeadline,
 		})
 	}
 	if cpuo.mutation.DraftsCleared() {

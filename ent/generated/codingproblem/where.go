@@ -135,6 +135,13 @@ func Released(v bool) predicate.CodingProblem {
 	})
 }
 
+// Deadline applies equality check predicate on the "deadline" field. It's identical to DeadlineEQ.
+func Deadline(v time.Time) predicate.CodingProblem {
+	return predicate.CodingProblem(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldDeadline), v))
+	})
+}
+
 // CreateTimeEQ applies the EQ predicate on the "create_time" field.
 func CreateTimeEQ(v time.Time) predicate.CodingProblem {
 	return predicate.CodingProblem(func(s *sql.Selector) {
@@ -631,6 +638,82 @@ func ReleasedEQ(v bool) predicate.CodingProblem {
 func ReleasedNEQ(v bool) predicate.CodingProblem {
 	return predicate.CodingProblem(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldReleased), v))
+	})
+}
+
+// DeadlineEQ applies the EQ predicate on the "deadline" field.
+func DeadlineEQ(v time.Time) predicate.CodingProblem {
+	return predicate.CodingProblem(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldDeadline), v))
+	})
+}
+
+// DeadlineNEQ applies the NEQ predicate on the "deadline" field.
+func DeadlineNEQ(v time.Time) predicate.CodingProblem {
+	return predicate.CodingProblem(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldDeadline), v))
+	})
+}
+
+// DeadlineIn applies the In predicate on the "deadline" field.
+func DeadlineIn(vs ...time.Time) predicate.CodingProblem {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.CodingProblem(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldDeadline), v...))
+	})
+}
+
+// DeadlineNotIn applies the NotIn predicate on the "deadline" field.
+func DeadlineNotIn(vs ...time.Time) predicate.CodingProblem {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.CodingProblem(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldDeadline), v...))
+	})
+}
+
+// DeadlineGT applies the GT predicate on the "deadline" field.
+func DeadlineGT(v time.Time) predicate.CodingProblem {
+	return predicate.CodingProblem(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldDeadline), v))
+	})
+}
+
+// DeadlineGTE applies the GTE predicate on the "deadline" field.
+func DeadlineGTE(v time.Time) predicate.CodingProblem {
+	return predicate.CodingProblem(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldDeadline), v))
+	})
+}
+
+// DeadlineLT applies the LT predicate on the "deadline" field.
+func DeadlineLT(v time.Time) predicate.CodingProblem {
+	return predicate.CodingProblem(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldDeadline), v))
+	})
+}
+
+// DeadlineLTE applies the LTE predicate on the "deadline" field.
+func DeadlineLTE(v time.Time) predicate.CodingProblem {
+	return predicate.CodingProblem(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldDeadline), v))
 	})
 }
 

@@ -151,6 +151,7 @@ func (r *mutationResolver) UpdateProblem(ctx context.Context, input model.Update
 		SetNillableStatement(input.Problem.Statement).
 		SetNillableSkeleton(input.Problem.Skeleton).
 		SetNillableReleased(input.Problem.Released).
+		SetNillableDeadline(input.Problem.Deadline).
 		Save(ctx)
 }
 

@@ -174,7 +174,7 @@ export default function TestCase(props: Props): React.Node {
           <h6>
             Case {props.name}: {testCase.points} Points
           </h6>
-          <div class="mb-2">
+          <div className="mb-2">
             {testCase.expanded_data ? (
               <div>
                 Input:

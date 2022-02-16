@@ -598,6 +598,7 @@ type CodingProblemMutation struct {
 	statement          *string
 	skeleton           *string
 	released           *bool
+	deadline           *time.Time
 	clearedFields      map[string]struct{}
 	drafts             map[int]struct{}
 	removeddrafts      map[int]struct{}
@@ -927,6 +928,42 @@ func (m *CodingProblemMutation) ResetReleased() {
 	m.released = nil
 }
 
+// SetDeadline sets the "deadline" field.
+func (m *CodingProblemMutation) SetDeadline(t time.Time) {
+	m.deadline = &t
+}
+
+// Deadline returns the value of the "deadline" field in the mutation.
+func (m *CodingProblemMutation) Deadline() (r time.Time, exists bool) {
+	v := m.deadline
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeadline returns the old "deadline" field's value of the CodingProblem entity.
+// If the CodingProblem object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CodingProblemMutation) OldDeadline(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeadline is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeadline requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeadline: %w", err)
+	}
+	return oldValue.Deadline, nil
+}
+
+// ResetDeadline resets all changes to the "deadline" field.
+func (m *CodingProblemMutation) ResetDeadline() {
+	m.deadline = nil
+}
+
 // AddDraftIDs adds the "drafts" edge to the CodingDraft entity by ids.
 func (m *CodingProblemMutation) AddDraftIDs(ids ...int) {
 	if m.drafts == nil {
@@ -1108,7 +1145,7 @@ func (m *CodingProblemMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CodingProblemMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.create_time != nil {
 		fields = append(fields, codingproblem.FieldCreateTime)
 	}
@@ -1126,6 +1163,9 @@ func (m *CodingProblemMutation) Fields() []string {
 	}
 	if m.released != nil {
 		fields = append(fields, codingproblem.FieldReleased)
+	}
+	if m.deadline != nil {
+		fields = append(fields, codingproblem.FieldDeadline)
 	}
 	return fields
 }
@@ -1147,6 +1187,8 @@ func (m *CodingProblemMutation) Field(name string) (ent.Value, bool) {
 		return m.Skeleton()
 	case codingproblem.FieldReleased:
 		return m.Released()
+	case codingproblem.FieldDeadline:
+		return m.Deadline()
 	}
 	return nil, false
 }
@@ -1168,6 +1210,8 @@ func (m *CodingProblemMutation) OldField(ctx context.Context, name string) (ent.
 		return m.OldSkeleton(ctx)
 	case codingproblem.FieldReleased:
 		return m.OldReleased(ctx)
+	case codingproblem.FieldDeadline:
+		return m.OldDeadline(ctx)
 	}
 	return nil, fmt.Errorf("unknown CodingProblem field %s", name)
 }
@@ -1218,6 +1262,13 @@ func (m *CodingProblemMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetReleased(v)
+		return nil
+	case codingproblem.FieldDeadline:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeadline(v)
 		return nil
 	}
 	return fmt.Errorf("unknown CodingProblem field %s", name)
@@ -1285,6 +1336,9 @@ func (m *CodingProblemMutation) ResetField(name string) error {
 		return nil
 	case codingproblem.FieldReleased:
 		m.ResetReleased()
+		return nil
+	case codingproblem.FieldDeadline:
+		m.ResetDeadline()
 		return nil
 	}
 	return fmt.Errorf("unknown CodingProblem field %s", name)

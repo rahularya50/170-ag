@@ -5,7 +5,7 @@ import * as React from "react";
 import { useMemo } from "react";
 import { Col, Container, Row, Table } from "react-bootstrap";
 import { useLazyLoadQuery } from "react-relay/hooks";
-import { generatePath, Link,Navigate, useParams  } from "react-router-dom";
+import { generatePath, Link, Navigate, useParams } from "react-router-dom";
 
 import SubmissionQuery from "./__generated__/SubmissionQuery.graphql";
 import { useRefreshingQuery } from "./useRefreshingQuery";
@@ -64,7 +64,7 @@ export default function Submission(): React.Node {
               year: "numeric",
             }).format(new Date(coding_submission.create_time))}
           </h2>
-          <p class="lead">
+          <p className="lead">
             {coding_submission.points == null ? (
               <>Submission is {coding_submission.status}.</>
             ) : (

@@ -32,6 +32,7 @@ export default function ProblemStatement(props: Props): React.Node {
       fragment ProblemStatement_problem on CodingProblem {
         id
         name
+        deadline
         statement
         released
       }
@@ -53,6 +54,7 @@ export default function ProblemStatement(props: Props): React.Node {
   const [isEditing, setIsEditing] = useState(false);
 
   const [name, setName] = useState(problem.name);
+  const [deadline, setDeadline] = useState(problem.deadline.slice(0, -1));
   const [statement, setStatement] = useState(problem.statement);
   const [released, setReleased] = useState(problem.released);
 
@@ -63,6 +65,7 @@ export default function ProblemStatement(props: Props): React.Node {
           id: problem.id,
           problem: {
             name,
+            deadline: new Date(deadline + "Z").toISOString(),
             statement,
             released,
           },
@@ -80,17 +83,42 @@ export default function ProblemStatement(props: Props): React.Node {
   return (
     <>
       {isEditing ? (
-        <Form.Group className="mb-3">
-          <Form.Label>Problem Title</Form.Label>
-          <Form.Control
-            type="text"
-            value={name}
-            disabled={isUpdating}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </Form.Group>
+        <>
+          <Form.Group className="mb-3">
+            <Form.Label>Problem Title</Form.Label>
+            <Form.Control
+              type="text"
+              value={name}
+              disabled={isUpdating}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Deadline (UTC)</Form.Label>
+            <Form.Control
+              type="datetime-local"
+              value={deadline}
+              disabled={isUpdating}
+              onChange={(e) => setDeadline(e.target.value)}
+              step={1}
+            />
+          </Form.Group>
+        </>
       ) : (
-        <h3>{problem.name}</h3>
+        <div className="mb-3">
+          <h3>{problem.name}</h3>
+          <i>
+            Due by{" "}
+            {Intl.DateTimeFormat("en-US", {
+              hour: "numeric",
+              minute: "numeric",
+              second: "numeric",
+              day: "numeric",
+              month: "numeric",
+              year: "numeric",
+            }).format(new Date(problem.deadline))}
+          </i>
+        </div>
       )}
       {isEditing ? (
         <Form.Group className="mb-3">
