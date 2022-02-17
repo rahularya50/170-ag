@@ -4,6 +4,7 @@ package generated
 
 import (
 	"170-ag/ent/generated/codingdraft"
+	"170-ag/ent/generated/codingextension"
 	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/codingtestcase"
@@ -166,6 +167,21 @@ func (cpc *CodingProblemCreate) AddSubmissions(c ...*CodingSubmission) *CodingPr
 		ids[i] = c[i].ID
 	}
 	return cpc.AddSubmissionIDs(ids...)
+}
+
+// AddExtensionIDs adds the "extensions" edge to the CodingExtension entity by IDs.
+func (cpc *CodingProblemCreate) AddExtensionIDs(ids ...int) *CodingProblemCreate {
+	cpc.mutation.AddExtensionIDs(ids...)
+	return cpc
+}
+
+// AddExtensions adds the "extensions" edges to the CodingExtension entity.
+func (cpc *CodingProblemCreate) AddExtensions(c ...*CodingExtension) *CodingProblemCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cpc.AddExtensionIDs(ids...)
 }
 
 // Mutation returns the CodingProblemMutation object of the builder.
@@ -447,6 +463,25 @@ func (cpc *CodingProblemCreate) createSpec() (*CodingProblem, *sqlgraph.CreateSp
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: codingsubmission.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cpc.mutation.ExtensionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   codingproblem.ExtensionsTable,
+			Columns: []string{codingproblem.ExtensionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingextension.FieldID,
 				},
 			},
 		}

@@ -4,6 +4,7 @@ package generated
 
 import (
 	"170-ag/ent/generated/codingdraft"
+	"170-ag/ent/generated/codingextension"
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/predicate"
 	"170-ag/ent/generated/user"
@@ -30,6 +31,7 @@ type UserQuery struct {
 	// eager-loading edges.
 	withDrafts      *CodingDraftQuery
 	withSubmissions *CodingSubmissionQuery
+	withExtensions  *CodingExtensionQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -103,6 +105,28 @@ func (uq *UserQuery) QuerySubmissions() *CodingSubmissionQuery {
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(codingsubmission.Table, codingsubmission.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, user.SubmissionsTable, user.SubmissionsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryExtensions chains the current query on the "extensions" edge.
+func (uq *UserQuery) QueryExtensions() *CodingExtensionQuery {
+	query := &CodingExtensionQuery{config: uq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(codingextension.Table, codingextension.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, user.ExtensionsTable, user.ExtensionsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -293,6 +317,7 @@ func (uq *UserQuery) Clone() *UserQuery {
 		predicates:      append([]predicate.User{}, uq.predicates...),
 		withDrafts:      uq.withDrafts.Clone(),
 		withSubmissions: uq.withSubmissions.Clone(),
+		withExtensions:  uq.withExtensions.Clone(),
 		// clone intermediate query.
 		sql:  uq.sql.Clone(),
 		path: uq.path,
@@ -318,6 +343,17 @@ func (uq *UserQuery) WithSubmissions(opts ...func(*CodingSubmissionQuery)) *User
 		opt(query)
 	}
 	uq.withSubmissions = query
+	return uq
+}
+
+// WithExtensions tells the query-builder to eager-load the nodes that are connected to
+// the "extensions" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithExtensions(opts ...func(*CodingExtensionQuery)) *UserQuery {
+	query := &CodingExtensionQuery{config: uq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withExtensions = query
 	return uq
 }
 
@@ -392,9 +428,10 @@ func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 	var (
 		nodes       = []*User{}
 		_spec       = uq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			uq.withDrafts != nil,
 			uq.withSubmissions != nil,
+			uq.withExtensions != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
@@ -472,6 +509,35 @@ func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 				return nil, fmt.Errorf(`unexpected foreign-key "coding_submission_author" returned %v for node %v`, *fk, n.ID)
 			}
 			node.Edges.Submissions = append(node.Edges.Submissions, n)
+		}
+	}
+
+	if query := uq.withExtensions; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		nodeids := make(map[int]*User)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+			nodes[i].Edges.Extensions = []*CodingExtension{}
+		}
+		query.withFKs = true
+		query.Where(predicate.CodingExtension(func(s *sql.Selector) {
+			s.Where(sql.InValues(user.ExtensionsColumn, fks...))
+		}))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			fk := n.coding_extension_student
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "coding_extension_student" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "coding_extension_student" returned %v for node %v`, *fk, n.ID)
+			}
+			node.Edges.Extensions = append(node.Edges.Extensions, n)
 		}
 	}
 

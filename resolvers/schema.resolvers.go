@@ -17,6 +17,7 @@ import (
 	"170-ag/site/web"
 	"context"
 	"fmt"
+	"time"
 )
 
 func (r *codingProblemResolver) MyDraft(ctx context.Context, obj *ent.CodingProblem) (*ent.CodingDraft, error) {
@@ -40,6 +41,18 @@ func (r *codingProblemResolver) MySubmissions(ctx context.Context, obj *ent.Codi
 
 func (r *codingProblemResolver) AllSubmissions(ctx context.Context, obj *ent.CodingProblem, after *ent.Cursor, first *int, before *ent.Cursor, last *int) (*ent.CodingSubmissionConnection, error) {
 	return obj.QuerySubmissions().Paginate(ctx, after, first, before, last)
+}
+
+func (r *codingProblemResolver) MyDeadline(ctx context.Context, obj *ent.CodingProblem) (*time.Time, error) {
+	viewer, ok := web.ViewerFromContext(ctx)
+	if !ok {
+		return nil, fmt.Errorf("viewer not found")
+	}
+	return site.GetSubmissionDeadlineForStudent(ctx, obj, viewer)
+}
+
+func (r *codingProblemResolver) ExtensionRoster(ctx context.Context, obj *ent.CodingProblem) (string, error) {
+	return site.ExportProblemExtensions(ctx, obj)
 }
 
 func (r *codingSubmissionStaffDataResolver) ExecutionID(ctx context.Context, obj *ent.CodingSubmissionStaffData) (*string, error) {
@@ -218,6 +231,18 @@ func (r *mutationResolver) DeleteTestCase(ctx context.Context, input model.Delet
 		return nil, err
 	}
 	err = r.client.CodingTestCase.DeleteOneID(input.ID).Exec(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return problem, nil
+}
+
+func (r *mutationResolver) SetProblemExtensions(ctx context.Context, input model.ExtensionsInput) (*ent.CodingProblem, error) {
+	problem, err := r.client.CodingProblem.Query().Where(codingproblem.ID(input.ProblemID)).Only(ctx)
+	if err != nil {
+		return nil, err
+	}
+	err = site.SetProblemExtensions(ctx, r.client, problem, input.Roster)
 	if err != nil {
 		return nil, err
 	}

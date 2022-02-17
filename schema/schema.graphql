@@ -34,7 +34,7 @@ type Query {
   nodes(ids: [ID!]!): [Node!]!
   user(id: ID!): User
   users(after: Cursor, first: Int, before: Cursor, last: Int): UserConnection!
-  coding_problem(id: ID!): CodingProblem
+  coding_problem(id: ID!): CodingProblem!
   coding_problems(
     after: Cursor
     first: Int
@@ -55,6 +55,7 @@ type Mutation {
   add_test_case(input: CreateTestCaseInput!): CodingTestCase!
   update_test_case(input: UpdateTestCaseInput!): CodingTestCase!
   delete_test_case(input: DeleteTestCaseInput!): CodingProblem!
+  set_problem_extensions(input: ExtensionsInput!): CodingProblem!
 }
 
 type User implements Node {
@@ -98,6 +99,8 @@ type CodingProblem implements Node {
   ): CodingSubmissionConnection!
   test_cases: [CodingTestCase!]!
   deadline: Time!
+  my_deadline: Time!
+  extension_roster: String!
 }
 
 type CodingProblemConnection {
@@ -237,4 +240,9 @@ type CodingSubmissionStaffData implements Node {
   coding_submission: CodingSubmission!
   stderr: String
   exit_error: String
+}
+
+input ExtensionsInput {
+  problem_id: ID!
+  roster: String!
 }

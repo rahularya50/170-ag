@@ -46,6 +46,9 @@ func (CodingProblem) Edges() []ent.Edge {
 		edge.From("submissions", CodingSubmission.Type).
 			Ref("coding_problem").
 			Annotations(entgql.Bind()),
+		edge.From("extensions", CodingExtension.Type).
+			Ref("coding_problem").
+			Annotations(entgql.Bind()),
 	}
 }
 

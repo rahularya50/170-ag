@@ -14,6 +14,8 @@ type Tx struct {
 	config
 	// CodingDraft is the client for interacting with the CodingDraft builders.
 	CodingDraft *CodingDraftClient
+	// CodingExtension is the client for interacting with the CodingExtension builders.
+	CodingExtension *CodingExtensionClient
 	// CodingProblem is the client for interacting with the CodingProblem builders.
 	CodingProblem *CodingProblemClient
 	// CodingSubmission is the client for interacting with the CodingSubmission builders.
@@ -162,6 +164,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.CodingDraft = NewCodingDraftClient(tx.config)
+	tx.CodingExtension = NewCodingExtensionClient(tx.config)
 	tx.CodingProblem = NewCodingProblemClient(tx.config)
 	tx.CodingSubmission = NewCodingSubmissionClient(tx.config)
 	tx.CodingSubmissionStaffData = NewCodingSubmissionStaffDataClient(tx.config)

@@ -4,6 +4,7 @@ package generated
 
 import (
 	"170-ag/ent/generated/codingdraft"
+	"170-ag/ent/generated/codingextension"
 	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/codingsubmissionstaffdata"
@@ -31,6 +32,7 @@ const (
 
 	// Node types.
 	TypeCodingDraft               = "CodingDraft"
+	TypeCodingExtension           = "CodingExtension"
 	TypeCodingProblem             = "CodingProblem"
 	TypeCodingSubmission          = "CodingSubmission"
 	TypeCodingSubmissionStaffData = "CodingSubmissionStaffData"
@@ -586,6 +588,553 @@ func (m *CodingDraftMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown CodingDraft edge %s", name)
 }
 
+// CodingExtensionMutation represents an operation that mutates the CodingExtension nodes in the graph.
+type CodingExtensionMutation struct {
+	config
+	op                    Op
+	typ                   string
+	id                    *int
+	create_time           *time.Time
+	update_time           *time.Time
+	deadline              *time.Time
+	clearedFields         map[string]struct{}
+	student               *int
+	clearedstudent        bool
+	coding_problem        *int
+	clearedcoding_problem bool
+	done                  bool
+	oldValue              func(context.Context) (*CodingExtension, error)
+	predicates            []predicate.CodingExtension
+}
+
+var _ ent.Mutation = (*CodingExtensionMutation)(nil)
+
+// codingextensionOption allows management of the mutation configuration using functional options.
+type codingextensionOption func(*CodingExtensionMutation)
+
+// newCodingExtensionMutation creates new mutation for the CodingExtension entity.
+func newCodingExtensionMutation(c config, op Op, opts ...codingextensionOption) *CodingExtensionMutation {
+	m := &CodingExtensionMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeCodingExtension,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withCodingExtensionID sets the ID field of the mutation.
+func withCodingExtensionID(id int) codingextensionOption {
+	return func(m *CodingExtensionMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *CodingExtension
+		)
+		m.oldValue = func(ctx context.Context) (*CodingExtension, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().CodingExtension.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withCodingExtension sets the old CodingExtension of the mutation.
+func withCodingExtension(node *CodingExtension) codingextensionOption {
+	return func(m *CodingExtensionMutation) {
+		m.oldValue = func(context.Context) (*CodingExtension, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m CodingExtensionMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m CodingExtensionMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("generated: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *CodingExtensionMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *CodingExtensionMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().CodingExtension.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreateTime sets the "create_time" field.
+func (m *CodingExtensionMutation) SetCreateTime(t time.Time) {
+	m.create_time = &t
+}
+
+// CreateTime returns the value of the "create_time" field in the mutation.
+func (m *CodingExtensionMutation) CreateTime() (r time.Time, exists bool) {
+	v := m.create_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreateTime returns the old "create_time" field's value of the CodingExtension entity.
+// If the CodingExtension object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CodingExtensionMutation) OldCreateTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreateTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreateTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreateTime: %w", err)
+	}
+	return oldValue.CreateTime, nil
+}
+
+// ResetCreateTime resets all changes to the "create_time" field.
+func (m *CodingExtensionMutation) ResetCreateTime() {
+	m.create_time = nil
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (m *CodingExtensionMutation) SetUpdateTime(t time.Time) {
+	m.update_time = &t
+}
+
+// UpdateTime returns the value of the "update_time" field in the mutation.
+func (m *CodingExtensionMutation) UpdateTime() (r time.Time, exists bool) {
+	v := m.update_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdateTime returns the old "update_time" field's value of the CodingExtension entity.
+// If the CodingExtension object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CodingExtensionMutation) OldUpdateTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdateTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdateTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdateTime: %w", err)
+	}
+	return oldValue.UpdateTime, nil
+}
+
+// ResetUpdateTime resets all changes to the "update_time" field.
+func (m *CodingExtensionMutation) ResetUpdateTime() {
+	m.update_time = nil
+}
+
+// SetDeadline sets the "deadline" field.
+func (m *CodingExtensionMutation) SetDeadline(t time.Time) {
+	m.deadline = &t
+}
+
+// Deadline returns the value of the "deadline" field in the mutation.
+func (m *CodingExtensionMutation) Deadline() (r time.Time, exists bool) {
+	v := m.deadline
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeadline returns the old "deadline" field's value of the CodingExtension entity.
+// If the CodingExtension object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CodingExtensionMutation) OldDeadline(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeadline is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeadline requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeadline: %w", err)
+	}
+	return oldValue.Deadline, nil
+}
+
+// ResetDeadline resets all changes to the "deadline" field.
+func (m *CodingExtensionMutation) ResetDeadline() {
+	m.deadline = nil
+}
+
+// SetStudentID sets the "student" edge to the User entity by id.
+func (m *CodingExtensionMutation) SetStudentID(id int) {
+	m.student = &id
+}
+
+// ClearStudent clears the "student" edge to the User entity.
+func (m *CodingExtensionMutation) ClearStudent() {
+	m.clearedstudent = true
+}
+
+// StudentCleared reports if the "student" edge to the User entity was cleared.
+func (m *CodingExtensionMutation) StudentCleared() bool {
+	return m.clearedstudent
+}
+
+// StudentID returns the "student" edge ID in the mutation.
+func (m *CodingExtensionMutation) StudentID() (id int, exists bool) {
+	if m.student != nil {
+		return *m.student, true
+	}
+	return
+}
+
+// StudentIDs returns the "student" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// StudentID instead. It exists only for internal usage by the builders.
+func (m *CodingExtensionMutation) StudentIDs() (ids []int) {
+	if id := m.student; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetStudent resets all changes to the "student" edge.
+func (m *CodingExtensionMutation) ResetStudent() {
+	m.student = nil
+	m.clearedstudent = false
+}
+
+// SetCodingProblemID sets the "coding_problem" edge to the CodingProblem entity by id.
+func (m *CodingExtensionMutation) SetCodingProblemID(id int) {
+	m.coding_problem = &id
+}
+
+// ClearCodingProblem clears the "coding_problem" edge to the CodingProblem entity.
+func (m *CodingExtensionMutation) ClearCodingProblem() {
+	m.clearedcoding_problem = true
+}
+
+// CodingProblemCleared reports if the "coding_problem" edge to the CodingProblem entity was cleared.
+func (m *CodingExtensionMutation) CodingProblemCleared() bool {
+	return m.clearedcoding_problem
+}
+
+// CodingProblemID returns the "coding_problem" edge ID in the mutation.
+func (m *CodingExtensionMutation) CodingProblemID() (id int, exists bool) {
+	if m.coding_problem != nil {
+		return *m.coding_problem, true
+	}
+	return
+}
+
+// CodingProblemIDs returns the "coding_problem" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CodingProblemID instead. It exists only for internal usage by the builders.
+func (m *CodingExtensionMutation) CodingProblemIDs() (ids []int) {
+	if id := m.coding_problem; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCodingProblem resets all changes to the "coding_problem" edge.
+func (m *CodingExtensionMutation) ResetCodingProblem() {
+	m.coding_problem = nil
+	m.clearedcoding_problem = false
+}
+
+// Where appends a list predicates to the CodingExtensionMutation builder.
+func (m *CodingExtensionMutation) Where(ps ...predicate.CodingExtension) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *CodingExtensionMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (CodingExtension).
+func (m *CodingExtensionMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *CodingExtensionMutation) Fields() []string {
+	fields := make([]string, 0, 3)
+	if m.create_time != nil {
+		fields = append(fields, codingextension.FieldCreateTime)
+	}
+	if m.update_time != nil {
+		fields = append(fields, codingextension.FieldUpdateTime)
+	}
+	if m.deadline != nil {
+		fields = append(fields, codingextension.FieldDeadline)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *CodingExtensionMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case codingextension.FieldCreateTime:
+		return m.CreateTime()
+	case codingextension.FieldUpdateTime:
+		return m.UpdateTime()
+	case codingextension.FieldDeadline:
+		return m.Deadline()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *CodingExtensionMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case codingextension.FieldCreateTime:
+		return m.OldCreateTime(ctx)
+	case codingextension.FieldUpdateTime:
+		return m.OldUpdateTime(ctx)
+	case codingextension.FieldDeadline:
+		return m.OldDeadline(ctx)
+	}
+	return nil, fmt.Errorf("unknown CodingExtension field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *CodingExtensionMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case codingextension.FieldCreateTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreateTime(v)
+		return nil
+	case codingextension.FieldUpdateTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdateTime(v)
+		return nil
+	case codingextension.FieldDeadline:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeadline(v)
+		return nil
+	}
+	return fmt.Errorf("unknown CodingExtension field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *CodingExtensionMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *CodingExtensionMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *CodingExtensionMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown CodingExtension numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *CodingExtensionMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *CodingExtensionMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *CodingExtensionMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown CodingExtension nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *CodingExtensionMutation) ResetField(name string) error {
+	switch name {
+	case codingextension.FieldCreateTime:
+		m.ResetCreateTime()
+		return nil
+	case codingextension.FieldUpdateTime:
+		m.ResetUpdateTime()
+		return nil
+	case codingextension.FieldDeadline:
+		m.ResetDeadline()
+		return nil
+	}
+	return fmt.Errorf("unknown CodingExtension field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *CodingExtensionMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.student != nil {
+		edges = append(edges, codingextension.EdgeStudent)
+	}
+	if m.coding_problem != nil {
+		edges = append(edges, codingextension.EdgeCodingProblem)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *CodingExtensionMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case codingextension.EdgeStudent:
+		if id := m.student; id != nil {
+			return []ent.Value{*id}
+		}
+	case codingextension.EdgeCodingProblem:
+		if id := m.coding_problem; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *CodingExtensionMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *CodingExtensionMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *CodingExtensionMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedstudent {
+		edges = append(edges, codingextension.EdgeStudent)
+	}
+	if m.clearedcoding_problem {
+		edges = append(edges, codingextension.EdgeCodingProblem)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *CodingExtensionMutation) EdgeCleared(name string) bool {
+	switch name {
+	case codingextension.EdgeStudent:
+		return m.clearedstudent
+	case codingextension.EdgeCodingProblem:
+		return m.clearedcoding_problem
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *CodingExtensionMutation) ClearEdge(name string) error {
+	switch name {
+	case codingextension.EdgeStudent:
+		m.ClearStudent()
+		return nil
+	case codingextension.EdgeCodingProblem:
+		m.ClearCodingProblem()
+		return nil
+	}
+	return fmt.Errorf("unknown CodingExtension unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *CodingExtensionMutation) ResetEdge(name string) error {
+	switch name {
+	case codingextension.EdgeStudent:
+		m.ResetStudent()
+		return nil
+	case codingextension.EdgeCodingProblem:
+		m.ResetCodingProblem()
+		return nil
+	}
+	return fmt.Errorf("unknown CodingExtension edge %s", name)
+}
+
 // CodingProblemMutation represents an operation that mutates the CodingProblem nodes in the graph.
 type CodingProblemMutation struct {
 	config
@@ -609,6 +1158,9 @@ type CodingProblemMutation struct {
 	submissions        map[int]struct{}
 	removedsubmissions map[int]struct{}
 	clearedsubmissions bool
+	extensions         map[int]struct{}
+	removedextensions  map[int]struct{}
+	clearedextensions  bool
 	done               bool
 	oldValue           func(context.Context) (*CodingProblem, error)
 	predicates         []predicate.CodingProblem
@@ -1126,6 +1678,60 @@ func (m *CodingProblemMutation) ResetSubmissions() {
 	m.removedsubmissions = nil
 }
 
+// AddExtensionIDs adds the "extensions" edge to the CodingExtension entity by ids.
+func (m *CodingProblemMutation) AddExtensionIDs(ids ...int) {
+	if m.extensions == nil {
+		m.extensions = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.extensions[ids[i]] = struct{}{}
+	}
+}
+
+// ClearExtensions clears the "extensions" edge to the CodingExtension entity.
+func (m *CodingProblemMutation) ClearExtensions() {
+	m.clearedextensions = true
+}
+
+// ExtensionsCleared reports if the "extensions" edge to the CodingExtension entity was cleared.
+func (m *CodingProblemMutation) ExtensionsCleared() bool {
+	return m.clearedextensions
+}
+
+// RemoveExtensionIDs removes the "extensions" edge to the CodingExtension entity by IDs.
+func (m *CodingProblemMutation) RemoveExtensionIDs(ids ...int) {
+	if m.removedextensions == nil {
+		m.removedextensions = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.extensions, ids[i])
+		m.removedextensions[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedExtensions returns the removed IDs of the "extensions" edge to the CodingExtension entity.
+func (m *CodingProblemMutation) RemovedExtensionsIDs() (ids []int) {
+	for id := range m.removedextensions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ExtensionsIDs returns the "extensions" edge IDs in the mutation.
+func (m *CodingProblemMutation) ExtensionsIDs() (ids []int) {
+	for id := range m.extensions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetExtensions resets all changes to the "extensions" edge.
+func (m *CodingProblemMutation) ResetExtensions() {
+	m.extensions = nil
+	m.clearedextensions = false
+	m.removedextensions = nil
+}
+
 // Where appends a list predicates to the CodingProblemMutation builder.
 func (m *CodingProblemMutation) Where(ps ...predicate.CodingProblem) {
 	m.predicates = append(m.predicates, ps...)
@@ -1346,7 +1952,7 @@ func (m *CodingProblemMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *CodingProblemMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.drafts != nil {
 		edges = append(edges, codingproblem.EdgeDrafts)
 	}
@@ -1355,6 +1961,9 @@ func (m *CodingProblemMutation) AddedEdges() []string {
 	}
 	if m.submissions != nil {
 		edges = append(edges, codingproblem.EdgeSubmissions)
+	}
+	if m.extensions != nil {
+		edges = append(edges, codingproblem.EdgeExtensions)
 	}
 	return edges
 }
@@ -1381,13 +1990,19 @@ func (m *CodingProblemMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case codingproblem.EdgeExtensions:
+		ids := make([]ent.Value, 0, len(m.extensions))
+		for id := range m.extensions {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *CodingProblemMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.removeddrafts != nil {
 		edges = append(edges, codingproblem.EdgeDrafts)
 	}
@@ -1396,6 +2011,9 @@ func (m *CodingProblemMutation) RemovedEdges() []string {
 	}
 	if m.removedsubmissions != nil {
 		edges = append(edges, codingproblem.EdgeSubmissions)
+	}
+	if m.removedextensions != nil {
+		edges = append(edges, codingproblem.EdgeExtensions)
 	}
 	return edges
 }
@@ -1422,13 +2040,19 @@ func (m *CodingProblemMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case codingproblem.EdgeExtensions:
+		ids := make([]ent.Value, 0, len(m.removedextensions))
+		for id := range m.removedextensions {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *CodingProblemMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.cleareddrafts {
 		edges = append(edges, codingproblem.EdgeDrafts)
 	}
@@ -1437,6 +2061,9 @@ func (m *CodingProblemMutation) ClearedEdges() []string {
 	}
 	if m.clearedsubmissions {
 		edges = append(edges, codingproblem.EdgeSubmissions)
+	}
+	if m.clearedextensions {
+		edges = append(edges, codingproblem.EdgeExtensions)
 	}
 	return edges
 }
@@ -1451,6 +2078,8 @@ func (m *CodingProblemMutation) EdgeCleared(name string) bool {
 		return m.clearedtest_cases
 	case codingproblem.EdgeSubmissions:
 		return m.clearedsubmissions
+	case codingproblem.EdgeExtensions:
+		return m.clearedextensions
 	}
 	return false
 }
@@ -1475,6 +2104,9 @@ func (m *CodingProblemMutation) ResetEdge(name string) error {
 		return nil
 	case codingproblem.EdgeSubmissions:
 		m.ResetSubmissions()
+		return nil
+	case codingproblem.EdgeExtensions:
+		m.ResetExtensions()
 		return nil
 	}
 	return fmt.Errorf("unknown CodingProblem edge %s", name)
@@ -4343,6 +4975,9 @@ type UserMutation struct {
 	submissions        map[int]struct{}
 	removedsubmissions map[int]struct{}
 	clearedsubmissions bool
+	extensions         map[int]struct{}
+	removedextensions  map[int]struct{}
+	clearedextensions  bool
 	done               bool
 	oldValue           func(context.Context) (*User, error)
 	predicates         []predicate.User
@@ -4747,6 +5382,60 @@ func (m *UserMutation) ResetSubmissions() {
 	m.removedsubmissions = nil
 }
 
+// AddExtensionIDs adds the "extensions" edge to the CodingExtension entity by ids.
+func (m *UserMutation) AddExtensionIDs(ids ...int) {
+	if m.extensions == nil {
+		m.extensions = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.extensions[ids[i]] = struct{}{}
+	}
+}
+
+// ClearExtensions clears the "extensions" edge to the CodingExtension entity.
+func (m *UserMutation) ClearExtensions() {
+	m.clearedextensions = true
+}
+
+// ExtensionsCleared reports if the "extensions" edge to the CodingExtension entity was cleared.
+func (m *UserMutation) ExtensionsCleared() bool {
+	return m.clearedextensions
+}
+
+// RemoveExtensionIDs removes the "extensions" edge to the CodingExtension entity by IDs.
+func (m *UserMutation) RemoveExtensionIDs(ids ...int) {
+	if m.removedextensions == nil {
+		m.removedextensions = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.extensions, ids[i])
+		m.removedextensions[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedExtensions returns the removed IDs of the "extensions" edge to the CodingExtension entity.
+func (m *UserMutation) RemovedExtensionsIDs() (ids []int) {
+	for id := range m.removedextensions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ExtensionsIDs returns the "extensions" edge IDs in the mutation.
+func (m *UserMutation) ExtensionsIDs() (ids []int) {
+	for id := range m.extensions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetExtensions resets all changes to the "extensions" edge.
+func (m *UserMutation) ResetExtensions() {
+	m.extensions = nil
+	m.clearedextensions = false
+	m.removedextensions = nil
+}
+
 // Where appends a list predicates to the UserMutation builder.
 func (m *UserMutation) Where(ps ...predicate.User) {
 	m.predicates = append(m.predicates, ps...)
@@ -4942,12 +5631,15 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.drafts != nil {
 		edges = append(edges, user.EdgeDrafts)
 	}
 	if m.submissions != nil {
 		edges = append(edges, user.EdgeSubmissions)
+	}
+	if m.extensions != nil {
+		edges = append(edges, user.EdgeExtensions)
 	}
 	return edges
 }
@@ -4968,18 +5660,27 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeExtensions:
+		ids := make([]ent.Value, 0, len(m.extensions))
+		for id := range m.extensions {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.removeddrafts != nil {
 		edges = append(edges, user.EdgeDrafts)
 	}
 	if m.removedsubmissions != nil {
 		edges = append(edges, user.EdgeSubmissions)
+	}
+	if m.removedextensions != nil {
+		edges = append(edges, user.EdgeExtensions)
 	}
 	return edges
 }
@@ -5000,18 +5701,27 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeExtensions:
+		ids := make([]ent.Value, 0, len(m.removedextensions))
+		for id := range m.removedextensions {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.cleareddrafts {
 		edges = append(edges, user.EdgeDrafts)
 	}
 	if m.clearedsubmissions {
 		edges = append(edges, user.EdgeSubmissions)
+	}
+	if m.clearedextensions {
+		edges = append(edges, user.EdgeExtensions)
 	}
 	return edges
 }
@@ -5024,6 +5734,8 @@ func (m *UserMutation) EdgeCleared(name string) bool {
 		return m.cleareddrafts
 	case user.EdgeSubmissions:
 		return m.clearedsubmissions
+	case user.EdgeExtensions:
+		return m.clearedextensions
 	}
 	return false
 }
@@ -5045,6 +5757,9 @@ func (m *UserMutation) ResetEdge(name string) error {
 		return nil
 	case user.EdgeSubmissions:
 		m.ResetSubmissions()
+		return nil
+	case user.EdgeExtensions:
+		m.ResetExtensions()
 		return nil
 	}
 	return fmt.Errorf("unknown User edge %s", name)

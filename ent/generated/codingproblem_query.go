@@ -4,6 +4,7 @@ package generated
 
 import (
 	"170-ag/ent/generated/codingdraft"
+	"170-ag/ent/generated/codingextension"
 	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/codingtestcase"
@@ -32,6 +33,7 @@ type CodingProblemQuery struct {
 	withDrafts      *CodingDraftQuery
 	withTestCases   *CodingTestCaseQuery
 	withSubmissions *CodingSubmissionQuery
+	withExtensions  *CodingExtensionQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -127,6 +129,28 @@ func (cpq *CodingProblemQuery) QuerySubmissions() *CodingSubmissionQuery {
 			sqlgraph.From(codingproblem.Table, codingproblem.FieldID, selector),
 			sqlgraph.To(codingsubmission.Table, codingsubmission.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, codingproblem.SubmissionsTable, codingproblem.SubmissionsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cpq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryExtensions chains the current query on the "extensions" edge.
+func (cpq *CodingProblemQuery) QueryExtensions() *CodingExtensionQuery {
+	query := &CodingExtensionQuery{config: cpq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cpq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cpq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(codingproblem.Table, codingproblem.FieldID, selector),
+			sqlgraph.To(codingextension.Table, codingextension.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, codingproblem.ExtensionsTable, codingproblem.ExtensionsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cpq.driver.Dialect(), step)
 		return fromU, nil
@@ -318,6 +342,7 @@ func (cpq *CodingProblemQuery) Clone() *CodingProblemQuery {
 		withDrafts:      cpq.withDrafts.Clone(),
 		withTestCases:   cpq.withTestCases.Clone(),
 		withSubmissions: cpq.withSubmissions.Clone(),
+		withExtensions:  cpq.withExtensions.Clone(),
 		// clone intermediate query.
 		sql:  cpq.sql.Clone(),
 		path: cpq.path,
@@ -354,6 +379,17 @@ func (cpq *CodingProblemQuery) WithSubmissions(opts ...func(*CodingSubmissionQue
 		opt(query)
 	}
 	cpq.withSubmissions = query
+	return cpq
+}
+
+// WithExtensions tells the query-builder to eager-load the nodes that are connected to
+// the "extensions" edge. The optional arguments are used to configure the query builder of the edge.
+func (cpq *CodingProblemQuery) WithExtensions(opts ...func(*CodingExtensionQuery)) *CodingProblemQuery {
+	query := &CodingExtensionQuery{config: cpq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	cpq.withExtensions = query
 	return cpq
 }
 
@@ -428,10 +464,11 @@ func (cpq *CodingProblemQuery) sqlAll(ctx context.Context) ([]*CodingProblem, er
 	var (
 		nodes       = []*CodingProblem{}
 		_spec       = cpq.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [4]bool{
 			cpq.withDrafts != nil,
 			cpq.withTestCases != nil,
 			cpq.withSubmissions != nil,
+			cpq.withExtensions != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
@@ -538,6 +575,35 @@ func (cpq *CodingProblemQuery) sqlAll(ctx context.Context) ([]*CodingProblem, er
 				return nil, fmt.Errorf(`unexpected foreign-key "coding_submission_coding_problem" returned %v for node %v`, *fk, n.ID)
 			}
 			node.Edges.Submissions = append(node.Edges.Submissions, n)
+		}
+	}
+
+	if query := cpq.withExtensions; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		nodeids := make(map[int]*CodingProblem)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+			nodes[i].Edges.Extensions = []*CodingExtension{}
+		}
+		query.withFKs = true
+		query.Where(predicate.CodingExtension(func(s *sql.Selector) {
+			s.Where(sql.InValues(codingproblem.ExtensionsColumn, fks...))
+		}))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			fk := n.coding_extension_coding_problem
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "coding_extension_coding_problem" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "coding_extension_coding_problem" returned %v for node %v`, *fk, n.ID)
+			}
+			node.Edges.Extensions = append(node.Edges.Extensions, n)
 		}
 	}
 

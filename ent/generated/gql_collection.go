@@ -33,6 +33,30 @@ func (cd *CodingDraftQuery) collectField(ctx *graphql.OperationContext, field gr
 }
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (ce *CodingExtensionQuery) CollectFields(ctx context.Context, satisfies ...string) *CodingExtensionQuery {
+	if fc := graphql.GetFieldContext(ctx); fc != nil {
+		ce = ce.collectField(graphql.GetOperationContext(ctx), fc.Field, satisfies...)
+	}
+	return ce
+}
+
+func (ce *CodingExtensionQuery) collectField(ctx *graphql.OperationContext, field graphql.CollectedField, satisfies ...string) *CodingExtensionQuery {
+	for _, field := range graphql.CollectFields(ctx, field.Selections, satisfies) {
+		switch field.Name {
+		case "coding_problem":
+			ce = ce.WithCodingProblem(func(query *CodingProblemQuery) {
+				query.collectField(ctx, field)
+			})
+		case "student":
+			ce = ce.WithStudent(func(query *UserQuery) {
+				query.collectField(ctx, field)
+			})
+		}
+	}
+	return ce
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
 func (cp *CodingProblemQuery) CollectFields(ctx context.Context, satisfies ...string) *CodingProblemQuery {
 	if fc := graphql.GetFieldContext(ctx); fc != nil {
 		cp = cp.collectField(graphql.GetOperationContext(ctx), fc.Field, satisfies...)
@@ -45,6 +69,10 @@ func (cp *CodingProblemQuery) collectField(ctx *graphql.OperationContext, field 
 		switch field.Name {
 		case "drafts":
 			cp = cp.WithDrafts(func(query *CodingDraftQuery) {
+				query.collectField(ctx, field)
+			})
+		case "extensions":
+			cp = cp.WithExtensions(func(query *CodingExtensionQuery) {
 				query.collectField(ctx, field)
 			})
 		case "submissions":
@@ -165,6 +193,10 @@ func (u *UserQuery) collectField(ctx *graphql.OperationContext, field graphql.Co
 		switch field.Name {
 		case "drafts":
 			u = u.WithDrafts(func(query *CodingDraftQuery) {
+				query.collectField(ctx, field)
+			})
+		case "extensions":
+			u = u.WithExtensions(func(query *CodingExtensionQuery) {
 				query.collectField(ctx, field)
 			})
 		case "submissions":

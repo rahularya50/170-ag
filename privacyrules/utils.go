@@ -26,10 +26,46 @@ func AllowQueryIfSubPolicyPasses(rules ...privacy.QueryRule) privacy.QueryRule {
 	})
 }
 
+func AllowMutationIfSubPolicyPasses(rules ...privacy.MutationRule) privacy.MutationRule {
+	return privacy.MutationRuleFunc(func(c context.Context, m ent.Mutation) error {
+		for _, rule := range rules {
+			switch ret := rule.EvalMutation(c, m); {
+			case errors.Is(ret, privacy.Allow):
+				return privacy.Allow // allow if the subpolicy passes
+			case errors.Is(ret, privacy.Skip):
+				continue // skip any indeterminate subpolicy rules
+			case errors.Is(ret, privacy.Deny):
+				return privacy.Skip // if the subpolicy fails, skip
+			default:
+				return privacy.Deny // if anything else happens, fail-safe and Deny
+			}
+		}
+		return privacy.Skip
+	})
+}
+
 func DenyQueryIfSubPolicyFails(rules ...privacy.QueryRule) privacy.QueryRule {
 	return privacy.QueryRuleFunc(func(c context.Context, q ent.Query) error {
 		for _, rule := range rules {
 			switch ret := rule.EvalQuery(c, q); {
+			case errors.Is(ret, privacy.Allow):
+				return privacy.Skip // if the subpolicy passes, skip
+			case errors.Is(ret, privacy.Skip):
+				continue // skip any indeterminate subpolicy rules
+			case errors.Is(ret, privacy.Deny):
+				return privacy.Deny // deny if the subpolicy fails
+			default:
+				return privacy.Deny // if anything else happens, fail-safe and Deny
+			}
+		}
+		return privacy.Skip
+	})
+}
+
+func DenyMutationIfSubPolicyFails(rules ...privacy.MutationRule) privacy.MutationRule {
+	return privacy.MutationRuleFunc(func(c context.Context, m ent.Mutation) error {
+		for _, rule := range rules {
+			switch ret := rule.EvalMutation(c, m); {
 			case errors.Is(ret, privacy.Allow):
 				return privacy.Skip // if the subpolicy passes, skip
 			case errors.Is(ret, privacy.Skip):

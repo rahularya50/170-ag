@@ -44,6 +44,52 @@ var (
 			},
 		},
 	}
+	// CodingExtensionsColumns holds the columns for the "coding_extensions" table.
+	CodingExtensionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "update_time", Type: field.TypeTime},
+		{Name: "deadline", Type: field.TypeTime},
+		{Name: "coding_extension_student", Type: field.TypeInt, Nullable: true},
+		{Name: "coding_extension_coding_problem", Type: field.TypeInt, Nullable: true},
+	}
+	// CodingExtensionsTable holds the schema information for the "coding_extensions" table.
+	CodingExtensionsTable = &schema.Table{
+		Name:       "coding_extensions",
+		Columns:    CodingExtensionsColumns,
+		PrimaryKey: []*schema.Column{CodingExtensionsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "coding_extensions_users_student",
+				Columns:    []*schema.Column{CodingExtensionsColumns[4]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "coding_extensions_coding_problems_coding_problem",
+				Columns:    []*schema.Column{CodingExtensionsColumns[5]},
+				RefColumns: []*schema.Column{CodingProblemsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "codingextension_coding_extension_student_coding_extension_coding_problem",
+				Unique:  true,
+				Columns: []*schema.Column{CodingExtensionsColumns[4], CodingExtensionsColumns[5]},
+			},
+			{
+				Name:    "codingextension_coding_extension_student",
+				Unique:  false,
+				Columns: []*schema.Column{CodingExtensionsColumns[4]},
+			},
+			{
+				Name:    "codingextension_coding_extension_coding_problem",
+				Unique:  false,
+				Columns: []*schema.Column{CodingExtensionsColumns[5]},
+			},
+		},
+	}
 	// CodingProblemsColumns holds the columns for the "coding_problems" table.
 	CodingProblemsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -210,6 +256,7 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		CodingDraftsTable,
+		CodingExtensionsTable,
 		CodingProblemsTable,
 		CodingSubmissionsTable,
 		CodingSubmissionStaffDataTable,
@@ -222,6 +269,8 @@ var (
 func init() {
 	CodingDraftsTable.ForeignKeys[0].RefTable = UsersTable
 	CodingDraftsTable.ForeignKeys[1].RefTable = CodingProblemsTable
+	CodingExtensionsTable.ForeignKeys[0].RefTable = UsersTable
+	CodingExtensionsTable.ForeignKeys[1].RefTable = CodingProblemsTable
 	CodingSubmissionsTable.ForeignKeys[0].RefTable = UsersTable
 	CodingSubmissionsTable.ForeignKeys[1].RefTable = CodingProblemsTable
 	CodingSubmissionsTable.ForeignKeys[2].RefTable = CodingSubmissionStaffDataTable

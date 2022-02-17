@@ -27,6 +27,8 @@ const (
 	EdgeDrafts = "drafts"
 	// EdgeSubmissions holds the string denoting the submissions edge name in mutations.
 	EdgeSubmissions = "submissions"
+	// EdgeExtensions holds the string denoting the extensions edge name in mutations.
+	EdgeExtensions = "extensions"
 	// Table holds the table name of the user in the database.
 	Table = "users"
 	// DraftsTable is the table that holds the drafts relation/edge.
@@ -43,6 +45,13 @@ const (
 	SubmissionsInverseTable = "coding_submissions"
 	// SubmissionsColumn is the table column denoting the submissions relation/edge.
 	SubmissionsColumn = "coding_submission_author"
+	// ExtensionsTable is the table that holds the extensions relation/edge.
+	ExtensionsTable = "coding_extensions"
+	// ExtensionsInverseTable is the table name for the CodingExtension entity.
+	// It exists in this package in order to avoid circular dependency with the "codingextension" package.
+	ExtensionsInverseTable = "coding_extensions"
+	// ExtensionsColumn is the table column denoting the extensions relation/edge.
+	ExtensionsColumn = "coding_extension_student"
 )
 
 // Columns holds all SQL columns for user fields.

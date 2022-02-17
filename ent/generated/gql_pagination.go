@@ -4,6 +4,7 @@ package generated
 
 import (
 	"170-ag/ent/generated/codingdraft"
+	"170-ag/ent/generated/codingextension"
 	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/codingsubmissionstaffdata"
@@ -462,6 +463,233 @@ func (cd *CodingDraft) ToEdge(order *CodingDraftOrder) *CodingDraftEdge {
 	return &CodingDraftEdge{
 		Node:   cd,
 		Cursor: order.Field.toCursor(cd),
+	}
+}
+
+// CodingExtensionEdge is the edge representation of CodingExtension.
+type CodingExtensionEdge struct {
+	Node   *CodingExtension `json:"node"`
+	Cursor Cursor           `json:"cursor"`
+}
+
+// CodingExtensionConnection is the connection containing edges to CodingExtension.
+type CodingExtensionConnection struct {
+	Edges      []*CodingExtensionEdge `json:"edges"`
+	PageInfo   PageInfo               `json:"pageInfo"`
+	TotalCount int                    `json:"totalCount"`
+}
+
+// CodingExtensionPaginateOption enables pagination customization.
+type CodingExtensionPaginateOption func(*codingExtensionPager) error
+
+// WithCodingExtensionOrder configures pagination ordering.
+func WithCodingExtensionOrder(order *CodingExtensionOrder) CodingExtensionPaginateOption {
+	if order == nil {
+		order = DefaultCodingExtensionOrder
+	}
+	o := *order
+	return func(pager *codingExtensionPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultCodingExtensionOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithCodingExtensionFilter configures pagination filter.
+func WithCodingExtensionFilter(filter func(*CodingExtensionQuery) (*CodingExtensionQuery, error)) CodingExtensionPaginateOption {
+	return func(pager *codingExtensionPager) error {
+		if filter == nil {
+			return errors.New("CodingExtensionQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type codingExtensionPager struct {
+	order  *CodingExtensionOrder
+	filter func(*CodingExtensionQuery) (*CodingExtensionQuery, error)
+}
+
+func newCodingExtensionPager(opts []CodingExtensionPaginateOption) (*codingExtensionPager, error) {
+	pager := &codingExtensionPager{}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultCodingExtensionOrder
+	}
+	return pager, nil
+}
+
+func (p *codingExtensionPager) applyFilter(query *CodingExtensionQuery) (*CodingExtensionQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *codingExtensionPager) toCursor(ce *CodingExtension) Cursor {
+	return p.order.Field.toCursor(ce)
+}
+
+func (p *codingExtensionPager) applyCursors(query *CodingExtensionQuery, after, before *Cursor) *CodingExtensionQuery {
+	for _, predicate := range cursorsToPredicates(
+		p.order.Direction, after, before,
+		p.order.Field.field, DefaultCodingExtensionOrder.Field.field,
+	) {
+		query = query.Where(predicate)
+	}
+	return query
+}
+
+func (p *codingExtensionPager) applyOrder(query *CodingExtensionQuery, reverse bool) *CodingExtensionQuery {
+	direction := p.order.Direction
+	if reverse {
+		direction = direction.reverse()
+	}
+	query = query.Order(direction.orderFunc(p.order.Field.field))
+	if p.order.Field != DefaultCodingExtensionOrder.Field {
+		query = query.Order(direction.orderFunc(DefaultCodingExtensionOrder.Field.field))
+	}
+	return query
+}
+
+// Paginate executes the query and returns a relay based cursor connection to CodingExtension.
+func (ce *CodingExtensionQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...CodingExtensionPaginateOption,
+) (*CodingExtensionConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newCodingExtensionPager(opts)
+	if err != nil {
+		return nil, err
+	}
+
+	if ce, err = pager.applyFilter(ce); err != nil {
+		return nil, err
+	}
+
+	conn := &CodingExtensionConnection{Edges: []*CodingExtensionEdge{}}
+	if !hasCollectedField(ctx, edgesField) || first != nil && *first == 0 || last != nil && *last == 0 {
+		if hasCollectedField(ctx, totalCountField) ||
+			hasCollectedField(ctx, pageInfoField) {
+			count, err := ce.Count(ctx)
+			if err != nil {
+				return nil, err
+			}
+			conn.TotalCount = count
+			conn.PageInfo.HasNextPage = first != nil && count > 0
+			conn.PageInfo.HasPreviousPage = last != nil && count > 0
+		}
+		return conn, nil
+	}
+
+	if (after != nil || first != nil || before != nil || last != nil) && hasCollectedField(ctx, totalCountField) {
+		count, err := ce.Clone().Count(ctx)
+		if err != nil {
+			return nil, err
+		}
+		conn.TotalCount = count
+	}
+
+	ce = pager.applyCursors(ce, after, before)
+	ce = pager.applyOrder(ce, last != nil)
+	var limit int
+	if first != nil {
+		limit = *first + 1
+	} else if last != nil {
+		limit = *last + 1
+	}
+	if limit > 0 {
+		ce = ce.Limit(limit)
+	}
+
+	if field := getCollectedField(ctx, edgesField, nodeField); field != nil {
+		ce = ce.collectField(graphql.GetOperationContext(ctx), *field)
+	}
+
+	nodes, err := ce.All(ctx)
+	if err != nil || len(nodes) == 0 {
+		return conn, err
+	}
+
+	if len(nodes) == limit {
+		conn.PageInfo.HasNextPage = first != nil
+		conn.PageInfo.HasPreviousPage = last != nil
+		nodes = nodes[:len(nodes)-1]
+	}
+
+	var nodeAt func(int) *CodingExtension
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *CodingExtension {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *CodingExtension {
+			return nodes[i]
+		}
+	}
+
+	conn.Edges = make([]*CodingExtensionEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		conn.Edges[i] = &CodingExtensionEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+
+	conn.PageInfo.StartCursor = &conn.Edges[0].Cursor
+	conn.PageInfo.EndCursor = &conn.Edges[len(conn.Edges)-1].Cursor
+	if conn.TotalCount == 0 {
+		conn.TotalCount = len(nodes)
+	}
+
+	return conn, nil
+}
+
+// CodingExtensionOrderField defines the ordering field of CodingExtension.
+type CodingExtensionOrderField struct {
+	field    string
+	toCursor func(*CodingExtension) Cursor
+}
+
+// CodingExtensionOrder defines the ordering of CodingExtension.
+type CodingExtensionOrder struct {
+	Direction OrderDirection             `json:"direction"`
+	Field     *CodingExtensionOrderField `json:"field"`
+}
+
+// DefaultCodingExtensionOrder is the default ordering of CodingExtension.
+var DefaultCodingExtensionOrder = &CodingExtensionOrder{
+	Direction: OrderDirectionAsc,
+	Field: &CodingExtensionOrderField{
+		field: codingextension.FieldID,
+		toCursor: func(ce *CodingExtension) Cursor {
+			return Cursor{ID: ce.ID}
+		},
+	},
+}
+
+// ToEdge converts CodingExtension into CodingExtensionEdge.
+func (ce *CodingExtension) ToEdge(order *CodingExtensionOrder) *CodingExtensionEdge {
+	if order == nil {
+		order = DefaultCodingExtensionOrder
+	}
+	return &CodingExtensionEdge{
+		Node:   ce,
+		Cursor: order.Field.toCursor(ce),
 	}
 }
 

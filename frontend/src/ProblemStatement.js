@@ -33,6 +33,7 @@ export default function ProblemStatement(props: Props): React.Node {
         id
         name
         deadline
+        my_deadline
         statement
         released
       }
@@ -116,7 +117,7 @@ export default function ProblemStatement(props: Props): React.Node {
               day: "numeric",
               month: "numeric",
               year: "numeric",
-            }).format(new Date(problem.deadline))}
+            }).format(new Date(problem.my_deadline))}
           </i>
         </div>
       )}

@@ -9,6 +9,9 @@ import (
 // CodingDraft is the predicate function for codingdraft builders.
 type CodingDraft func(*sql.Selector)
 
+// CodingExtension is the predicate function for codingextension builders.
+type CodingExtension func(*sql.Selector)
+
 // CodingProblem is the predicate function for codingproblem builders.
 type CodingProblem func(*sql.Selector)
 

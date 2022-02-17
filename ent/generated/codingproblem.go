@@ -43,9 +43,11 @@ type CodingProblemEdges struct {
 	TestCases []*CodingTestCase `json:"test_cases,omitempty"`
 	// Submissions holds the value of the submissions edge.
 	Submissions []*CodingSubmission `json:"submissions,omitempty"`
+	// Extensions holds the value of the extensions edge.
+	Extensions []*CodingExtension `json:"extensions,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 }
 
 // DraftsOrErr returns the Drafts value or an error if the edge
@@ -73,6 +75,15 @@ func (e CodingProblemEdges) SubmissionsOrErr() ([]*CodingSubmission, error) {
 		return e.Submissions, nil
 	}
 	return nil, &NotLoadedError{edge: "submissions"}
+}
+
+// ExtensionsOrErr returns the Extensions value or an error if the edge
+// was not loaded in eager-loading.
+func (e CodingProblemEdges) ExtensionsOrErr() ([]*CodingExtension, error) {
+	if e.loadedTypes[3] {
+		return e.Extensions, nil
+	}
+	return nil, &NotLoadedError{edge: "extensions"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -169,6 +180,11 @@ func (cp *CodingProblem) QueryTestCases() *CodingTestCaseQuery {
 // QuerySubmissions queries the "submissions" edge of the CodingProblem entity.
 func (cp *CodingProblem) QuerySubmissions() *CodingSubmissionQuery {
 	return (&CodingProblemClient{config: cp.config}).QuerySubmissions(cp)
+}
+
+// QueryExtensions queries the "extensions" edge of the CodingProblem entity.
+func (cp *CodingProblem) QueryExtensions() *CodingExtensionQuery {
+	return (&CodingProblemClient{config: cp.config}).QueryExtensions(cp)
 }
 
 // Update returns a builder for updating this CodingProblem.

@@ -4,6 +4,7 @@ package runtime
 
 import (
 	"170-ag/ent/generated/codingdraft"
+	"170-ag/ent/generated/codingextension"
 	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/codingsubmissionstaffdata"
@@ -46,6 +47,30 @@ func init() {
 	codingdraft.DefaultUpdateTime = codingdraftDescUpdateTime.Default.(func() time.Time)
 	// codingdraft.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
 	codingdraft.UpdateDefaultUpdateTime = codingdraftDescUpdateTime.UpdateDefault.(func() time.Time)
+	codingextensionMixin := schema.CodingExtension{}.Mixin()
+	codingextension.Policy = privacy.NewPolicies(schema.CodingExtension{})
+	codingextension.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := codingextension.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	codingextensionMixinFields0 := codingextensionMixin[0].Fields()
+	_ = codingextensionMixinFields0
+	codingextensionFields := schema.CodingExtension{}.Fields()
+	_ = codingextensionFields
+	// codingextensionDescCreateTime is the schema descriptor for create_time field.
+	codingextensionDescCreateTime := codingextensionMixinFields0[0].Descriptor()
+	// codingextension.DefaultCreateTime holds the default value on creation for the create_time field.
+	codingextension.DefaultCreateTime = codingextensionDescCreateTime.Default.(func() time.Time)
+	// codingextensionDescUpdateTime is the schema descriptor for update_time field.
+	codingextensionDescUpdateTime := codingextensionMixinFields0[1].Descriptor()
+	// codingextension.DefaultUpdateTime holds the default value on creation for the update_time field.
+	codingextension.DefaultUpdateTime = codingextensionDescUpdateTime.Default.(func() time.Time)
+	// codingextension.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	codingextension.UpdateDefaultUpdateTime = codingextensionDescUpdateTime.UpdateDefault.(func() time.Time)
 	codingproblemMixin := schema.CodingProblem{}.Mixin()
 	codingproblem.Policy = privacy.NewPolicies(schema.CodingProblem{})
 	codingproblem.Hooks[0] = func(next ent.Mutator) ent.Mutator {

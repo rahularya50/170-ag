@@ -4,6 +4,7 @@ package generated
 
 import (
 	"170-ag/ent/generated/codingdraft"
+	"170-ag/ent/generated/codingextension"
 	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/codingsubmissionstaffdata"
@@ -36,6 +37,7 @@ type OrderFunc func(*sql.Selector)
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
 		codingdraft.Table:               codingdraft.ValidColumn,
+		codingextension.Table:           codingextension.ValidColumn,
 		codingproblem.Table:             codingproblem.ValidColumn,
 		codingsubmission.Table:          codingsubmission.ValidColumn,
 		codingsubmissionstaffdata.Table: codingsubmissionstaffdata.ValidColumn,

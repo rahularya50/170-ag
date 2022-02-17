@@ -21,6 +21,19 @@ func (f CodingDraftFunc) Mutate(ctx context.Context, m generated.Mutation) (gene
 	return f(ctx, mv)
 }
 
+// The CodingExtensionFunc type is an adapter to allow the use of ordinary
+// function as CodingExtension mutator.
+type CodingExtensionFunc func(context.Context, *generated.CodingExtensionMutation) (generated.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CodingExtensionFunc) Mutate(ctx context.Context, m generated.Mutation) (generated.Value, error) {
+	mv, ok := m.(*generated.CodingExtensionMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *generated.CodingExtensionMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The CodingProblemFunc type is an adapter to allow the use of ordinary
 // function as CodingProblem mutator.
 type CodingProblemFunc func(context.Context, *generated.CodingProblemMutation) (generated.Value, error)

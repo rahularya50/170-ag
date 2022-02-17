@@ -188,6 +188,30 @@ func (f CodingDraftMutationRuleFunc) EvalMutation(ctx context.Context, m generat
 	return Denyf("generated/privacy: unexpected mutation type %T, expect *generated.CodingDraftMutation", m)
 }
 
+// The CodingExtensionQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type CodingExtensionQueryRuleFunc func(context.Context, *generated.CodingExtensionQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f CodingExtensionQueryRuleFunc) EvalQuery(ctx context.Context, q generated.Query) error {
+	if q, ok := q.(*generated.CodingExtensionQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("generated/privacy: unexpected query type %T, expect *generated.CodingExtensionQuery", q)
+}
+
+// The CodingExtensionMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type CodingExtensionMutationRuleFunc func(context.Context, *generated.CodingExtensionMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f CodingExtensionMutationRuleFunc) EvalMutation(ctx context.Context, m generated.Mutation) error {
+	if m, ok := m.(*generated.CodingExtensionMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("generated/privacy: unexpected mutation type %T, expect *generated.CodingExtensionMutation", m)
+}
+
 // The CodingProblemQueryRuleFunc type is an adapter to allow the use of ordinary
 // functions as a query rule.
 type CodingProblemQueryRuleFunc func(context.Context, *generated.CodingProblemQuery) error
@@ -369,6 +393,8 @@ func queryFilter(q generated.Query) (Filter, error) {
 	switch q := q.(type) {
 	case *generated.CodingDraftQuery:
 		return q.Filter(), nil
+	case *generated.CodingExtensionQuery:
+		return q.Filter(), nil
 	case *generated.CodingProblemQuery:
 		return q.Filter(), nil
 	case *generated.CodingSubmissionQuery:
@@ -389,6 +415,8 @@ func queryFilter(q generated.Query) (Filter, error) {
 func mutationFilter(m generated.Mutation) (Filter, error) {
 	switch m := m.(type) {
 	case *generated.CodingDraftMutation:
+		return m.Filter(), nil
+	case *generated.CodingExtensionMutation:
 		return m.Filter(), nil
 	case *generated.CodingProblemMutation:
 		return m.Filter(), nil

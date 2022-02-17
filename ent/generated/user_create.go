@@ -4,6 +4,7 @@ package generated
 
 import (
 	"170-ag/ent/generated/codingdraft"
+	"170-ag/ent/generated/codingextension"
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/user"
 	"context"
@@ -114,6 +115,21 @@ func (uc *UserCreate) AddSubmissions(c ...*CodingSubmission) *UserCreate {
 		ids[i] = c[i].ID
 	}
 	return uc.AddSubmissionIDs(ids...)
+}
+
+// AddExtensionIDs adds the "extensions" edge to the CodingExtension entity by IDs.
+func (uc *UserCreate) AddExtensionIDs(ids ...int) *UserCreate {
+	uc.mutation.AddExtensionIDs(ids...)
+	return uc
+}
+
+// AddExtensions adds the "extensions" edges to the CodingExtension entity.
+func (uc *UserCreate) AddExtensions(c ...*CodingExtension) *UserCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uc.AddExtensionIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -332,6 +348,25 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: codingsubmission.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.ExtensionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.ExtensionsTable,
+			Columns: []string{user.ExtensionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingextension.FieldID,
 				},
 			},
 		}

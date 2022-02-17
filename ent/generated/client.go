@@ -10,6 +10,7 @@ import (
 	"170-ag/ent/generated/migrate"
 
 	"170-ag/ent/generated/codingdraft"
+	"170-ag/ent/generated/codingextension"
 	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/codingsubmissionstaffdata"
@@ -29,6 +30,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// CodingDraft is the client for interacting with the CodingDraft builders.
 	CodingDraft *CodingDraftClient
+	// CodingExtension is the client for interacting with the CodingExtension builders.
+	CodingExtension *CodingExtensionClient
 	// CodingProblem is the client for interacting with the CodingProblem builders.
 	CodingProblem *CodingProblemClient
 	// CodingSubmission is the client for interacting with the CodingSubmission builders.
@@ -57,6 +60,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.CodingDraft = NewCodingDraftClient(c.config)
+	c.CodingExtension = NewCodingExtensionClient(c.config)
 	c.CodingProblem = NewCodingProblemClient(c.config)
 	c.CodingSubmission = NewCodingSubmissionClient(c.config)
 	c.CodingSubmissionStaffData = NewCodingSubmissionStaffDataClient(c.config)
@@ -97,6 +101,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:                       ctx,
 		config:                    cfg,
 		CodingDraft:               NewCodingDraftClient(cfg),
+		CodingExtension:           NewCodingExtensionClient(cfg),
 		CodingProblem:             NewCodingProblemClient(cfg),
 		CodingSubmission:          NewCodingSubmissionClient(cfg),
 		CodingSubmissionStaffData: NewCodingSubmissionStaffDataClient(cfg),
@@ -123,6 +128,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:                       ctx,
 		config:                    cfg,
 		CodingDraft:               NewCodingDraftClient(cfg),
+		CodingExtension:           NewCodingExtensionClient(cfg),
 		CodingProblem:             NewCodingProblemClient(cfg),
 		CodingSubmission:          NewCodingSubmissionClient(cfg),
 		CodingSubmissionStaffData: NewCodingSubmissionStaffDataClient(cfg),
@@ -159,6 +165,7 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.CodingDraft.Use(hooks...)
+	c.CodingExtension.Use(hooks...)
 	c.CodingProblem.Use(hooks...)
 	c.CodingSubmission.Use(hooks...)
 	c.CodingSubmissionStaffData.Use(hooks...)
@@ -290,6 +297,129 @@ func (c *CodingDraftClient) Hooks() []Hook {
 	return append(hooks[:len(hooks):len(hooks)], codingdraft.Hooks[:]...)
 }
 
+// CodingExtensionClient is a client for the CodingExtension schema.
+type CodingExtensionClient struct {
+	config
+}
+
+// NewCodingExtensionClient returns a client for the CodingExtension from the given config.
+func NewCodingExtensionClient(c config) *CodingExtensionClient {
+	return &CodingExtensionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `codingextension.Hooks(f(g(h())))`.
+func (c *CodingExtensionClient) Use(hooks ...Hook) {
+	c.hooks.CodingExtension = append(c.hooks.CodingExtension, hooks...)
+}
+
+// Create returns a create builder for CodingExtension.
+func (c *CodingExtensionClient) Create() *CodingExtensionCreate {
+	mutation := newCodingExtensionMutation(c.config, OpCreate)
+	return &CodingExtensionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of CodingExtension entities.
+func (c *CodingExtensionClient) CreateBulk(builders ...*CodingExtensionCreate) *CodingExtensionCreateBulk {
+	return &CodingExtensionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for CodingExtension.
+func (c *CodingExtensionClient) Update() *CodingExtensionUpdate {
+	mutation := newCodingExtensionMutation(c.config, OpUpdate)
+	return &CodingExtensionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CodingExtensionClient) UpdateOne(ce *CodingExtension) *CodingExtensionUpdateOne {
+	mutation := newCodingExtensionMutation(c.config, OpUpdateOne, withCodingExtension(ce))
+	return &CodingExtensionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CodingExtensionClient) UpdateOneID(id int) *CodingExtensionUpdateOne {
+	mutation := newCodingExtensionMutation(c.config, OpUpdateOne, withCodingExtensionID(id))
+	return &CodingExtensionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for CodingExtension.
+func (c *CodingExtensionClient) Delete() *CodingExtensionDelete {
+	mutation := newCodingExtensionMutation(c.config, OpDelete)
+	return &CodingExtensionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *CodingExtensionClient) DeleteOne(ce *CodingExtension) *CodingExtensionDeleteOne {
+	return c.DeleteOneID(ce.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *CodingExtensionClient) DeleteOneID(id int) *CodingExtensionDeleteOne {
+	builder := c.Delete().Where(codingextension.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CodingExtensionDeleteOne{builder}
+}
+
+// Query returns a query builder for CodingExtension.
+func (c *CodingExtensionClient) Query() *CodingExtensionQuery {
+	return &CodingExtensionQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a CodingExtension entity by its id.
+func (c *CodingExtensionClient) Get(ctx context.Context, id int) (*CodingExtension, error) {
+	return c.Query().Where(codingextension.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CodingExtensionClient) GetX(ctx context.Context, id int) *CodingExtension {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryStudent queries the student edge of a CodingExtension.
+func (c *CodingExtensionClient) QueryStudent(ce *CodingExtension) *UserQuery {
+	query := &UserQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := ce.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(codingextension.Table, codingextension.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, codingextension.StudentTable, codingextension.StudentColumn),
+		)
+		fromV = sqlgraph.Neighbors(ce.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCodingProblem queries the coding_problem edge of a CodingExtension.
+func (c *CodingExtensionClient) QueryCodingProblem(ce *CodingExtension) *CodingProblemQuery {
+	query := &CodingProblemQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := ce.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(codingextension.Table, codingextension.FieldID, id),
+			sqlgraph.To(codingproblem.Table, codingproblem.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, codingextension.CodingProblemTable, codingextension.CodingProblemColumn),
+		)
+		fromV = sqlgraph.Neighbors(ce.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *CodingExtensionClient) Hooks() []Hook {
+	hooks := c.hooks.CodingExtension
+	return append(hooks[:len(hooks):len(hooks)], codingextension.Hooks[:]...)
+}
+
 // CodingProblemClient is a client for the CodingProblem schema.
 type CodingProblemClient struct {
 	config
@@ -416,6 +546,22 @@ func (c *CodingProblemClient) QuerySubmissions(cp *CodingProblem) *CodingSubmiss
 			sqlgraph.From(codingproblem.Table, codingproblem.FieldID, id),
 			sqlgraph.To(codingsubmission.Table, codingsubmission.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, codingproblem.SubmissionsTable, codingproblem.SubmissionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(cp.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryExtensions queries the extensions edge of a CodingProblem.
+func (c *CodingProblemClient) QueryExtensions(cp *CodingProblem) *CodingExtensionQuery {
+	query := &CodingExtensionQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := cp.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(codingproblem.Table, codingproblem.FieldID, id),
+			sqlgraph.To(codingextension.Table, codingextension.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, codingproblem.ExtensionsTable, codingproblem.ExtensionsColumn),
 		)
 		fromV = sqlgraph.Neighbors(cp.driver.Dialect(), step)
 		return fromV, nil
@@ -1015,6 +1161,22 @@ func (c *UserClient) QuerySubmissions(u *User) *CodingSubmissionQuery {
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(codingsubmission.Table, codingsubmission.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, user.SubmissionsTable, user.SubmissionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryExtensions queries the extensions edge of a User.
+func (c *UserClient) QueryExtensions(u *User) *CodingExtensionQuery {
+	query := &CodingExtensionQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(codingextension.Table, codingextension.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, user.ExtensionsTable, user.ExtensionsColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil

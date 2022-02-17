@@ -4,6 +4,7 @@ package generated
 
 import (
 	"170-ag/ent/generated/codingdraft"
+	"170-ag/ent/generated/codingextension"
 	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/codingtestcase"
@@ -152,6 +153,21 @@ func (cpu *CodingProblemUpdate) AddSubmissions(c ...*CodingSubmission) *CodingPr
 	return cpu.AddSubmissionIDs(ids...)
 }
 
+// AddExtensionIDs adds the "extensions" edge to the CodingExtension entity by IDs.
+func (cpu *CodingProblemUpdate) AddExtensionIDs(ids ...int) *CodingProblemUpdate {
+	cpu.mutation.AddExtensionIDs(ids...)
+	return cpu
+}
+
+// AddExtensions adds the "extensions" edges to the CodingExtension entity.
+func (cpu *CodingProblemUpdate) AddExtensions(c ...*CodingExtension) *CodingProblemUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cpu.AddExtensionIDs(ids...)
+}
+
 // Mutation returns the CodingProblemMutation object of the builder.
 func (cpu *CodingProblemUpdate) Mutation() *CodingProblemMutation {
 	return cpu.mutation
@@ -218,6 +234,27 @@ func (cpu *CodingProblemUpdate) RemoveSubmissions(c ...*CodingSubmission) *Codin
 		ids[i] = c[i].ID
 	}
 	return cpu.RemoveSubmissionIDs(ids...)
+}
+
+// ClearExtensions clears all "extensions" edges to the CodingExtension entity.
+func (cpu *CodingProblemUpdate) ClearExtensions() *CodingProblemUpdate {
+	cpu.mutation.ClearExtensions()
+	return cpu
+}
+
+// RemoveExtensionIDs removes the "extensions" edge to CodingExtension entities by IDs.
+func (cpu *CodingProblemUpdate) RemoveExtensionIDs(ids ...int) *CodingProblemUpdate {
+	cpu.mutation.RemoveExtensionIDs(ids...)
+	return cpu
+}
+
+// RemoveExtensions removes "extensions" edges to CodingExtension entities.
+func (cpu *CodingProblemUpdate) RemoveExtensions(c ...*CodingExtension) *CodingProblemUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cpu.RemoveExtensionIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -532,6 +569,60 @@ func (cpu *CodingProblemUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if cpu.mutation.ExtensionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   codingproblem.ExtensionsTable,
+			Columns: []string{codingproblem.ExtensionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingextension.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cpu.mutation.RemovedExtensionsIDs(); len(nodes) > 0 && !cpu.mutation.ExtensionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   codingproblem.ExtensionsTable,
+			Columns: []string{codingproblem.ExtensionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingextension.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cpu.mutation.ExtensionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   codingproblem.ExtensionsTable,
+			Columns: []string{codingproblem.ExtensionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingextension.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, cpu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{codingproblem.Label}
@@ -672,6 +763,21 @@ func (cpuo *CodingProblemUpdateOne) AddSubmissions(c ...*CodingSubmission) *Codi
 	return cpuo.AddSubmissionIDs(ids...)
 }
 
+// AddExtensionIDs adds the "extensions" edge to the CodingExtension entity by IDs.
+func (cpuo *CodingProblemUpdateOne) AddExtensionIDs(ids ...int) *CodingProblemUpdateOne {
+	cpuo.mutation.AddExtensionIDs(ids...)
+	return cpuo
+}
+
+// AddExtensions adds the "extensions" edges to the CodingExtension entity.
+func (cpuo *CodingProblemUpdateOne) AddExtensions(c ...*CodingExtension) *CodingProblemUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cpuo.AddExtensionIDs(ids...)
+}
+
 // Mutation returns the CodingProblemMutation object of the builder.
 func (cpuo *CodingProblemUpdateOne) Mutation() *CodingProblemMutation {
 	return cpuo.mutation
@@ -738,6 +844,27 @@ func (cpuo *CodingProblemUpdateOne) RemoveSubmissions(c ...*CodingSubmission) *C
 		ids[i] = c[i].ID
 	}
 	return cpuo.RemoveSubmissionIDs(ids...)
+}
+
+// ClearExtensions clears all "extensions" edges to the CodingExtension entity.
+func (cpuo *CodingProblemUpdateOne) ClearExtensions() *CodingProblemUpdateOne {
+	cpuo.mutation.ClearExtensions()
+	return cpuo
+}
+
+// RemoveExtensionIDs removes the "extensions" edge to CodingExtension entities by IDs.
+func (cpuo *CodingProblemUpdateOne) RemoveExtensionIDs(ids ...int) *CodingProblemUpdateOne {
+	cpuo.mutation.RemoveExtensionIDs(ids...)
+	return cpuo
+}
+
+// RemoveExtensions removes "extensions" edges to CodingExtension entities.
+func (cpuo *CodingProblemUpdateOne) RemoveExtensions(c ...*CodingExtension) *CodingProblemUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cpuo.RemoveExtensionIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -1068,6 +1195,60 @@ func (cpuo *CodingProblemUpdateOne) sqlSave(ctx context.Context) (_node *CodingP
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: codingsubmission.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cpuo.mutation.ExtensionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   codingproblem.ExtensionsTable,
+			Columns: []string{codingproblem.ExtensionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingextension.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cpuo.mutation.RemovedExtensionsIDs(); len(nodes) > 0 && !cpuo.mutation.ExtensionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   codingproblem.ExtensionsTable,
+			Columns: []string{codingproblem.ExtensionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingextension.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cpuo.mutation.ExtensionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   codingproblem.ExtensionsTable,
+			Columns: []string{codingproblem.ExtensionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingextension.FieldID,
 				},
 			},
 		}

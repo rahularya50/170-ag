@@ -15,7 +15,6 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
 const defaultPort = "8080"
@@ -40,9 +39,9 @@ func main() {
 	}
 
 	gqlServer := handler.NewDefaultServer(resolvers.NewSchema(client))
-	gqlServer.SetErrorPresenter(func(ctx context.Context, err error) *gqlerror.Error {
-		return gqlerror.Errorf("something went wrong")
-	})
+	// gqlServer.SetErrorPresenter(func(ctx context.Context, err error) *gqlerror.Error {
+	// 	return gqlerror.Errorf("something went wrong")
+	// })
 	gqlServer.Use(extension.FixedComplexityLimit(250))
 
 	srv := web.HandlerWithViewerContext(gqlServer, client)

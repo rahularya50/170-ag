@@ -4,6 +4,7 @@ package generated
 
 import (
 	"170-ag/ent/generated/codingdraft"
+	"170-ag/ent/generated/codingextension"
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/predicate"
 	"170-ag/ent/generated/user"
@@ -100,6 +101,21 @@ func (uu *UserUpdate) AddSubmissions(c ...*CodingSubmission) *UserUpdate {
 	return uu.AddSubmissionIDs(ids...)
 }
 
+// AddExtensionIDs adds the "extensions" edge to the CodingExtension entity by IDs.
+func (uu *UserUpdate) AddExtensionIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddExtensionIDs(ids...)
+	return uu
+}
+
+// AddExtensions adds the "extensions" edges to the CodingExtension entity.
+func (uu *UserUpdate) AddExtensions(c ...*CodingExtension) *UserUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uu.AddExtensionIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
@@ -145,6 +161,27 @@ func (uu *UserUpdate) RemoveSubmissions(c ...*CodingSubmission) *UserUpdate {
 		ids[i] = c[i].ID
 	}
 	return uu.RemoveSubmissionIDs(ids...)
+}
+
+// ClearExtensions clears all "extensions" edges to the CodingExtension entity.
+func (uu *UserUpdate) ClearExtensions() *UserUpdate {
+	uu.mutation.ClearExtensions()
+	return uu
+}
+
+// RemoveExtensionIDs removes the "extensions" edge to CodingExtension entities by IDs.
+func (uu *UserUpdate) RemoveExtensionIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveExtensionIDs(ids...)
+	return uu
+}
+
+// RemoveExtensions removes "extensions" edges to CodingExtension entities.
+func (uu *UserUpdate) RemoveExtensions(c ...*CodingExtension) *UserUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uu.RemoveExtensionIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -385,6 +422,60 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if uu.mutation.ExtensionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.ExtensionsTable,
+			Columns: []string{user.ExtensionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingextension.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedExtensionsIDs(); len(nodes) > 0 && !uu.mutation.ExtensionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.ExtensionsTable,
+			Columns: []string{user.ExtensionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingextension.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.ExtensionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.ExtensionsTable,
+			Columns: []string{user.ExtensionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingextension.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
@@ -474,6 +565,21 @@ func (uuo *UserUpdateOne) AddSubmissions(c ...*CodingSubmission) *UserUpdateOne 
 	return uuo.AddSubmissionIDs(ids...)
 }
 
+// AddExtensionIDs adds the "extensions" edge to the CodingExtension entity by IDs.
+func (uuo *UserUpdateOne) AddExtensionIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddExtensionIDs(ids...)
+	return uuo
+}
+
+// AddExtensions adds the "extensions" edges to the CodingExtension entity.
+func (uuo *UserUpdateOne) AddExtensions(c ...*CodingExtension) *UserUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uuo.AddExtensionIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
@@ -519,6 +625,27 @@ func (uuo *UserUpdateOne) RemoveSubmissions(c ...*CodingSubmission) *UserUpdateO
 		ids[i] = c[i].ID
 	}
 	return uuo.RemoveSubmissionIDs(ids...)
+}
+
+// ClearExtensions clears all "extensions" edges to the CodingExtension entity.
+func (uuo *UserUpdateOne) ClearExtensions() *UserUpdateOne {
+	uuo.mutation.ClearExtensions()
+	return uuo
+}
+
+// RemoveExtensionIDs removes the "extensions" edge to CodingExtension entities by IDs.
+func (uuo *UserUpdateOne) RemoveExtensionIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveExtensionIDs(ids...)
+	return uuo
+}
+
+// RemoveExtensions removes "extensions" edges to CodingExtension entities.
+func (uuo *UserUpdateOne) RemoveExtensions(c ...*CodingExtension) *UserUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uuo.RemoveExtensionIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -775,6 +902,60 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: codingsubmission.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.ExtensionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.ExtensionsTable,
+			Columns: []string{user.ExtensionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingextension.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedExtensionsIDs(); len(nodes) > 0 && !uuo.mutation.ExtensionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.ExtensionsTable,
+			Columns: []string{user.ExtensionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingextension.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.ExtensionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.ExtensionsTable,
+			Columns: []string{user.ExtensionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: codingextension.FieldID,
 				},
 			},
 		}

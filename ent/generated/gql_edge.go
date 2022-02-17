@@ -20,6 +20,22 @@ func (cd *CodingDraft) CodingProblem(ctx context.Context) (*CodingProblem, error
 	return result, err
 }
 
+func (ce *CodingExtension) Student(ctx context.Context) (*User, error) {
+	result, err := ce.Edges.StudentOrErr()
+	if IsNotLoaded(err) {
+		result, err = ce.QueryStudent().Only(ctx)
+	}
+	return result, err
+}
+
+func (ce *CodingExtension) CodingProblem(ctx context.Context) (*CodingProblem, error) {
+	result, err := ce.Edges.CodingProblemOrErr()
+	if IsNotLoaded(err) {
+		result, err = ce.QueryCodingProblem().Only(ctx)
+	}
+	return result, err
+}
+
 func (cp *CodingProblem) Drafts(ctx context.Context) ([]*CodingDraft, error) {
 	result, err := cp.Edges.DraftsOrErr()
 	if IsNotLoaded(err) {
@@ -40,6 +56,14 @@ func (cp *CodingProblem) Submissions(ctx context.Context) ([]*CodingSubmission, 
 	result, err := cp.Edges.SubmissionsOrErr()
 	if IsNotLoaded(err) {
 		result, err = cp.QuerySubmissions().All(ctx)
+	}
+	return result, err
+}
+
+func (cp *CodingProblem) Extensions(ctx context.Context) ([]*CodingExtension, error) {
+	result, err := cp.Edges.ExtensionsOrErr()
+	if IsNotLoaded(err) {
+		result, err = cp.QueryExtensions().All(ctx)
 	}
 	return result, err
 }
@@ -112,6 +136,14 @@ func (u *User) Submissions(ctx context.Context) ([]*CodingSubmission, error) {
 	result, err := u.Edges.SubmissionsOrErr()
 	if IsNotLoaded(err) {
 		result, err = u.QuerySubmissions().All(ctx)
+	}
+	return result, err
+}
+
+func (u *User) Extensions(ctx context.Context) ([]*CodingExtension, error) {
+	result, err := u.Edges.ExtensionsOrErr()
+	if IsNotLoaded(err) {
+		result, err = u.QueryExtensions().All(ctx)
 	}
 	return result, err
 }

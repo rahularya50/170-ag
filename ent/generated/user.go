@@ -37,9 +37,11 @@ type UserEdges struct {
 	Drafts []*CodingDraft `json:"drafts,omitempty"`
 	// Submissions holds the value of the submissions edge.
 	Submissions []*CodingSubmission `json:"submissions,omitempty"`
+	// Extensions holds the value of the extensions edge.
+	Extensions []*CodingExtension `json:"extensions,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // DraftsOrErr returns the Drafts value or an error if the edge
@@ -58,6 +60,15 @@ func (e UserEdges) SubmissionsOrErr() ([]*CodingSubmission, error) {
 		return e.Submissions, nil
 	}
 	return nil, &NotLoadedError{edge: "submissions"}
+}
+
+// ExtensionsOrErr returns the Extensions value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) ExtensionsOrErr() ([]*CodingExtension, error) {
+	if e.loadedTypes[2] {
+		return e.Extensions, nil
+	}
+	return nil, &NotLoadedError{edge: "extensions"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -137,6 +148,11 @@ func (u *User) QueryDrafts() *CodingDraftQuery {
 // QuerySubmissions queries the "submissions" edge of the User entity.
 func (u *User) QuerySubmissions() *CodingSubmissionQuery {
 	return (&UserClient{config: u.config}).QuerySubmissions(u)
+}
+
+// QueryExtensions queries the "extensions" edge of the User entity.
+func (u *User) QueryExtensions() *CodingExtensionQuery {
+	return (&UserClient{config: u.config}).QueryExtensions(u)
 }
 
 // Update returns a builder for updating this User.

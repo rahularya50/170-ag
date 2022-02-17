@@ -586,6 +586,34 @@ func HasSubmissionsWith(preds ...predicate.CodingSubmission) predicate.User {
 	})
 }
 
+// HasExtensions applies the HasEdge predicate on the "extensions" edge.
+func HasExtensions() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ExtensionsTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, ExtensionsTable, ExtensionsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasExtensionsWith applies the HasEdge predicate on the "extensions" edge with a given conditions (other predicates).
+func HasExtensionsWith(preds ...predicate.CodingExtension) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ExtensionsInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, ExtensionsTable, ExtensionsColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.User) predicate.User {
 	return predicate.User(func(s *sql.Selector) {

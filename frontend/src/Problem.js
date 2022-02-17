@@ -3,11 +3,12 @@
 import graphql from "babel-plugin-relay/macro";
 import * as React from "react";
 import { useState } from "react";
-import { Col, Container, Row, Tab, Tabs } from "react-bootstrap";
+import { Button, Col, Container, Modal, Row, Tab, Tabs } from "react-bootstrap";
 import { useLazyLoadQuery } from "react-relay/hooks";
-import { Link,Navigate, useParams  } from "react-router-dom";
+import { Link, Navigate, useParams } from "react-router-dom";
 
 import ProblemEditor from "./ProblemEditor";
+import ProblemExtensionRosterEditor from "./ProblemExtensionRosterEditor";
 import ProblemStatement from "./ProblemStatement";
 import ProblemSubmissions from "./ProblemSubmissions";
 import ProblemTestCases from "./ProblemTestCases";
@@ -19,6 +20,7 @@ export default function Problem(): React.Node {
     graphql`
       query ProblemQuery($id: ID!) {
         viewer {
+          is_staff
           ...ProblemStatement_viewer
           ...ProblemTestCases_viewer
           ...ProblemEditor_viewer
@@ -26,6 +28,7 @@ export default function Problem(): React.Node {
         coding_problem(id: $id) {
           ...ProblemStatement_problem
           ...ProblemTestCases_problem
+          ...ProblemExtensionRosterEditor_problem
           ...ProblemSubmissions_problem
           ...ProblemEditor_problem
         }
@@ -35,8 +38,9 @@ export default function Problem(): React.Node {
   );
 
   const [tab, setTab] = useState("problem");
+  const [showRosterEditor, setShowRosterEditor] = useState(false);
 
-  if (!coding_problem || !viewer) {
+  if (!viewer) {
     return <Navigate to="404" />;
   }
 
@@ -48,6 +52,15 @@ export default function Problem(): React.Node {
             <Tab eventKey="problem" title="Problem">
               <ProblemStatement viewer={viewer} problem={coding_problem} />
               <ProblemTestCases viewer={viewer} problem={coding_problem} />
+              {viewer.is_staff && (
+                <Button
+                  className="mb-3"
+                  onClick={() => setShowRosterEditor(true)}
+                  size="sm"
+                >
+                  Edit Roster
+                </Button>
+              )}
             </Tab>
             <Tab eventKey="submissions" title="Submissions">
               <ProblemSubmissions problem={coding_problem} />
@@ -63,6 +76,19 @@ export default function Problem(): React.Node {
           />
         </Col>
       </Row>
+      <Modal
+        show={showRosterEditor}
+        onHide={() => setShowRosterEditor(false)}
+        size="lg"
+      >
+        <Modal.Body>
+          {showRosterEditor && (
+            <React.Suspense fallback={null}>
+              <ProblemExtensionRosterEditor problem={coding_problem} />
+            </React.Suspense>
+          )}
+        </Modal.Body>
+      </Modal>
     </Container>
   );
 }

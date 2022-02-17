@@ -4,6 +4,7 @@ package generated
 
 import (
 	"170-ag/ent/generated/codingdraft"
+	"170-ag/ent/generated/codingextension"
 	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/codingsubmissionstaffdata"
@@ -20,7 +21,7 @@ import (
 
 // schemaGraph holds a representation of ent/schema at runtime.
 var schemaGraph = func() *sqlgraph.Schema {
-	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 7)}
+	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 8)}
 	graph.Nodes[0] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   codingdraft.Table,
@@ -38,6 +39,22 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 	}
 	graph.Nodes[1] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   codingextension.Table,
+			Columns: codingextension.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: codingextension.FieldID,
+			},
+		},
+		Type: "CodingExtension",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			codingextension.FieldCreateTime: {Type: field.TypeTime, Column: codingextension.FieldCreateTime},
+			codingextension.FieldUpdateTime: {Type: field.TypeTime, Column: codingextension.FieldUpdateTime},
+			codingextension.FieldDeadline:   {Type: field.TypeTime, Column: codingextension.FieldDeadline},
+		},
+	}
+	graph.Nodes[2] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   codingproblem.Table,
 			Columns: codingproblem.Columns,
@@ -57,7 +74,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			codingproblem.FieldDeadline:   {Type: field.TypeTime, Column: codingproblem.FieldDeadline},
 		},
 	}
-	graph.Nodes[2] = &sqlgraph.Node{
+	graph.Nodes[3] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   codingsubmission.Table,
 			Columns: codingsubmission.Columns,
@@ -76,7 +93,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			codingsubmission.FieldResults:    {Type: field.TypeJSON, Column: codingsubmission.FieldResults},
 		},
 	}
-	graph.Nodes[3] = &sqlgraph.Node{
+	graph.Nodes[4] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   codingsubmissionstaffdata.Table,
 			Columns: codingsubmissionstaffdata.Columns,
@@ -96,7 +113,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			codingsubmissionstaffdata.FieldExitError:   {Type: field.TypeString, Column: codingsubmissionstaffdata.FieldExitError},
 		},
 	}
-	graph.Nodes[4] = &sqlgraph.Node{
+	graph.Nodes[5] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   codingtestcase.Table,
 			Columns: codingtestcase.Columns,
@@ -113,7 +130,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			codingtestcase.FieldVisibility: {Type: field.TypeEnum, Column: codingtestcase.FieldVisibility},
 		},
 	}
-	graph.Nodes[5] = &sqlgraph.Node{
+	graph.Nodes[6] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   codingtestcasedata.Table,
 			Columns: codingtestcasedata.Columns,
@@ -130,7 +147,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			codingtestcasedata.FieldOutput:     {Type: field.TypeString, Column: codingtestcasedata.FieldOutput},
 		},
 	}
-	graph.Nodes[6] = &sqlgraph.Node{
+	graph.Nodes[7] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   user.Table,
 			Columns: user.Columns,
@@ -173,6 +190,30 @@ var schemaGraph = func() *sqlgraph.Schema {
 		"CodingProblem",
 	)
 	graph.MustAddE(
+		"student",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   codingextension.StudentTable,
+			Columns: []string{codingextension.StudentColumn},
+			Bidi:    false,
+		},
+		"CodingExtension",
+		"User",
+	)
+	graph.MustAddE(
+		"coding_problem",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   codingextension.CodingProblemTable,
+			Columns: []string{codingextension.CodingProblemColumn},
+			Bidi:    false,
+		},
+		"CodingExtension",
+		"CodingProblem",
+	)
+	graph.MustAddE(
 		"drafts",
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -207,6 +248,18 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		"CodingProblem",
 		"CodingSubmission",
+	)
+	graph.MustAddE(
+		"extensions",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   codingproblem.ExtensionsTable,
+			Columns: []string{codingproblem.ExtensionsColumn},
+			Bidi:    false,
+		},
+		"CodingProblem",
+		"CodingExtension",
 	)
 	graph.MustAddE(
 		"author",
@@ -316,6 +369,18 @@ var schemaGraph = func() *sqlgraph.Schema {
 		"User",
 		"CodingSubmission",
 	)
+	graph.MustAddE(
+		"extensions",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.ExtensionsTable,
+			Columns: []string{user.ExtensionsColumn},
+			Bidi:    false,
+		},
+		"User",
+		"CodingExtension",
+	)
 	return graph
 }()
 
@@ -408,6 +473,88 @@ func (f *CodingDraftFilter) WhereHasCodingProblemWith(preds ...predicate.CodingP
 }
 
 // addPredicate implements the predicateAdder interface.
+func (ceq *CodingExtensionQuery) addPredicate(pred func(s *sql.Selector)) {
+	ceq.predicates = append(ceq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the CodingExtensionQuery builder.
+func (ceq *CodingExtensionQuery) Filter() *CodingExtensionFilter {
+	return &CodingExtensionFilter{ceq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *CodingExtensionMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the CodingExtensionMutation builder.
+func (m *CodingExtensionMutation) Filter() *CodingExtensionFilter {
+	return &CodingExtensionFilter{m}
+}
+
+// CodingExtensionFilter provides a generic filtering capability at runtime for CodingExtensionQuery.
+type CodingExtensionFilter struct {
+	predicateAdder
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *CodingExtensionFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[1].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int predicate on the id field.
+func (f *CodingExtensionFilter) WhereID(p entql.IntP) {
+	f.Where(p.Field(codingextension.FieldID))
+}
+
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *CodingExtensionFilter) WhereCreateTime(p entql.TimeP) {
+	f.Where(p.Field(codingextension.FieldCreateTime))
+}
+
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *CodingExtensionFilter) WhereUpdateTime(p entql.TimeP) {
+	f.Where(p.Field(codingextension.FieldUpdateTime))
+}
+
+// WhereDeadline applies the entql time.Time predicate on the deadline field.
+func (f *CodingExtensionFilter) WhereDeadline(p entql.TimeP) {
+	f.Where(p.Field(codingextension.FieldDeadline))
+}
+
+// WhereHasStudent applies a predicate to check if query has an edge student.
+func (f *CodingExtensionFilter) WhereHasStudent() {
+	f.Where(entql.HasEdge("student"))
+}
+
+// WhereHasStudentWith applies a predicate to check if query has an edge student with a given conditions (other predicates).
+func (f *CodingExtensionFilter) WhereHasStudentWith(preds ...predicate.User) {
+	f.Where(entql.HasEdgeWith("student", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasCodingProblem applies a predicate to check if query has an edge coding_problem.
+func (f *CodingExtensionFilter) WhereHasCodingProblem() {
+	f.Where(entql.HasEdge("coding_problem"))
+}
+
+// WhereHasCodingProblemWith applies a predicate to check if query has an edge coding_problem with a given conditions (other predicates).
+func (f *CodingExtensionFilter) WhereHasCodingProblemWith(preds ...predicate.CodingProblem) {
+	f.Where(entql.HasEdgeWith("coding_problem", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
 func (cpq *CodingProblemQuery) addPredicate(pred func(s *sql.Selector)) {
 	cpq.predicates = append(cpq.predicates, pred)
 }
@@ -435,7 +582,7 @@ type CodingProblemFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *CodingProblemFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[1].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[2].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -523,6 +670,20 @@ func (f *CodingProblemFilter) WhereHasSubmissionsWith(preds ...predicate.CodingS
 	})))
 }
 
+// WhereHasExtensions applies a predicate to check if query has an edge extensions.
+func (f *CodingProblemFilter) WhereHasExtensions() {
+	f.Where(entql.HasEdge("extensions"))
+}
+
+// WhereHasExtensionsWith applies a predicate to check if query has an edge extensions with a given conditions (other predicates).
+func (f *CodingProblemFilter) WhereHasExtensionsWith(preds ...predicate.CodingExtension) {
+	f.Where(entql.HasEdgeWith("extensions", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
 // addPredicate implements the predicateAdder interface.
 func (csq *CodingSubmissionQuery) addPredicate(pred func(s *sql.Selector)) {
 	csq.predicates = append(csq.predicates, pred)
@@ -551,7 +712,7 @@ type CodingSubmissionFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *CodingSubmissionFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[2].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[3].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -662,7 +823,7 @@ type CodingSubmissionStaffDataFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *CodingSubmissionStaffDataFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[3].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[4].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -750,7 +911,7 @@ type CodingTestCaseFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *CodingTestCaseFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[4].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[5].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -837,7 +998,7 @@ type CodingTestCaseDataFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *CodingTestCaseDataFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[5].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[6].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -910,7 +1071,7 @@ type UserFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *UserFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[6].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[7].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -968,6 +1129,20 @@ func (f *UserFilter) WhereHasSubmissions() {
 // WhereHasSubmissionsWith applies a predicate to check if query has an edge submissions with a given conditions (other predicates).
 func (f *UserFilter) WhereHasSubmissionsWith(preds ...predicate.CodingSubmission) {
 	f.Where(entql.HasEdgeWith("submissions", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasExtensions applies a predicate to check if query has an edge extensions.
+func (f *UserFilter) WhereHasExtensions() {
+	f.Where(entql.HasEdge("extensions"))
+}
+
+// WhereHasExtensionsWith applies a predicate to check if query has an edge extensions with a given conditions (other predicates).
+func (f *UserFilter) WhereHasExtensionsWith(preds ...predicate.CodingExtension) {
+	f.Where(entql.HasEdgeWith("extensions", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}
