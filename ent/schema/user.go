@@ -10,7 +10,6 @@ import (
 
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
-	"entgo.io/ent/entql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
@@ -76,13 +75,6 @@ func denyIfSettingToStaff() privacy.UserMutationRuleFunc {
 	})
 }
 
-func filterToMutateCurrentStudents() privacy.FilterFunc {
-	return privacy.FilterFunc(func(c context.Context, f privacy.Filter) error {
-		f.(*generated.UserFilter).WhereIsStaff(entql.BoolEQ(false))
-		return nil
-	})
-}
-
 func (User) Policy() ent.Policy {
 	return privacy.Policy{
 		Mutation: privacy.MutationPolicy{
@@ -90,7 +82,6 @@ func (User) Policy() ent.Policy {
 				privacyrules.AllowMutationIfSubPolicyPasses(
 					allowUserMutateIfEmailMatchesContext(),
 					denyIfSettingToStaff(),
-					filterToMutateCurrentStudents(),
 					policy.AllowIfViewerIsStaff(),
 				),
 				ent.OpCreate,

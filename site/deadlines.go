@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-const layout = "15:04:05 02/01/06"
+const layout = "15:04:05 2006-01-02"
 
 func GetSubmissionDeadlineForStudent(ctx context.Context, problem *ent.CodingProblem, student *ent.User) (*time.Time, error) {
 	extension, err := problem.QueryExtensions().Where(codingextension.HasStudentWith(user.IDEQ(student.ID))).Only(ctx)
