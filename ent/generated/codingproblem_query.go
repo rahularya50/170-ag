@@ -34,6 +34,7 @@ type CodingProblemQuery struct {
 	withTestCases   *CodingTestCaseQuery
 	withSubmissions *CodingSubmissionQuery
 	withExtensions  *CodingExtensionQuery
+	modifiers       []func(s *sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -484,6 +485,9 @@ func (cpq *CodingProblemQuery) sqlAll(ctx context.Context) ([]*CodingProblem, er
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(cpq.modifiers) > 0 {
+		_spec.Modifiers = cpq.modifiers
+	}
 	if err := sqlgraph.QueryNodes(ctx, cpq.driver, _spec); err != nil {
 		return nil, err
 	}
@@ -612,6 +616,9 @@ func (cpq *CodingProblemQuery) sqlAll(ctx context.Context) ([]*CodingProblem, er
 
 func (cpq *CodingProblemQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := cpq.querySpec()
+	if len(cpq.modifiers) > 0 {
+		_spec.Modifiers = cpq.modifiers
+	}
 	_spec.Node.Columns = cpq.fields
 	if len(cpq.fields) > 0 {
 		_spec.Unique = cpq.unique != nil && *cpq.unique
@@ -690,6 +697,9 @@ func (cpq *CodingProblemQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	if cpq.unique != nil && *cpq.unique {
 		selector.Distinct()
 	}
+	for _, m := range cpq.modifiers {
+		m(selector)
+	}
 	for _, p := range cpq.predicates {
 		p(selector)
 	}
@@ -705,6 +715,12 @@ func (cpq *CodingProblemQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// Modify adds a query modifier for attaching custom logic to queries.
+func (cpq *CodingProblemQuery) Modify(modifiers ...func(s *sql.Selector)) *CodingProblemSelect {
+	cpq.modifiers = append(cpq.modifiers, modifiers...)
+	return cpq.Select()
 }
 
 // CodingProblemGroupBy is the group-by builder for CodingProblem entities.
@@ -1193,4 +1209,10 @@ func (cps *CodingProblemSelect) sqlScan(ctx context.Context, v interface{}) erro
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
+}
+
+// Modify adds a query modifier for attaching custom logic to queries.
+func (cps *CodingProblemSelect) Modify(modifiers ...func(s *sql.Selector)) *CodingProblemSelect {
+	cps.modifiers = append(cps.modifiers, modifiers...)
+	return cps
 }

@@ -28,6 +28,7 @@ type CodingSubmissionStaffDataQuery struct {
 	predicates []predicate.CodingSubmissionStaffData
 	// eager-loading edges.
 	withCodingSubmission *CodingSubmissionQuery
+	modifiers            []func(s *sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -373,6 +374,9 @@ func (cssdq *CodingSubmissionStaffDataQuery) sqlAll(ctx context.Context) ([]*Cod
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(cssdq.modifiers) > 0 {
+		_spec.Modifiers = cssdq.modifiers
+	}
 	if err := sqlgraph.QueryNodes(ctx, cssdq.driver, _spec); err != nil {
 		return nil, err
 	}
@@ -413,6 +417,9 @@ func (cssdq *CodingSubmissionStaffDataQuery) sqlAll(ctx context.Context) ([]*Cod
 
 func (cssdq *CodingSubmissionStaffDataQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := cssdq.querySpec()
+	if len(cssdq.modifiers) > 0 {
+		_spec.Modifiers = cssdq.modifiers
+	}
 	_spec.Node.Columns = cssdq.fields
 	if len(cssdq.fields) > 0 {
 		_spec.Unique = cssdq.unique != nil && *cssdq.unique
@@ -491,6 +498,9 @@ func (cssdq *CodingSubmissionStaffDataQuery) sqlQuery(ctx context.Context) *sql.
 	if cssdq.unique != nil && *cssdq.unique {
 		selector.Distinct()
 	}
+	for _, m := range cssdq.modifiers {
+		m(selector)
+	}
 	for _, p := range cssdq.predicates {
 		p(selector)
 	}
@@ -506,6 +516,12 @@ func (cssdq *CodingSubmissionStaffDataQuery) sqlQuery(ctx context.Context) *sql.
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// Modify adds a query modifier for attaching custom logic to queries.
+func (cssdq *CodingSubmissionStaffDataQuery) Modify(modifiers ...func(s *sql.Selector)) *CodingSubmissionStaffDataSelect {
+	cssdq.modifiers = append(cssdq.modifiers, modifiers...)
+	return cssdq.Select()
 }
 
 // CodingSubmissionStaffDataGroupBy is the group-by builder for CodingSubmissionStaffData entities.
@@ -994,4 +1010,10 @@ func (cssds *CodingSubmissionStaffDataSelect) sqlScan(ctx context.Context, v int
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
+}
+
+// Modify adds a query modifier for attaching custom logic to queries.
+func (cssds *CodingSubmissionStaffDataSelect) Modify(modifiers ...func(s *sql.Selector)) *CodingSubmissionStaffDataSelect {
+	cssds.modifiers = append(cssds.modifiers, modifiers...)
+	return cssds
 }

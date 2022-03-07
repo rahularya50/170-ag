@@ -28,6 +28,7 @@ type CodingTestCaseDataQuery struct {
 	predicates []predicate.CodingTestCaseData
 	// eager-loading edges.
 	withTestCase *CodingTestCaseQuery
+	modifiers    []func(s *sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -373,6 +374,9 @@ func (ctcdq *CodingTestCaseDataQuery) sqlAll(ctx context.Context) ([]*CodingTest
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(ctcdq.modifiers) > 0 {
+		_spec.Modifiers = ctcdq.modifiers
+	}
 	if err := sqlgraph.QueryNodes(ctx, ctcdq.driver, _spec); err != nil {
 		return nil, err
 	}
@@ -413,6 +417,9 @@ func (ctcdq *CodingTestCaseDataQuery) sqlAll(ctx context.Context) ([]*CodingTest
 
 func (ctcdq *CodingTestCaseDataQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := ctcdq.querySpec()
+	if len(ctcdq.modifiers) > 0 {
+		_spec.Modifiers = ctcdq.modifiers
+	}
 	_spec.Node.Columns = ctcdq.fields
 	if len(ctcdq.fields) > 0 {
 		_spec.Unique = ctcdq.unique != nil && *ctcdq.unique
@@ -491,6 +498,9 @@ func (ctcdq *CodingTestCaseDataQuery) sqlQuery(ctx context.Context) *sql.Selecto
 	if ctcdq.unique != nil && *ctcdq.unique {
 		selector.Distinct()
 	}
+	for _, m := range ctcdq.modifiers {
+		m(selector)
+	}
 	for _, p := range ctcdq.predicates {
 		p(selector)
 	}
@@ -506,6 +516,12 @@ func (ctcdq *CodingTestCaseDataQuery) sqlQuery(ctx context.Context) *sql.Selecto
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// Modify adds a query modifier for attaching custom logic to queries.
+func (ctcdq *CodingTestCaseDataQuery) Modify(modifiers ...func(s *sql.Selector)) *CodingTestCaseDataSelect {
+	ctcdq.modifiers = append(ctcdq.modifiers, modifiers...)
+	return ctcdq.Select()
 }
 
 // CodingTestCaseDataGroupBy is the group-by builder for CodingTestCaseData entities.
@@ -994,4 +1010,10 @@ func (ctcds *CodingTestCaseDataSelect) sqlScan(ctx context.Context, v interface{
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
+}
+
+// Modify adds a query modifier for attaching custom logic to queries.
+func (ctcds *CodingTestCaseDataSelect) Modify(modifiers ...func(s *sql.Selector)) *CodingTestCaseDataSelect {
+	ctcds.modifiers = append(ctcds.modifiers, modifiers...)
+	return ctcds
 }

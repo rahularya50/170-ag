@@ -16,8 +16,7 @@ const layout = "15:04:05 2006-01-02"
 
 func GetSubmissionDeadlineForStudent(ctx context.Context, problem *ent.CodingProblem, student *ent.User) (*time.Time, error) {
 	extension, err := problem.QueryExtensions().Where(codingextension.HasStudentWith(user.IDEQ(student.ID))).Only(ctx)
-	_, not_found := err.(*ent.NotFoundError)
-	if err != nil && !not_found {
+	if err != nil && !ent.IsNotFound(err) {
 		return nil, err
 	}
 	if extension != nil {
@@ -72,13 +71,14 @@ func SetProblemExtensions(ctx context.Context, client *ent.Client, problem *ent.
 			return err
 		}
 		student, err := tx.User.Query().Where(user.Email(email)).Only(ctx)
-		_, not_found := err.(*ent.NotFoundError)
-		if not_found {
+		if ent.IsNotFound(err) {
 			// create the user
 			student, err = tx.User.Create().SetEmail(email).Save(ctx)
 			if err != nil {
 				return err
 			}
+		} else if err != nil {
+			return err
 		}
 		builders = append(
 			builders,

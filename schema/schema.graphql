@@ -101,6 +101,7 @@ type CodingProblem implements Node {
   deadline: Time!
   my_deadline: Time!
   extension_roster: String!
+  score_roster: String!
 }
 
 type CodingProblemConnection {

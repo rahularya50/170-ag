@@ -32,6 +32,7 @@ type CodingSubmissionQuery struct {
 	withCodingProblem *CodingProblemQuery
 	withStaffData     *CodingSubmissionStaffDataQuery
 	withFKs           bool
+	modifiers         []func(s *sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -454,6 +455,9 @@ func (csq *CodingSubmissionQuery) sqlAll(ctx context.Context) ([]*CodingSubmissi
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(csq.modifiers) > 0 {
+		_spec.Modifiers = csq.modifiers
+	}
 	if err := sqlgraph.QueryNodes(ctx, csq.driver, _spec); err != nil {
 		return nil, err
 	}
@@ -553,6 +557,9 @@ func (csq *CodingSubmissionQuery) sqlAll(ctx context.Context) ([]*CodingSubmissi
 
 func (csq *CodingSubmissionQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := csq.querySpec()
+	if len(csq.modifiers) > 0 {
+		_spec.Modifiers = csq.modifiers
+	}
 	_spec.Node.Columns = csq.fields
 	if len(csq.fields) > 0 {
 		_spec.Unique = csq.unique != nil && *csq.unique
@@ -631,6 +638,9 @@ func (csq *CodingSubmissionQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	if csq.unique != nil && *csq.unique {
 		selector.Distinct()
 	}
+	for _, m := range csq.modifiers {
+		m(selector)
+	}
 	for _, p := range csq.predicates {
 		p(selector)
 	}
@@ -646,6 +656,12 @@ func (csq *CodingSubmissionQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// Modify adds a query modifier for attaching custom logic to queries.
+func (csq *CodingSubmissionQuery) Modify(modifiers ...func(s *sql.Selector)) *CodingSubmissionSelect {
+	csq.modifiers = append(csq.modifiers, modifiers...)
+	return csq.Select()
 }
 
 // CodingSubmissionGroupBy is the group-by builder for CodingSubmission entities.
@@ -1134,4 +1150,10 @@ func (css *CodingSubmissionSelect) sqlScan(ctx context.Context, v interface{}) e
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
+}
+
+// Modify adds a query modifier for attaching custom logic to queries.
+func (css *CodingSubmissionSelect) Modify(modifiers ...func(s *sql.Selector)) *CodingSubmissionSelect {
+	css.modifiers = append(css.modifiers, modifiers...)
+	return css
 }

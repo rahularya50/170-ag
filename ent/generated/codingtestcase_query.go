@@ -30,6 +30,7 @@ type CodingTestCaseQuery struct {
 	withCodingProblem *CodingProblemQuery
 	withData          *CodingTestCaseDataQuery
 	withFKs           bool
+	modifiers         []func(s *sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -417,6 +418,9 @@ func (ctcq *CodingTestCaseQuery) sqlAll(ctx context.Context) ([]*CodingTestCase,
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(ctcq.modifiers) > 0 {
+		_spec.Modifiers = ctcq.modifiers
+	}
 	if err := sqlgraph.QueryNodes(ctx, ctcq.driver, _spec); err != nil {
 		return nil, err
 	}
@@ -487,6 +491,9 @@ func (ctcq *CodingTestCaseQuery) sqlAll(ctx context.Context) ([]*CodingTestCase,
 
 func (ctcq *CodingTestCaseQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := ctcq.querySpec()
+	if len(ctcq.modifiers) > 0 {
+		_spec.Modifiers = ctcq.modifiers
+	}
 	_spec.Node.Columns = ctcq.fields
 	if len(ctcq.fields) > 0 {
 		_spec.Unique = ctcq.unique != nil && *ctcq.unique
@@ -565,6 +572,9 @@ func (ctcq *CodingTestCaseQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	if ctcq.unique != nil && *ctcq.unique {
 		selector.Distinct()
 	}
+	for _, m := range ctcq.modifiers {
+		m(selector)
+	}
 	for _, p := range ctcq.predicates {
 		p(selector)
 	}
@@ -580,6 +590,12 @@ func (ctcq *CodingTestCaseQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// Modify adds a query modifier for attaching custom logic to queries.
+func (ctcq *CodingTestCaseQuery) Modify(modifiers ...func(s *sql.Selector)) *CodingTestCaseSelect {
+	ctcq.modifiers = append(ctcq.modifiers, modifiers...)
+	return ctcq.Select()
 }
 
 // CodingTestCaseGroupBy is the group-by builder for CodingTestCase entities.
@@ -1068,4 +1084,10 @@ func (ctcs *CodingTestCaseSelect) sqlScan(ctx context.Context, v interface{}) er
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
+}
+
+// Modify adds a query modifier for attaching custom logic to queries.
+func (ctcs *CodingTestCaseSelect) Modify(modifiers ...func(s *sql.Selector)) *CodingTestCaseSelect {
+	ctcs.modifiers = append(ctcs.modifiers, modifiers...)
+	return ctcs
 }

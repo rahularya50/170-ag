@@ -30,6 +30,7 @@ type CodingDraftQuery struct {
 	withAuthor        *UserQuery
 	withCodingProblem *CodingProblemQuery
 	withFKs           bool
+	modifiers         []func(s *sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -417,6 +418,9 @@ func (cdq *CodingDraftQuery) sqlAll(ctx context.Context) ([]*CodingDraft, error)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(cdq.modifiers) > 0 {
+		_spec.Modifiers = cdq.modifiers
+	}
 	if err := sqlgraph.QueryNodes(ctx, cdq.driver, _spec); err != nil {
 		return nil, err
 	}
@@ -487,6 +491,9 @@ func (cdq *CodingDraftQuery) sqlAll(ctx context.Context) ([]*CodingDraft, error)
 
 func (cdq *CodingDraftQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := cdq.querySpec()
+	if len(cdq.modifiers) > 0 {
+		_spec.Modifiers = cdq.modifiers
+	}
 	_spec.Node.Columns = cdq.fields
 	if len(cdq.fields) > 0 {
 		_spec.Unique = cdq.unique != nil && *cdq.unique
@@ -565,6 +572,9 @@ func (cdq *CodingDraftQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	if cdq.unique != nil && *cdq.unique {
 		selector.Distinct()
 	}
+	for _, m := range cdq.modifiers {
+		m(selector)
+	}
 	for _, p := range cdq.predicates {
 		p(selector)
 	}
@@ -580,6 +590,12 @@ func (cdq *CodingDraftQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// Modify adds a query modifier for attaching custom logic to queries.
+func (cdq *CodingDraftQuery) Modify(modifiers ...func(s *sql.Selector)) *CodingDraftSelect {
+	cdq.modifiers = append(cdq.modifiers, modifiers...)
+	return cdq.Select()
 }
 
 // CodingDraftGroupBy is the group-by builder for CodingDraft entities.
@@ -1068,4 +1084,10 @@ func (cds *CodingDraftSelect) sqlScan(ctx context.Context, v interface{}) error 
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
+}
+
+// Modify adds a query modifier for attaching custom logic to queries.
+func (cds *CodingDraftSelect) Modify(modifiers ...func(s *sql.Selector)) *CodingDraftSelect {
+	cds.modifiers = append(cds.modifiers, modifiers...)
+	return cds
 }

@@ -55,6 +55,10 @@ func (r *codingProblemResolver) ExtensionRoster(ctx context.Context, obj *ent.Co
 	return site.ExportProblemExtensions(ctx, obj)
 }
 
+func (r *codingProblemResolver) ScoreRoster(ctx context.Context, obj *ent.CodingProblem) (string, error) {
+	return site.ExportStudentScores(ctx, obj)
+}
+
 func (r *codingSubmissionStaffDataResolver) ExecutionID(ctx context.Context, obj *ent.CodingSubmissionStaffData) (*string, error) {
 	if obj.ExecutionID == nil {
 		return nil, nil

@@ -30,6 +30,7 @@ type CodingExtensionQuery struct {
 	withStudent       *UserQuery
 	withCodingProblem *CodingProblemQuery
 	withFKs           bool
+	modifiers         []func(s *sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -417,6 +418,9 @@ func (ceq *CodingExtensionQuery) sqlAll(ctx context.Context) ([]*CodingExtension
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(ceq.modifiers) > 0 {
+		_spec.Modifiers = ceq.modifiers
+	}
 	if err := sqlgraph.QueryNodes(ctx, ceq.driver, _spec); err != nil {
 		return nil, err
 	}
@@ -487,6 +491,9 @@ func (ceq *CodingExtensionQuery) sqlAll(ctx context.Context) ([]*CodingExtension
 
 func (ceq *CodingExtensionQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := ceq.querySpec()
+	if len(ceq.modifiers) > 0 {
+		_spec.Modifiers = ceq.modifiers
+	}
 	_spec.Node.Columns = ceq.fields
 	if len(ceq.fields) > 0 {
 		_spec.Unique = ceq.unique != nil && *ceq.unique
@@ -565,6 +572,9 @@ func (ceq *CodingExtensionQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	if ceq.unique != nil && *ceq.unique {
 		selector.Distinct()
 	}
+	for _, m := range ceq.modifiers {
+		m(selector)
+	}
 	for _, p := range ceq.predicates {
 		p(selector)
 	}
@@ -580,6 +590,12 @@ func (ceq *CodingExtensionQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// Modify adds a query modifier for attaching custom logic to queries.
+func (ceq *CodingExtensionQuery) Modify(modifiers ...func(s *sql.Selector)) *CodingExtensionSelect {
+	ceq.modifiers = append(ceq.modifiers, modifiers...)
+	return ceq.Select()
 }
 
 // CodingExtensionGroupBy is the group-by builder for CodingExtension entities.
@@ -1068,4 +1084,10 @@ func (ces *CodingExtensionSelect) sqlScan(ctx context.Context, v interface{}) er
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
+}
+
+// Modify adds a query modifier for attaching custom logic to queries.
+func (ces *CodingExtensionSelect) Modify(modifiers ...func(s *sql.Selector)) *CodingExtensionSelect {
+	ces.modifiers = append(ces.modifiers, modifiers...)
+	return ces
 }
