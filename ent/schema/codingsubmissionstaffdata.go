@@ -1,9 +1,11 @@
 package schema
 
 import (
+	"170-ag/ent/generated"
 	"170-ag/ent/generated/privacy"
 	"170-ag/privacyrules"
 	"170-ag/site/policy"
+	"context"
 
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
@@ -48,6 +50,22 @@ func (CodingSubmissionStaffData) Indexes() []ent.Index {
 	}
 }
 
+func allowIfSubmissionIsValidation() privacy.QueryRule {
+	return privacy.CodingSubmissionStaffDataQueryRuleFunc(func(ctx context.Context, q *generated.CodingSubmissionStaffDataQuery) error {
+		allow_ctx := privacy.DecisionContext(ctx, privacy.Allow)
+		submissions, err := q.Clone().QueryCodingSubmission().All(allow_ctx)
+		if err != nil {
+			return err
+		}
+		for _, submission := range submissions {
+			if !submission.IsValidation {
+				return privacy.Skip
+			}
+		}
+		return privacy.Allow
+	})
+}
+
 func (CodingSubmissionStaffData) Policy() ent.Policy {
 	return privacy.Policy{
 		Mutation: privacy.MutationPolicy{
@@ -60,6 +78,7 @@ func (CodingSubmissionStaffData) Policy() ent.Policy {
 			privacyrules.AllowWithPrivacyAccessToken(privacyrules.SubmissionEnqueuingAccessToken),
 			policy.DenyIfNoViewer(),
 			policy.AllowIfViewerIsStaff(),
+			allowIfSubmissionIsValidation(),
 			privacy.AlwaysDenyRule(),
 		},
 	}

@@ -27,6 +27,8 @@ type CodingSubmission struct {
 	UpdateTime time.Time `json:"update_time,omitempty"`
 	// Code holds the value of the "code" field.
 	Code string `json:"code,omitempty"`
+	// IsValidation holds the value of the "is_validation" field.
+	IsValidation bool `json:"is_validation,omitempty"`
 	// Status holds the value of the "status" field.
 	Status codingsubmission.Status `json:"status,omitempty"`
 	// Points holds the value of the "points" field.
@@ -103,6 +105,8 @@ func (*CodingSubmission) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case codingsubmission.FieldResults:
 			values[i] = new([]byte)
+		case codingsubmission.FieldIsValidation:
+			values[i] = new(sql.NullBool)
 		case codingsubmission.FieldID, codingsubmission.FieldPoints:
 			values[i] = new(sql.NullInt64)
 		case codingsubmission.FieldCode, codingsubmission.FieldStatus:
@@ -153,6 +157,12 @@ func (cs *CodingSubmission) assignValues(columns []string, values []interface{})
 				return fmt.Errorf("unexpected type %T for field code", values[i])
 			} else if value.Valid {
 				cs.Code = value.String
+			}
+		case codingsubmission.FieldIsValidation:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_validation", values[i])
+			} else if value.Valid {
+				cs.IsValidation = value.Bool
 			}
 		case codingsubmission.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -245,6 +255,8 @@ func (cs *CodingSubmission) String() string {
 	builder.WriteString(cs.UpdateTime.Format(time.ANSIC))
 	builder.WriteString(", code=")
 	builder.WriteString(cs.Code)
+	builder.WriteString(", is_validation=")
+	builder.WriteString(fmt.Sprintf("%v", cs.IsValidation))
 	builder.WriteString(", status=")
 	builder.WriteString(fmt.Sprintf("%v", cs.Status))
 	if v := cs.Points; v != nil {

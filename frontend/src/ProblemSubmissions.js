@@ -21,7 +21,7 @@ export default function ProblemSubmissions(props: Props): React.Node {
       fragment ProblemSubmissions_problem on CodingProblem
       @refetchable(queryName: "ProblemSubmissionsRefetchQuery") {
         id
-        my_submissions {
+        my_submissions(is_validation: false) {
           edges {
             node {
               id

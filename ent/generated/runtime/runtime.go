@@ -161,6 +161,10 @@ func init() {
 	codingsubmissionDescCode := codingsubmissionFields[0].Descriptor()
 	// codingsubmission.CodeValidator is a validator for the "code" field. It is called by the builders before save.
 	codingsubmission.CodeValidator = codingsubmissionDescCode.Validators[0].(func(string) error)
+	// codingsubmissionDescIsValidation is the schema descriptor for is_validation field.
+	codingsubmissionDescIsValidation := codingsubmissionFields[1].Descriptor()
+	// codingsubmission.DefaultIsValidation holds the default value on creation for the is_validation field.
+	codingsubmission.DefaultIsValidation = codingsubmissionDescIsValidation.Default.(bool)
 	codingsubmissionstaffdataMixin := schema.CodingSubmissionStaffData{}.Mixin()
 	codingsubmissionstaffdata.Policy = privacy.NewPolicies(schema.CodingSubmissionStaffData{})
 	codingsubmissionstaffdata.Hooks[0] = func(next ent.Mutator) ent.Mutator {

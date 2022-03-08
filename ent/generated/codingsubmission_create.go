@@ -60,6 +60,20 @@ func (csc *CodingSubmissionCreate) SetCode(s string) *CodingSubmissionCreate {
 	return csc
 }
 
+// SetIsValidation sets the "is_validation" field.
+func (csc *CodingSubmissionCreate) SetIsValidation(b bool) *CodingSubmissionCreate {
+	csc.mutation.SetIsValidation(b)
+	return csc
+}
+
+// SetNillableIsValidation sets the "is_validation" field if the given value is not nil.
+func (csc *CodingSubmissionCreate) SetNillableIsValidation(b *bool) *CodingSubmissionCreate {
+	if b != nil {
+		csc.SetIsValidation(*b)
+	}
+	return csc
+}
+
 // SetStatus sets the "status" field.
 func (csc *CodingSubmissionCreate) SetStatus(c codingsubmission.Status) *CodingSubmissionCreate {
 	csc.mutation.SetStatus(c)
@@ -230,6 +244,10 @@ func (csc *CodingSubmissionCreate) defaults() error {
 		v := codingsubmission.DefaultUpdateTime()
 		csc.mutation.SetUpdateTime(v)
 	}
+	if _, ok := csc.mutation.IsValidation(); !ok {
+		v := codingsubmission.DefaultIsValidation
+		csc.mutation.SetIsValidation(v)
+	}
 	if _, ok := csc.mutation.Status(); !ok {
 		v := codingsubmission.DefaultStatus
 		csc.mutation.SetStatus(v)
@@ -252,6 +270,9 @@ func (csc *CodingSubmissionCreate) check() error {
 		if err := codingsubmission.CodeValidator(v); err != nil {
 			return &ValidationError{Name: "code", err: fmt.Errorf(`generated: validator failed for field "CodingSubmission.code": %w`, err)}
 		}
+	}
+	if _, ok := csc.mutation.IsValidation(); !ok {
+		return &ValidationError{Name: "is_validation", err: errors.New(`generated: missing required field "CodingSubmission.is_validation"`)}
 	}
 	if _, ok := csc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`generated: missing required field "CodingSubmission.status"`)}
@@ -318,6 +339,14 @@ func (csc *CodingSubmissionCreate) createSpec() (*CodingSubmission, *sqlgraph.Cr
 			Column: codingsubmission.FieldCode,
 		})
 		_node.Code = value
+	}
+	if value, ok := csc.mutation.IsValidation(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: codingsubmission.FieldIsValidation,
+		})
+		_node.IsValidation = value
 	}
 	if value, ok := csc.mutation.Status(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -493,6 +522,18 @@ func (u *CodingSubmissionUpsert) UpdateCode() *CodingSubmissionUpsert {
 	return u
 }
 
+// SetIsValidation sets the "is_validation" field.
+func (u *CodingSubmissionUpsert) SetIsValidation(v bool) *CodingSubmissionUpsert {
+	u.Set(codingsubmission.FieldIsValidation, v)
+	return u
+}
+
+// UpdateIsValidation sets the "is_validation" field to the value that was provided on create.
+func (u *CodingSubmissionUpsert) UpdateIsValidation() *CodingSubmissionUpsert {
+	u.SetExcluded(codingsubmission.FieldIsValidation)
+	return u
+}
+
 // SetStatus sets the "status" field.
 func (u *CodingSubmissionUpsert) SetStatus(v codingsubmission.Status) *CodingSubmissionUpsert {
 	u.Set(codingsubmission.FieldStatus, v)
@@ -565,6 +606,9 @@ func (u *CodingSubmissionUpsertOne) UpdateNewValues() *CodingSubmissionUpsertOne
 		if _, exists := u.create.mutation.Code(); exists {
 			s.SetIgnore(codingsubmission.FieldCode)
 		}
+		if _, exists := u.create.mutation.IsValidation(); exists {
+			s.SetIgnore(codingsubmission.FieldIsValidation)
+		}
 	}))
 	return u
 }
@@ -636,6 +680,20 @@ func (u *CodingSubmissionUpsertOne) SetCode(v string) *CodingSubmissionUpsertOne
 func (u *CodingSubmissionUpsertOne) UpdateCode() *CodingSubmissionUpsertOne {
 	return u.Update(func(s *CodingSubmissionUpsert) {
 		s.UpdateCode()
+	})
+}
+
+// SetIsValidation sets the "is_validation" field.
+func (u *CodingSubmissionUpsertOne) SetIsValidation(v bool) *CodingSubmissionUpsertOne {
+	return u.Update(func(s *CodingSubmissionUpsert) {
+		s.SetIsValidation(v)
+	})
+}
+
+// UpdateIsValidation sets the "is_validation" field to the value that was provided on create.
+func (u *CodingSubmissionUpsertOne) UpdateIsValidation() *CodingSubmissionUpsertOne {
+	return u.Update(func(s *CodingSubmissionUpsert) {
+		s.UpdateIsValidation()
 	})
 }
 
@@ -883,6 +941,9 @@ func (u *CodingSubmissionUpsertBulk) UpdateNewValues() *CodingSubmissionUpsertBu
 			if _, exists := b.mutation.Code(); exists {
 				s.SetIgnore(codingsubmission.FieldCode)
 			}
+			if _, exists := b.mutation.IsValidation(); exists {
+				s.SetIgnore(codingsubmission.FieldIsValidation)
+			}
 		}
 	}))
 	return u
@@ -955,6 +1016,20 @@ func (u *CodingSubmissionUpsertBulk) SetCode(v string) *CodingSubmissionUpsertBu
 func (u *CodingSubmissionUpsertBulk) UpdateCode() *CodingSubmissionUpsertBulk {
 	return u.Update(func(s *CodingSubmissionUpsert) {
 		s.UpdateCode()
+	})
+}
+
+// SetIsValidation sets the "is_validation" field.
+func (u *CodingSubmissionUpsertBulk) SetIsValidation(v bool) *CodingSubmissionUpsertBulk {
+	return u.Update(func(s *CodingSubmissionUpsert) {
+		s.SetIsValidation(v)
+	})
+}
+
+// UpdateIsValidation sets the "is_validation" field to the value that was provided on create.
+func (u *CodingSubmissionUpsertBulk) UpdateIsValidation() *CodingSubmissionUpsertBulk {
+	return u.Update(func(s *CodingSubmissionUpsert) {
+		s.UpdateIsValidation()
 	})
 }
 

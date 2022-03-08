@@ -85,6 +85,30 @@ export default function ProblemEditor(props: Props): React.Node {
     });
   };
 
+  const [validateMutation, isValidating] =
+    useMutation<ProblemEditorSubmitMutation>(
+      graphql`
+        mutation ProblemEditorValidateMutation($input: CodingSubmissionInput!) {
+          create_submission(input: $input) {
+            coding_problem {
+              ...ProblemSubmissions_problem
+            }
+          }
+        }
+      `
+    );
+
+  const validate = () => {
+    validateMutation({
+      variables: {
+        input: { problem_id: id, code: studentCode, is_validation: true },
+      },
+      onError: () => {
+        alert("validation failed!");
+      },
+    });
+  };
+
   const [submitMutation, isSubmitting] =
     useMutation<ProblemEditorSubmitMutation>(
       graphql`
@@ -100,7 +124,9 @@ export default function ProblemEditor(props: Props): React.Node {
 
   const submit = () => {
     submitMutation({
-      variables: { input: { problem_id: id, code: studentCode } },
+      variables: {
+        input: { problem_id: id, code: studentCode, is_validation: false },
+      },
       onCompleted: () => {
         props.onSubmit();
       },
@@ -176,6 +202,9 @@ export default function ProblemEditor(props: Props): React.Node {
           size="sm"
         >
           {isSaved ? "Draft Saved" : "Save Draft"}
+        </LoadingButton>
+        <LoadingButton isUpdating={isValidating} onClick={validate} size="sm">
+          Validate
         </LoadingButton>
         <LoadingButton isUpdating={isSubmitting} onClick={submit} size="sm">
           Submit

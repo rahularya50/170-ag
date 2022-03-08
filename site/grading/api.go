@@ -4,7 +4,6 @@ import (
 	ent "170-ag/ent/generated"
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/codingsubmissionstaffdata"
-	"170-ag/ent/generated/codingtestcase"
 	"170-ag/ent/models"
 	"170-ag/proto/schemas"
 	"170-ag/site"
@@ -66,10 +65,7 @@ func (s *JudgingServer) SubmitGradingResponse(ctx context.Context, response *sch
 	if err != nil {
 		return nil, err
 	}
-	test_cases, err := submission.
-		QueryCodingProblem().
-		QueryTestCases().
-		Order(ent.Asc(codingtestcase.FieldCreateTime)).
+	test_cases, err := site.QueryTestCases(submission).
 		WithData().
 		All(ctx)
 	if err != nil {

@@ -2,6 +2,7 @@ package site
 
 import (
 	ent "170-ag/ent/generated"
+	"170-ag/ent/generated/codingtestcase"
 	"170-ag/ent/models"
 	"bufio"
 	"errors"
@@ -9,6 +10,15 @@ import (
 	"strconv"
 	"strings"
 )
+
+func QueryTestCases(submission *ent.CodingSubmission) *ent.CodingTestCaseQuery {
+	test_case_query := submission.QueryCodingProblem().QueryTestCases()
+	if submission.IsValidation {
+		// filter out private test cases for validation
+		test_case_query = test_case_query.Where(codingtestcase.VisibilityNotIn(codingtestcase.VisibilityPrivate))
+	}
+	return test_case_query.Order(ent.Asc(codingtestcase.FieldCreateTime))
+}
 
 func GenerateInput(test_case_data []*ent.CodingTestCaseData) (string, error) {
 	totalCases := 0

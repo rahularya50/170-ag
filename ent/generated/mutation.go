@@ -2121,6 +2121,7 @@ type CodingSubmissionMutation struct {
 	create_time           *time.Time
 	update_time           *time.Time
 	code                  *string
+	is_validation         *bool
 	status                *codingsubmission.Status
 	points                *int
 	addpoints             *int
@@ -2341,6 +2342,42 @@ func (m *CodingSubmissionMutation) OldCode(ctx context.Context) (v string, err e
 // ResetCode resets all changes to the "code" field.
 func (m *CodingSubmissionMutation) ResetCode() {
 	m.code = nil
+}
+
+// SetIsValidation sets the "is_validation" field.
+func (m *CodingSubmissionMutation) SetIsValidation(b bool) {
+	m.is_validation = &b
+}
+
+// IsValidation returns the value of the "is_validation" field in the mutation.
+func (m *CodingSubmissionMutation) IsValidation() (r bool, exists bool) {
+	v := m.is_validation
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsValidation returns the old "is_validation" field's value of the CodingSubmission entity.
+// If the CodingSubmission object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CodingSubmissionMutation) OldIsValidation(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsValidation is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsValidation requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsValidation: %w", err)
+	}
+	return oldValue.IsValidation, nil
+}
+
+// ResetIsValidation resets all changes to the "is_validation" field.
+func (m *CodingSubmissionMutation) ResetIsValidation() {
+	m.is_validation = nil
 }
 
 // SetStatus sets the "status" field.
@@ -2634,7 +2671,7 @@ func (m *CodingSubmissionMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CodingSubmissionMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.create_time != nil {
 		fields = append(fields, codingsubmission.FieldCreateTime)
 	}
@@ -2643,6 +2680,9 @@ func (m *CodingSubmissionMutation) Fields() []string {
 	}
 	if m.code != nil {
 		fields = append(fields, codingsubmission.FieldCode)
+	}
+	if m.is_validation != nil {
+		fields = append(fields, codingsubmission.FieldIsValidation)
 	}
 	if m.status != nil {
 		fields = append(fields, codingsubmission.FieldStatus)
@@ -2667,6 +2707,8 @@ func (m *CodingSubmissionMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdateTime()
 	case codingsubmission.FieldCode:
 		return m.Code()
+	case codingsubmission.FieldIsValidation:
+		return m.IsValidation()
 	case codingsubmission.FieldStatus:
 		return m.Status()
 	case codingsubmission.FieldPoints:
@@ -2688,6 +2730,8 @@ func (m *CodingSubmissionMutation) OldField(ctx context.Context, name string) (e
 		return m.OldUpdateTime(ctx)
 	case codingsubmission.FieldCode:
 		return m.OldCode(ctx)
+	case codingsubmission.FieldIsValidation:
+		return m.OldIsValidation(ctx)
 	case codingsubmission.FieldStatus:
 		return m.OldStatus(ctx)
 	case codingsubmission.FieldPoints:
@@ -2723,6 +2767,13 @@ func (m *CodingSubmissionMutation) SetField(name string, value ent.Value) error 
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCode(v)
+		return nil
+	case codingsubmission.FieldIsValidation:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsValidation(v)
 		return nil
 	case codingsubmission.FieldStatus:
 		v, ok := value.(codingsubmission.Status)
@@ -2832,6 +2883,9 @@ func (m *CodingSubmissionMutation) ResetField(name string) error {
 		return nil
 	case codingsubmission.FieldCode:
 		m.ResetCode()
+		return nil
+	case codingsubmission.FieldIsValidation:
+		m.ResetIsValidation()
 		return nil
 	case codingsubmission.FieldStatus:
 		m.ResetStatus()

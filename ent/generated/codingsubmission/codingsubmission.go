@@ -22,6 +22,8 @@ const (
 	FieldUpdateTime = "update_time"
 	// FieldCode holds the string denoting the code field in the database.
 	FieldCode = "code"
+	// FieldIsValidation holds the string denoting the is_validation field in the database.
+	FieldIsValidation = "is_validation"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
 	// FieldPoints holds the string denoting the points field in the database.
@@ -65,6 +67,7 @@ var Columns = []string{
 	FieldCreateTime,
 	FieldUpdateTime,
 	FieldCode,
+	FieldIsValidation,
 	FieldStatus,
 	FieldPoints,
 	FieldResults,
@@ -110,6 +113,8 @@ var (
 	UpdateDefaultUpdateTime func() time.Time
 	// CodeValidator is a validator for the "code" field. It is called by the builders before save.
 	CodeValidator func(string) error
+	// DefaultIsValidation holds the default value on creation for the "is_validation" field.
+	DefaultIsValidation bool
 )
 
 // Status defines the type for the "status" enum field.

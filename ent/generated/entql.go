@@ -85,12 +85,13 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "CodingSubmission",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			codingsubmission.FieldCreateTime: {Type: field.TypeTime, Column: codingsubmission.FieldCreateTime},
-			codingsubmission.FieldUpdateTime: {Type: field.TypeTime, Column: codingsubmission.FieldUpdateTime},
-			codingsubmission.FieldCode:       {Type: field.TypeString, Column: codingsubmission.FieldCode},
-			codingsubmission.FieldStatus:     {Type: field.TypeEnum, Column: codingsubmission.FieldStatus},
-			codingsubmission.FieldPoints:     {Type: field.TypeInt, Column: codingsubmission.FieldPoints},
-			codingsubmission.FieldResults:    {Type: field.TypeJSON, Column: codingsubmission.FieldResults},
+			codingsubmission.FieldCreateTime:   {Type: field.TypeTime, Column: codingsubmission.FieldCreateTime},
+			codingsubmission.FieldUpdateTime:   {Type: field.TypeTime, Column: codingsubmission.FieldUpdateTime},
+			codingsubmission.FieldCode:         {Type: field.TypeString, Column: codingsubmission.FieldCode},
+			codingsubmission.FieldIsValidation: {Type: field.TypeBool, Column: codingsubmission.FieldIsValidation},
+			codingsubmission.FieldStatus:       {Type: field.TypeEnum, Column: codingsubmission.FieldStatus},
+			codingsubmission.FieldPoints:       {Type: field.TypeInt, Column: codingsubmission.FieldPoints},
+			codingsubmission.FieldResults:      {Type: field.TypeJSON, Column: codingsubmission.FieldResults},
 		},
 	}
 	graph.Nodes[4] = &sqlgraph.Node{
@@ -736,6 +737,11 @@ func (f *CodingSubmissionFilter) WhereUpdateTime(p entql.TimeP) {
 // WhereCode applies the entql string predicate on the code field.
 func (f *CodingSubmissionFilter) WhereCode(p entql.StringP) {
 	f.Where(p.Field(codingsubmission.FieldCode))
+}
+
+// WhereIsValidation applies the entql bool predicate on the is_validation field.
+func (f *CodingSubmissionFilter) WhereIsValidation(p entql.BoolP) {
+	f.Where(p.Field(codingsubmission.FieldIsValidation))
 }
 
 // WhereStatus applies the entql string predicate on the status field.

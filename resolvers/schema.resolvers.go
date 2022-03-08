@@ -28,15 +28,20 @@ func (r *codingProblemResolver) MyDraft(ctx context.Context, obj *ent.CodingProb
 	return obj.QueryDrafts().Where(codingdraft.HasAuthorWith(user.ID(viewer.ID))).Only(ctx)
 }
 
-func (r *codingProblemResolver) MySubmissions(ctx context.Context, obj *ent.CodingProblem, after *ent.Cursor, first *int, before *ent.Cursor, last *int) (*ent.CodingSubmissionConnection, error) {
+func (r *codingProblemResolver) MySubmissions(ctx context.Context, obj *ent.CodingProblem, after *ent.Cursor, first *int, before *ent.Cursor, last *int, isValidation *bool) (*ent.CodingSubmissionConnection, error) {
 	viewer, ok := web.ViewerFromContext(ctx)
 	if !ok {
 		return nil, fmt.Errorf("viewer not found")
 	}
-	return obj.QuerySubmissions().
+	query := obj.QuerySubmissions().
 		Where(codingsubmission.HasAuthorWith(user.ID(viewer.ID))).
-		Order(ent.Desc(codingsubmission.FieldCreateTime)).
-		Paginate(ctx, after, first, before, last)
+		Order(ent.Desc(codingsubmission.FieldCreateTime))
+
+	if isValidation != nil {
+		query = query.Where(codingsubmission.IsValidation(*isValidation))
+	}
+
+	return query.Paginate(ctx, after, first, before, last)
 }
 
 func (r *codingProblemResolver) AllSubmissions(ctx context.Context, obj *ent.CodingProblem, after *ent.Cursor, first *int, before *ent.Cursor, last *int) (*ent.CodingSubmissionConnection, error) {
@@ -122,19 +127,19 @@ func (r *mutationResolver) CreateSubmission(ctx context.Context, input model.Cod
 		SetAuthor(viewer).
 		SetCode(input.Code).
 		SetCodingProblemID(input.ProblemID).
+		SetIsValidation(input.IsValidation).
 		Save(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	submission_ctx := privacyrules.NewContextWithAccessToken(ctx, privacyrules.SubmissionEnqueuingAccessToken)
+	if !input.IsValidation {
+		// authorize viewer to see hidden test cases
+		submission_ctx = privacyrules.NewContextWithAccessToken(ctx, privacyrules.FullSubmissionTestCaseAccessToken)
+	}
+	test_case_data, err := site.QueryTestCases(submission).QueryData().All(submission_ctx)
 
-	test_case_data, err := tx.CodingProblem.Query().
-		Where(codingproblem.ID(input.ProblemID)).
-		QueryTestCases().
-		Order(ent.Asc(codingtestcase.FieldCreateTime)).
-		QueryData().
-		All(submission_ctx)
 	if err != nil {
 		return nil, err
 	}

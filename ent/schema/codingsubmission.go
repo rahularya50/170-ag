@@ -30,6 +30,7 @@ type CodingSubmission struct {
 func (CodingSubmission) Fields() []ent.Field {
 	return []ent.Field{
 		field.Text("code").Immutable().MaxLen(65535),
+		field.Bool("is_validation").Immutable().Default(false),
 		field.Enum("status").
 			NamedValues(
 				"Queued", "QUEUED",
@@ -60,7 +61,7 @@ func (CodingSubmission) Mixin() []ent.Mixin {
 
 func (CodingSubmission) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Edges("author", "coding_problem"),
+		index.Edges("author", "coding_problem").Fields("is_validation", "create_time"),
 		index.Edges("coding_problem"),
 		index.Fields("status"),
 	}

@@ -90,6 +90,7 @@ type CodingProblem implements Node {
     first: Int
     before: Cursor
     last: Int
+    is_validation: Boolean
   ): CodingSubmissionConnection!
   all_submissions(
     after: Cursor
@@ -191,6 +192,7 @@ type CodingSubmission implements Node {
   create_time: Time!
   code: String!
   status: CodingSubmissionStatus!
+  is_validation: Boolean!
   staff_data: CodingSubmissionStaffData!
   results: CodingSubmissionResults!
   points: Int
@@ -220,6 +222,7 @@ enum CodingSubmissionResult {
 input CodingSubmissionInput {
   problem_id: ID!
   code: String!
+  is_validation: Boolean! = false
 }
 
 type CodingSubmissionConnection {

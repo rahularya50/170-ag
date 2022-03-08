@@ -84,8 +84,8 @@ func (CodingTestCaseData) Policy() ent.Policy {
 			policy.AllowIfViewerIsStaff(),
 			// if the case is public, we can show its data to anyone who can see the case
 			allowIfTestCaseIsPublic(),
-			// we also need to read its contents when sending a submission to the judge
-			privacyrules.AllowWithPrivacyAccessToken(privacyrules.SubmissionEnqueuingAccessToken),
+			// we also need to read its contents when sending a full submission to the judge
+			privacyrules.AllowWithPrivacyAccessToken(privacyrules.FullSubmissionTestCaseAccessToken),
 			privacy.AlwaysDenyRule(),
 		},
 	}

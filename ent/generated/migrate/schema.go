@@ -113,6 +113,7 @@ var (
 		{Name: "create_time", Type: field.TypeTime},
 		{Name: "update_time", Type: field.TypeTime},
 		{Name: "code", Type: field.TypeString, Size: 65535},
+		{Name: "is_validation", Type: field.TypeBool, Default: false},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"QUEUED", "RUNNING", "COMPLETED", "INTERNAL_ERROR"}, Default: "QUEUED"},
 		{Name: "points", Type: field.TypeInt, Nullable: true},
 		{Name: "results", Type: field.TypeJSON, Nullable: true},
@@ -128,38 +129,38 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "coding_submissions_users_author",
-				Columns:    []*schema.Column{CodingSubmissionsColumns[7]},
+				Columns:    []*schema.Column{CodingSubmissionsColumns[8]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "coding_submissions_coding_problems_coding_problem",
-				Columns:    []*schema.Column{CodingSubmissionsColumns[8]},
+				Columns:    []*schema.Column{CodingSubmissionsColumns[9]},
 				RefColumns: []*schema.Column{CodingProblemsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "coding_submissions_coding_submission_staff_data_coding_submission",
-				Columns:    []*schema.Column{CodingSubmissionsColumns[9]},
+				Columns:    []*schema.Column{CodingSubmissionsColumns[10]},
 				RefColumns: []*schema.Column{CodingSubmissionStaffDataColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
 		Indexes: []*schema.Index{
 			{
-				Name:    "codingsubmission_coding_submission_author_coding_submission_coding_problem",
+				Name:    "codingsubmission_is_validation_create_time_coding_submission_author_coding_submission_coding_problem",
 				Unique:  false,
-				Columns: []*schema.Column{CodingSubmissionsColumns[7], CodingSubmissionsColumns[8]},
+				Columns: []*schema.Column{CodingSubmissionsColumns[4], CodingSubmissionsColumns[1], CodingSubmissionsColumns[8], CodingSubmissionsColumns[9]},
 			},
 			{
 				Name:    "codingsubmission_coding_submission_coding_problem",
 				Unique:  false,
-				Columns: []*schema.Column{CodingSubmissionsColumns[8]},
+				Columns: []*schema.Column{CodingSubmissionsColumns[9]},
 			},
 			{
 				Name:    "codingsubmission_status",
 				Unique:  false,
-				Columns: []*schema.Column{CodingSubmissionsColumns[4]},
+				Columns: []*schema.Column{CodingSubmissionsColumns[5]},
 			},
 		},
 	}

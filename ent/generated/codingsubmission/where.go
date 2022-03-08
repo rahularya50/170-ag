@@ -114,6 +114,13 @@ func Code(v string) predicate.CodingSubmission {
 	})
 }
 
+// IsValidation applies equality check predicate on the "is_validation" field. It's identical to IsValidationEQ.
+func IsValidation(v bool) predicate.CodingSubmission {
+	return predicate.CodingSubmission(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldIsValidation), v))
+	})
+}
+
 // Points applies equality check predicate on the "points" field. It's identical to PointsEQ.
 func Points(v int) predicate.CodingSubmission {
 	return predicate.CodingSubmission(func(s *sql.Selector) {
@@ -381,6 +388,20 @@ func CodeEqualFold(v string) predicate.CodingSubmission {
 func CodeContainsFold(v string) predicate.CodingSubmission {
 	return predicate.CodingSubmission(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldCode), v))
+	})
+}
+
+// IsValidationEQ applies the EQ predicate on the "is_validation" field.
+func IsValidationEQ(v bool) predicate.CodingSubmission {
+	return predicate.CodingSubmission(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldIsValidation), v))
+	})
+}
+
+// IsValidationNEQ applies the NEQ predicate on the "is_validation" field.
+func IsValidationNEQ(v bool) predicate.CodingSubmission {
+	return predicate.CodingSubmission(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldIsValidation), v))
 	})
 }
 
