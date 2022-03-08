@@ -21,6 +21,8 @@ func JudgeLoadedRequest(ctx context.Context) error {
 		return err
 	}
 	cmd := exec.CommandContext(cmd_ctx, "/bin/sh", "-c", "ulimit -v 500000 -t 15; python3 tmp.py")
+	stderrBuilder := new(strings.Builder)
+	cmd.Stderr = stderrBuilder
 	cmd.Stdin = strings.NewReader(request.Input)
 	stdout, err := cmd.Output()
 	result := schemas.ExecutionResult_OK
@@ -28,10 +30,9 @@ func JudgeLoadedRequest(ctx context.Context) error {
 		result = schemas.ExecutionResult_TIME_LIMIT_EXCEEDED
 	}
 	exit_err, _ := err.(*exec.ExitError)
-	var stderr string
+	stderr := stderrBuilder.String()
 	var errorCode string
 	if exit_err != nil {
-		stderr = string(exit_err.Stderr)
 		errorCode = err.Error()
 		switch errStr := strings.ToLower(stderr); {
 		case strings.Contains(errStr, "memory"):

@@ -74,24 +74,6 @@ export default function ProblemValidation(props: Props): React.Node {
         }).format(new Date(create_time))}
       </h3>
       <p className="lead">Status: {status}</p>
-      {output != null && (
-        <div>
-          Standard Output:
-          <pre>{output || "(None)"}</pre>
-        </div>
-      )}
-      {stderr != null && (
-        <div>
-          Standard Error:
-          <pre>{stderr || "(None)"}</pre>
-        </div>
-      )}
-      {exit_error != null && (
-        <div>
-          Exit Status:
-          <pre>{exit_error || "(None)"}</pre>
-        </div>
-      )}
       {case_results.length > 0 && (
         <Table hover>
           <thead>
@@ -109,6 +91,24 @@ export default function ProblemValidation(props: Props): React.Node {
             ))}
           </tbody>
         </Table>
+      )}
+      {output != null && (
+        <div>
+          Standard Output:
+          <pre>{output || "(None)"}</pre>
+        </div>
+      )}
+      {stderr != null && (
+        <div>
+          Standard Error:
+          <pre>{stderr || "(None)"}</pre>
+        </div>
+      )}
+      {exit_error != null && (
+        <div>
+          Exit Status:
+          <pre>{exit_error || "(None)"}</pre>
+        </div>
       )}
     </div>
   );

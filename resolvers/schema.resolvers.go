@@ -136,7 +136,7 @@ func (r *mutationResolver) CreateSubmission(ctx context.Context, input model.Cod
 	submission_ctx := privacyrules.NewContextWithAccessToken(ctx, privacyrules.SubmissionEnqueuingAccessToken)
 	if !input.IsValidation {
 		// authorize viewer to see hidden test cases
-		submission_ctx = privacyrules.NewContextWithAccessToken(ctx, privacyrules.FullSubmissionTestCaseAccessToken)
+		submission_ctx = privacyrules.NewContextWithAccessToken(submission_ctx, privacyrules.FullSubmissionTestCaseAccessToken)
 	}
 	test_case_data, err := site.QueryTestCases(submission).QueryData().All(submission_ctx)
 
