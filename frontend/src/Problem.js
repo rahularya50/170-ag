@@ -12,6 +12,7 @@ import ProblemRoster from "./ProblemRoster";
 import ProblemStatement from "./ProblemStatement";
 import ProblemSubmissions from "./ProblemSubmissions";
 import ProblemTestCases from "./ProblemTestCases";
+import ProblemValidation from "./ProblemValidation";
 
 export default function Problem(): React.Node {
   const { id } = useParams();
@@ -28,9 +29,10 @@ export default function Problem(): React.Node {
         coding_problem(id: $id) {
           ...ProblemStatement_problem
           ...ProblemTestCases_problem
+          ...ProblemRoster_problem
           ...ProblemSubmissions_problem
           ...ProblemEditor_problem
-          ...ProblemRoster_problem
+          ...ProblemValidation_problem
         }
       }
     `,
@@ -53,6 +55,9 @@ export default function Problem(): React.Node {
               <ProblemTestCases viewer={viewer} problem={coding_problem} />
               {viewer.is_staff && <ProblemRoster problem={coding_problem} />}
             </Tab>
+            <Tab eventKey="validation" title="Validation">
+              <ProblemValidation problem={coding_problem} />
+            </Tab>
             <Tab eventKey="submissions" title="Submissions">
               <ProblemSubmissions problem={coding_problem} />
             </Tab>
@@ -63,6 +68,7 @@ export default function Problem(): React.Node {
           <ProblemEditor
             viewer={viewer}
             problem={coding_problem}
+            onValidate={() => setTab("validation")}
             onSubmit={() => setTab("submissions")}
           />
         </Col>

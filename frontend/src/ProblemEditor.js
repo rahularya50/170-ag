@@ -21,6 +21,7 @@ import "ace-builds/src-noconflict/mode-python";
 type Props = {
   viewer: ProblemEditor_viewer$key,
   problem: ProblemEditor_problem$key,
+  onValidate: () => mixed,
   onSubmit: () => mixed,
 };
 
@@ -91,7 +92,7 @@ export default function ProblemEditor(props: Props): React.Node {
         mutation ProblemEditorValidateMutation($input: CodingSubmissionInput!) {
           create_submission(input: $input) {
             coding_problem {
-              ...ProblemSubmissions_problem
+              ...ProblemValidation_problem
             }
           }
         }
@@ -103,8 +104,13 @@ export default function ProblemEditor(props: Props): React.Node {
       variables: {
         input: { problem_id: id, code: studentCode, is_validation: true },
       },
+      onCompleted: () => {
+        props.onValidate();
+      },
       onError: () => {
-        alert("validation failed!");
+        alert(
+          "validation failed! (did you submit too often in the last few minutes?)"
+        );
       },
     });
   };
@@ -131,7 +137,9 @@ export default function ProblemEditor(props: Props): React.Node {
         props.onSubmit();
       },
       onError: () => {
-        alert("submission failed!");
+        alert(
+          "submission failed! (did you submit too often in the last few minutes?)"
+        );
       },
     });
   };
@@ -203,10 +211,20 @@ export default function ProblemEditor(props: Props): React.Node {
         >
           {isSaved ? "Draft Saved" : "Save Draft"}
         </LoadingButton>
-        <LoadingButton isUpdating={isValidating} onClick={validate} size="sm">
+        <LoadingButton
+          isUpdating={isValidating}
+          onClick={validate}
+          variant="primary"
+          size="sm"
+        >
           Validate
         </LoadingButton>
-        <LoadingButton isUpdating={isSubmitting} onClick={submit} size="sm">
+        <LoadingButton
+          isUpdating={isSubmitting}
+          onClick={submit}
+          variant="danger"
+          size="sm"
+        >
           Submit
         </LoadingButton>
       </Stack>

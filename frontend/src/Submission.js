@@ -75,7 +75,7 @@ export default function Submission(): React.Node {
             <Table hover>
               <thead>
                 <tr>
-                  <th>Submission</th>
+                  <th>Case</th>
                   <th>Status</th>
                   <th>Score</th>
                 </tr>
