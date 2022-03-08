@@ -58,7 +58,7 @@ func CleanupStalled(c context.Context, client *ent.Client, timeout time.Duration
 	return client.CodingSubmission.Update().
 		Where(
 			codingsubmission.StatusEQ(codingsubmission.StatusRunning),
-			codingsubmission.UpdateTimeGT(time.Now().Add(-timeout))).
+			codingsubmission.UpdateTimeLT(time.Now().Add(-timeout))).
 		SetStatus(codingsubmission.StatusInternalError).
 		Exec(c)
 }

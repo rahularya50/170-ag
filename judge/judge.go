@@ -14,13 +14,13 @@ func JudgeLoadedRequest(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	cmd_ctx, cancel := context.WithTimeout(ctx, time.Duration(time.Second*10))
+	cmd_ctx, cancel := context.WithTimeout(ctx, time.Duration(time.Second*20))
 	defer cancel()
 	err = os.WriteFile("tmp.py", []byte(request.Code), 0644)
 	if err != nil {
 		return err
 	}
-	cmd := exec.CommandContext(cmd_ctx, "/bin/sh", "-c", "ulimit -v 500000 -t 5; python3 tmp.py")
+	cmd := exec.CommandContext(cmd_ctx, "/bin/sh", "-c", "ulimit -v 500000 -t 15; python3 tmp.py")
 	cmd.Stdin = strings.NewReader(request.Input)
 	stdout, err := cmd.Output()
 	result := schemas.ExecutionResult_OK
