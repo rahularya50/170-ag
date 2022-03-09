@@ -5,7 +5,6 @@ import * as React from "react";
 import { useMemo } from "react";
 import { Table } from "react-bootstrap";
 import { useFragment } from "react-relay/hooks";
-import { generatePath, Link } from "react-router-dom";
 
 import type { ProblemValidation_problem$key } from "./__generated__/ProblemValidation_problem.graphql";
 import ProblemValidationRefetchQuery from "./__generated__/ProblemValidationRefetchQuery.graphql";

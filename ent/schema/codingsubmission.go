@@ -61,7 +61,7 @@ func (CodingSubmission) Mixin() []ent.Mixin {
 
 func (CodingSubmission) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Edges("author", "coding_problem").Fields("is_validation", "create_time"),
+		index.Edges("author", "coding_problem"),
 		index.Edges("coding_problem"),
 		index.Fields("status"),
 	}

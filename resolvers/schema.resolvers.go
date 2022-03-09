@@ -9,6 +9,7 @@ import (
 	"170-ag/ent/generated/codingproblem"
 	"170-ag/ent/generated/codingsubmission"
 	"170-ag/ent/generated/codingtestcase"
+	"170-ag/ent/generated/codingtestcasedata"
 	"170-ag/ent/generated/user"
 	"170-ag/privacyrules"
 	resolvers "170-ag/resolvers/generated"
@@ -138,7 +139,7 @@ func (r *mutationResolver) CreateSubmission(ctx context.Context, input model.Cod
 		// authorize viewer to see hidden test cases
 		submission_ctx = privacyrules.NewContextWithAccessToken(submission_ctx, privacyrules.FullSubmissionTestCaseAccessToken)
 	}
-	test_case_data, err := site.QueryTestCases(submission).QueryData().All(submission_ctx)
+	test_case_data, err := site.QueryTestCases(submission).QueryData().Order(ent.Asc(codingtestcasedata.FieldCreateTime)).All(submission_ctx)
 
 	if err != nil {
 		return nil, err

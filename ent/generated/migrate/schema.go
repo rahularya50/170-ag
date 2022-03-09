@@ -148,9 +148,9 @@ var (
 		},
 		Indexes: []*schema.Index{
 			{
-				Name:    "codingsubmission_is_validation_create_time_coding_submission_author_coding_submission_coding_problem",
+				Name:    "codingsubmission_coding_submission_author_coding_submission_coding_problem",
 				Unique:  false,
-				Columns: []*schema.Column{CodingSubmissionsColumns[4], CodingSubmissionsColumns[1], CodingSubmissionsColumns[8], CodingSubmissionsColumns[9]},
+				Columns: []*schema.Column{CodingSubmissionsColumns[8], CodingSubmissionsColumns[9]},
 			},
 			{
 				Name:    "codingsubmission_coding_submission_coding_problem",
