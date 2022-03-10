@@ -9,6 +9,16 @@ import (
 	"time"
 )
 
+const OUTPUT_MAXLEN = 7000000
+const ERR_MAXLEN = 10000
+
+func truncate(s string, maxLen int) string {
+	if len(s) < maxLen {
+		return s
+	}
+	return s[:maxLen]
+}
+
 func JudgeLoadedRequest(ctx context.Context) error {
 	request, err := loadJudgingProto()
 	if err != nil {
@@ -43,9 +53,9 @@ func JudgeLoadedRequest(ctx context.Context) error {
 	}
 	response := &schemas.GradingResponse{
 		IdNonce:   request.IdNonce,
-		Stdout:    string(stdout),
-		Stderr:    stderr,
-		ErrorCode: errorCode,
+		Stdout:    truncate(string(stdout), OUTPUT_MAXLEN),
+		Stderr:    truncate(stderr, ERR_MAXLEN),
+		ErrorCode: truncate(errorCode, ERR_MAXLEN),
 		Result:    result,
 	}
 	err = storeGradingProto(response)
