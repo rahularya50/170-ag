@@ -6,3 +6,4 @@ spec:
   domains:
     - judge.rahularya.org
     - judge.cs170.org
+    - scoreboard-grpc.judge.rahularya.org

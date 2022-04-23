@@ -22,6 +22,7 @@ flow:
 # serve backend (run `yarn start` for frontend)
 view: export SESSION_KEY = abcdef
 view: export ENV = dev
+view: export GRADESCOPE_TOKEN = abcdef
 
 view:
 	go run ./cmd/site

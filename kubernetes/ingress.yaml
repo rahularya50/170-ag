@@ -13,6 +13,27 @@ spec:
       name: web-frontend
       port:
         number: 80
+  rules:
+    - host: scoreboard-grpc.judge.rahularya.org
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-frontend
+                port:
+                  number: 6000
+    - host: judge.cs170.org
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-frontend
+                port:
+                  number: 80
 ---
 apiVersion: networking.gke.io/v1beta1
 kind: FrontendConfig

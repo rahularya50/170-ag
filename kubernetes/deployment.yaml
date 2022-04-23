@@ -22,6 +22,8 @@ spec:
               value: prod
             - name: PORT
               value: "8080"
+            - name: GRPC_PORT
+              value: "6000"
             - name: ENDPOINT
               value: "cal/cs170/sp22"
           envFrom:
