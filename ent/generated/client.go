@@ -16,6 +16,8 @@ import (
 	"170-ag/ent/generated/codingsubmissionstaffdata"
 	"170-ag/ent/generated/codingtestcase"
 	"170-ag/ent/generated/codingtestcasedata"
+	"170-ag/ent/generated/projectscore"
+	"170-ag/ent/generated/projectteam"
 	"170-ag/ent/generated/user"
 
 	"entgo.io/ent/dialect"
@@ -42,6 +44,10 @@ type Client struct {
 	CodingTestCase *CodingTestCaseClient
 	// CodingTestCaseData is the client for interacting with the CodingTestCaseData builders.
 	CodingTestCaseData *CodingTestCaseDataClient
+	// ProjectScore is the client for interacting with the ProjectScore builders.
+	ProjectScore *ProjectScoreClient
+	// ProjectTeam is the client for interacting with the ProjectTeam builders.
+	ProjectTeam *ProjectTeamClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 	// additional fields for node api
@@ -66,6 +72,8 @@ func (c *Client) init() {
 	c.CodingSubmissionStaffData = NewCodingSubmissionStaffDataClient(c.config)
 	c.CodingTestCase = NewCodingTestCaseClient(c.config)
 	c.CodingTestCaseData = NewCodingTestCaseDataClient(c.config)
+	c.ProjectScore = NewProjectScoreClient(c.config)
+	c.ProjectTeam = NewProjectTeamClient(c.config)
 	c.User = NewUserClient(c.config)
 }
 
@@ -107,6 +115,8 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		CodingSubmissionStaffData: NewCodingSubmissionStaffDataClient(cfg),
 		CodingTestCase:            NewCodingTestCaseClient(cfg),
 		CodingTestCaseData:        NewCodingTestCaseDataClient(cfg),
+		ProjectScore:              NewProjectScoreClient(cfg),
+		ProjectTeam:               NewProjectTeamClient(cfg),
 		User:                      NewUserClient(cfg),
 	}, nil
 }
@@ -134,6 +144,8 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		CodingSubmissionStaffData: NewCodingSubmissionStaffDataClient(cfg),
 		CodingTestCase:            NewCodingTestCaseClient(cfg),
 		CodingTestCaseData:        NewCodingTestCaseDataClient(cfg),
+		ProjectScore:              NewProjectScoreClient(cfg),
+		ProjectTeam:               NewProjectTeamClient(cfg),
 		User:                      NewUserClient(cfg),
 	}, nil
 }
@@ -171,6 +183,8 @@ func (c *Client) Use(hooks ...Hook) {
 	c.CodingSubmissionStaffData.Use(hooks...)
 	c.CodingTestCase.Use(hooks...)
 	c.CodingTestCaseData.Use(hooks...)
+	c.ProjectScore.Use(hooks...)
+	c.ProjectTeam.Use(hooks...)
 	c.User.Use(hooks...)
 }
 
@@ -1049,6 +1063,220 @@ func (c *CodingTestCaseDataClient) QueryTestCase(ctcd *CodingTestCaseData) *Codi
 func (c *CodingTestCaseDataClient) Hooks() []Hook {
 	hooks := c.hooks.CodingTestCaseData
 	return append(hooks[:len(hooks):len(hooks)], codingtestcasedata.Hooks[:]...)
+}
+
+// ProjectScoreClient is a client for the ProjectScore schema.
+type ProjectScoreClient struct {
+	config
+}
+
+// NewProjectScoreClient returns a client for the ProjectScore from the given config.
+func NewProjectScoreClient(c config) *ProjectScoreClient {
+	return &ProjectScoreClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `projectscore.Hooks(f(g(h())))`.
+func (c *ProjectScoreClient) Use(hooks ...Hook) {
+	c.hooks.ProjectScore = append(c.hooks.ProjectScore, hooks...)
+}
+
+// Create returns a create builder for ProjectScore.
+func (c *ProjectScoreClient) Create() *ProjectScoreCreate {
+	mutation := newProjectScoreMutation(c.config, OpCreate)
+	return &ProjectScoreCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ProjectScore entities.
+func (c *ProjectScoreClient) CreateBulk(builders ...*ProjectScoreCreate) *ProjectScoreCreateBulk {
+	return &ProjectScoreCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ProjectScore.
+func (c *ProjectScoreClient) Update() *ProjectScoreUpdate {
+	mutation := newProjectScoreMutation(c.config, OpUpdate)
+	return &ProjectScoreUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ProjectScoreClient) UpdateOne(ps *ProjectScore) *ProjectScoreUpdateOne {
+	mutation := newProjectScoreMutation(c.config, OpUpdateOne, withProjectScore(ps))
+	return &ProjectScoreUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ProjectScoreClient) UpdateOneID(id int) *ProjectScoreUpdateOne {
+	mutation := newProjectScoreMutation(c.config, OpUpdateOne, withProjectScoreID(id))
+	return &ProjectScoreUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ProjectScore.
+func (c *ProjectScoreClient) Delete() *ProjectScoreDelete {
+	mutation := newProjectScoreMutation(c.config, OpDelete)
+	return &ProjectScoreDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *ProjectScoreClient) DeleteOne(ps *ProjectScore) *ProjectScoreDeleteOne {
+	return c.DeleteOneID(ps.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *ProjectScoreClient) DeleteOneID(id int) *ProjectScoreDeleteOne {
+	builder := c.Delete().Where(projectscore.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ProjectScoreDeleteOne{builder}
+}
+
+// Query returns a query builder for ProjectScore.
+func (c *ProjectScoreClient) Query() *ProjectScoreQuery {
+	return &ProjectScoreQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a ProjectScore entity by its id.
+func (c *ProjectScoreClient) Get(ctx context.Context, id int) (*ProjectScore, error) {
+	return c.Query().Where(projectscore.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ProjectScoreClient) GetX(ctx context.Context, id int) *ProjectScore {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryTeam queries the team edge of a ProjectScore.
+func (c *ProjectScoreClient) QueryTeam(ps *ProjectScore) *ProjectTeamQuery {
+	query := &ProjectTeamQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := ps.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(projectscore.Table, projectscore.FieldID, id),
+			sqlgraph.To(projectteam.Table, projectteam.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, projectscore.TeamTable, projectscore.TeamColumn),
+		)
+		fromV = sqlgraph.Neighbors(ps.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ProjectScoreClient) Hooks() []Hook {
+	hooks := c.hooks.ProjectScore
+	return append(hooks[:len(hooks):len(hooks)], projectscore.Hooks[:]...)
+}
+
+// ProjectTeamClient is a client for the ProjectTeam schema.
+type ProjectTeamClient struct {
+	config
+}
+
+// NewProjectTeamClient returns a client for the ProjectTeam from the given config.
+func NewProjectTeamClient(c config) *ProjectTeamClient {
+	return &ProjectTeamClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `projectteam.Hooks(f(g(h())))`.
+func (c *ProjectTeamClient) Use(hooks ...Hook) {
+	c.hooks.ProjectTeam = append(c.hooks.ProjectTeam, hooks...)
+}
+
+// Create returns a create builder for ProjectTeam.
+func (c *ProjectTeamClient) Create() *ProjectTeamCreate {
+	mutation := newProjectTeamMutation(c.config, OpCreate)
+	return &ProjectTeamCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ProjectTeam entities.
+func (c *ProjectTeamClient) CreateBulk(builders ...*ProjectTeamCreate) *ProjectTeamCreateBulk {
+	return &ProjectTeamCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ProjectTeam.
+func (c *ProjectTeamClient) Update() *ProjectTeamUpdate {
+	mutation := newProjectTeamMutation(c.config, OpUpdate)
+	return &ProjectTeamUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ProjectTeamClient) UpdateOne(pt *ProjectTeam) *ProjectTeamUpdateOne {
+	mutation := newProjectTeamMutation(c.config, OpUpdateOne, withProjectTeam(pt))
+	return &ProjectTeamUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ProjectTeamClient) UpdateOneID(id int) *ProjectTeamUpdateOne {
+	mutation := newProjectTeamMutation(c.config, OpUpdateOne, withProjectTeamID(id))
+	return &ProjectTeamUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ProjectTeam.
+func (c *ProjectTeamClient) Delete() *ProjectTeamDelete {
+	mutation := newProjectTeamMutation(c.config, OpDelete)
+	return &ProjectTeamDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *ProjectTeamClient) DeleteOne(pt *ProjectTeam) *ProjectTeamDeleteOne {
+	return c.DeleteOneID(pt.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *ProjectTeamClient) DeleteOneID(id int) *ProjectTeamDeleteOne {
+	builder := c.Delete().Where(projectteam.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ProjectTeamDeleteOne{builder}
+}
+
+// Query returns a query builder for ProjectTeam.
+func (c *ProjectTeamClient) Query() *ProjectTeamQuery {
+	return &ProjectTeamQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a ProjectTeam entity by its id.
+func (c *ProjectTeamClient) Get(ctx context.Context, id int) (*ProjectTeam, error) {
+	return c.Query().Where(projectteam.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ProjectTeamClient) GetX(ctx context.Context, id int) *ProjectTeam {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryScores queries the scores edge of a ProjectTeam.
+func (c *ProjectTeamClient) QueryScores(pt *ProjectTeam) *ProjectScoreQuery {
+	query := &ProjectScoreQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := pt.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(projectteam.Table, projectteam.FieldID, id),
+			sqlgraph.To(projectscore.Table, projectscore.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, projectteam.ScoresTable, projectteam.ScoresColumn),
+		)
+		fromV = sqlgraph.Neighbors(pt.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ProjectTeamClient) Hooks() []Hook {
+	hooks := c.hooks.ProjectTeam
+	return append(hooks[:len(hooks):len(hooks)], projectteam.Hooks[:]...)
 }
 
 // UserClient is a client for the User schema.
