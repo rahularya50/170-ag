@@ -11,6 +11,8 @@ import (
 	"170-ag/ent/generated/codingtestcase"
 	"170-ag/ent/generated/codingtestcasedata"
 	"170-ag/ent/generated/predicate"
+	"170-ag/ent/generated/projectscore"
+	"170-ag/ent/generated/projectteam"
 	"170-ag/ent/generated/user"
 
 	"entgo.io/ent/dialect/sql"
@@ -21,7 +23,7 @@ import (
 
 // schemaGraph holds a representation of ent/schema at runtime.
 var schemaGraph = func() *sqlgraph.Schema {
-	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 8)}
+	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 10)}
 	graph.Nodes[0] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   codingdraft.Table,
@@ -149,6 +151,40 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 	}
 	graph.Nodes[7] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   projectscore.Table,
+			Columns: projectscore.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: projectscore.FieldID,
+			},
+		},
+		Type: "ProjectScore",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			projectscore.FieldCreateTime: {Type: field.TypeTime, Column: projectscore.FieldCreateTime},
+			projectscore.FieldUpdateTime: {Type: field.TypeTime, Column: projectscore.FieldUpdateTime},
+			projectscore.FieldCaseID:     {Type: field.TypeInt32, Column: projectscore.FieldCaseID},
+			projectscore.FieldScore:      {Type: field.TypeFloat64, Column: projectscore.FieldScore},
+		},
+	}
+	graph.Nodes[8] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   projectteam.Table,
+			Columns: projectteam.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: projectteam.FieldID,
+			},
+		},
+		Type: "ProjectTeam",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			projectteam.FieldCreateTime: {Type: field.TypeTime, Column: projectteam.FieldCreateTime},
+			projectteam.FieldUpdateTime: {Type: field.TypeTime, Column: projectteam.FieldUpdateTime},
+			projectteam.FieldTeamID:     {Type: field.TypeInt32, Column: projectteam.FieldTeamID},
+			projectteam.FieldName:       {Type: field.TypeString, Column: projectteam.FieldName},
+		},
+	}
+	graph.Nodes[9] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   user.Table,
 			Columns: user.Columns,
@@ -345,6 +381,30 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		"CodingTestCaseData",
 		"CodingTestCase",
+	)
+	graph.MustAddE(
+		"team",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   projectscore.TeamTable,
+			Columns: []string{projectscore.TeamColumn},
+			Bidi:    false,
+		},
+		"ProjectScore",
+		"ProjectTeam",
+	)
+	graph.MustAddE(
+		"scores",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   projectteam.ScoresTable,
+			Columns: []string{projectteam.ScoresColumn},
+			Bidi:    false,
+		},
+		"ProjectTeam",
+		"ProjectScore",
 	)
 	graph.MustAddE(
 		"drafts",
@@ -1050,6 +1110,152 @@ func (f *CodingTestCaseDataFilter) WhereHasTestCaseWith(preds ...predicate.Codin
 }
 
 // addPredicate implements the predicateAdder interface.
+func (psq *ProjectScoreQuery) addPredicate(pred func(s *sql.Selector)) {
+	psq.predicates = append(psq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the ProjectScoreQuery builder.
+func (psq *ProjectScoreQuery) Filter() *ProjectScoreFilter {
+	return &ProjectScoreFilter{psq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *ProjectScoreMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the ProjectScoreMutation builder.
+func (m *ProjectScoreMutation) Filter() *ProjectScoreFilter {
+	return &ProjectScoreFilter{m}
+}
+
+// ProjectScoreFilter provides a generic filtering capability at runtime for ProjectScoreQuery.
+type ProjectScoreFilter struct {
+	predicateAdder
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *ProjectScoreFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[7].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int predicate on the id field.
+func (f *ProjectScoreFilter) WhereID(p entql.IntP) {
+	f.Where(p.Field(projectscore.FieldID))
+}
+
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *ProjectScoreFilter) WhereCreateTime(p entql.TimeP) {
+	f.Where(p.Field(projectscore.FieldCreateTime))
+}
+
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *ProjectScoreFilter) WhereUpdateTime(p entql.TimeP) {
+	f.Where(p.Field(projectscore.FieldUpdateTime))
+}
+
+// WhereCaseID applies the entql int32 predicate on the case_id field.
+func (f *ProjectScoreFilter) WhereCaseID(p entql.Int32P) {
+	f.Where(p.Field(projectscore.FieldCaseID))
+}
+
+// WhereScore applies the entql float64 predicate on the score field.
+func (f *ProjectScoreFilter) WhereScore(p entql.Float64P) {
+	f.Where(p.Field(projectscore.FieldScore))
+}
+
+// WhereHasTeam applies a predicate to check if query has an edge team.
+func (f *ProjectScoreFilter) WhereHasTeam() {
+	f.Where(entql.HasEdge("team"))
+}
+
+// WhereHasTeamWith applies a predicate to check if query has an edge team with a given conditions (other predicates).
+func (f *ProjectScoreFilter) WhereHasTeamWith(preds ...predicate.ProjectTeam) {
+	f.Where(entql.HasEdgeWith("team", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (ptq *ProjectTeamQuery) addPredicate(pred func(s *sql.Selector)) {
+	ptq.predicates = append(ptq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the ProjectTeamQuery builder.
+func (ptq *ProjectTeamQuery) Filter() *ProjectTeamFilter {
+	return &ProjectTeamFilter{ptq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *ProjectTeamMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the ProjectTeamMutation builder.
+func (m *ProjectTeamMutation) Filter() *ProjectTeamFilter {
+	return &ProjectTeamFilter{m}
+}
+
+// ProjectTeamFilter provides a generic filtering capability at runtime for ProjectTeamQuery.
+type ProjectTeamFilter struct {
+	predicateAdder
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *ProjectTeamFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[8].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int predicate on the id field.
+func (f *ProjectTeamFilter) WhereID(p entql.IntP) {
+	f.Where(p.Field(projectteam.FieldID))
+}
+
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *ProjectTeamFilter) WhereCreateTime(p entql.TimeP) {
+	f.Where(p.Field(projectteam.FieldCreateTime))
+}
+
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *ProjectTeamFilter) WhereUpdateTime(p entql.TimeP) {
+	f.Where(p.Field(projectteam.FieldUpdateTime))
+}
+
+// WhereTeamID applies the entql int32 predicate on the team_id field.
+func (f *ProjectTeamFilter) WhereTeamID(p entql.Int32P) {
+	f.Where(p.Field(projectteam.FieldTeamID))
+}
+
+// WhereName applies the entql string predicate on the name field.
+func (f *ProjectTeamFilter) WhereName(p entql.StringP) {
+	f.Where(p.Field(projectteam.FieldName))
+}
+
+// WhereHasScores applies a predicate to check if query has an edge scores.
+func (f *ProjectTeamFilter) WhereHasScores() {
+	f.Where(entql.HasEdge("scores"))
+}
+
+// WhereHasScoresWith applies a predicate to check if query has an edge scores with a given conditions (other predicates).
+func (f *ProjectTeamFilter) WhereHasScoresWith(preds ...predicate.ProjectScore) {
+	f.Where(entql.HasEdgeWith("scores", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
 func (uq *UserQuery) addPredicate(pred func(s *sql.Selector)) {
 	uq.predicates = append(uq.predicates, pred)
 }
@@ -1077,7 +1283,7 @@ type UserFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *UserFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[7].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[9].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})

@@ -11,6 +11,8 @@ import (
 	"170-ag/ent/generated/codingtestcase"
 	"170-ag/ent/generated/codingtestcasedata"
 	"170-ag/ent/generated/predicate"
+	"170-ag/ent/generated/projectscore"
+	"170-ag/ent/generated/projectteam"
 	"170-ag/ent/generated/user"
 	"170-ag/ent/models"
 	"context"
@@ -38,6 +40,8 @@ const (
 	TypeCodingSubmissionStaffData = "CodingSubmissionStaffData"
 	TypeCodingTestCase            = "CodingTestCase"
 	TypeCodingTestCaseData        = "CodingTestCaseData"
+	TypeProjectScore              = "ProjectScore"
+	TypeProjectTeam               = "ProjectTeam"
 	TypeUser                      = "User"
 )
 
@@ -5009,6 +5013,1219 @@ func (m *CodingTestCaseDataMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown CodingTestCaseData edge %s", name)
+}
+
+// ProjectScoreMutation represents an operation that mutates the ProjectScore nodes in the graph.
+type ProjectScoreMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int
+	create_time   *time.Time
+	update_time   *time.Time
+	case_id       *int32
+	addcase_id    *int32
+	score         *float64
+	addscore      *float64
+	clearedFields map[string]struct{}
+	team          *int
+	clearedteam   bool
+	done          bool
+	oldValue      func(context.Context) (*ProjectScore, error)
+	predicates    []predicate.ProjectScore
+}
+
+var _ ent.Mutation = (*ProjectScoreMutation)(nil)
+
+// projectscoreOption allows management of the mutation configuration using functional options.
+type projectscoreOption func(*ProjectScoreMutation)
+
+// newProjectScoreMutation creates new mutation for the ProjectScore entity.
+func newProjectScoreMutation(c config, op Op, opts ...projectscoreOption) *ProjectScoreMutation {
+	m := &ProjectScoreMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeProjectScore,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withProjectScoreID sets the ID field of the mutation.
+func withProjectScoreID(id int) projectscoreOption {
+	return func(m *ProjectScoreMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *ProjectScore
+		)
+		m.oldValue = func(ctx context.Context) (*ProjectScore, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().ProjectScore.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withProjectScore sets the old ProjectScore of the mutation.
+func withProjectScore(node *ProjectScore) projectscoreOption {
+	return func(m *ProjectScoreMutation) {
+		m.oldValue = func(context.Context) (*ProjectScore, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ProjectScoreMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ProjectScoreMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("generated: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ProjectScoreMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ProjectScoreMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().ProjectScore.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreateTime sets the "create_time" field.
+func (m *ProjectScoreMutation) SetCreateTime(t time.Time) {
+	m.create_time = &t
+}
+
+// CreateTime returns the value of the "create_time" field in the mutation.
+func (m *ProjectScoreMutation) CreateTime() (r time.Time, exists bool) {
+	v := m.create_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreateTime returns the old "create_time" field's value of the ProjectScore entity.
+// If the ProjectScore object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProjectScoreMutation) OldCreateTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreateTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreateTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreateTime: %w", err)
+	}
+	return oldValue.CreateTime, nil
+}
+
+// ResetCreateTime resets all changes to the "create_time" field.
+func (m *ProjectScoreMutation) ResetCreateTime() {
+	m.create_time = nil
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (m *ProjectScoreMutation) SetUpdateTime(t time.Time) {
+	m.update_time = &t
+}
+
+// UpdateTime returns the value of the "update_time" field in the mutation.
+func (m *ProjectScoreMutation) UpdateTime() (r time.Time, exists bool) {
+	v := m.update_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdateTime returns the old "update_time" field's value of the ProjectScore entity.
+// If the ProjectScore object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProjectScoreMutation) OldUpdateTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdateTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdateTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdateTime: %w", err)
+	}
+	return oldValue.UpdateTime, nil
+}
+
+// ResetUpdateTime resets all changes to the "update_time" field.
+func (m *ProjectScoreMutation) ResetUpdateTime() {
+	m.update_time = nil
+}
+
+// SetCaseID sets the "case_id" field.
+func (m *ProjectScoreMutation) SetCaseID(i int32) {
+	m.case_id = &i
+	m.addcase_id = nil
+}
+
+// CaseID returns the value of the "case_id" field in the mutation.
+func (m *ProjectScoreMutation) CaseID() (r int32, exists bool) {
+	v := m.case_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCaseID returns the old "case_id" field's value of the ProjectScore entity.
+// If the ProjectScore object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProjectScoreMutation) OldCaseID(ctx context.Context) (v int32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCaseID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCaseID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCaseID: %w", err)
+	}
+	return oldValue.CaseID, nil
+}
+
+// AddCaseID adds i to the "case_id" field.
+func (m *ProjectScoreMutation) AddCaseID(i int32) {
+	if m.addcase_id != nil {
+		*m.addcase_id += i
+	} else {
+		m.addcase_id = &i
+	}
+}
+
+// AddedCaseID returns the value that was added to the "case_id" field in this mutation.
+func (m *ProjectScoreMutation) AddedCaseID() (r int32, exists bool) {
+	v := m.addcase_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCaseID resets all changes to the "case_id" field.
+func (m *ProjectScoreMutation) ResetCaseID() {
+	m.case_id = nil
+	m.addcase_id = nil
+}
+
+// SetScore sets the "score" field.
+func (m *ProjectScoreMutation) SetScore(f float64) {
+	m.score = &f
+	m.addscore = nil
+}
+
+// Score returns the value of the "score" field in the mutation.
+func (m *ProjectScoreMutation) Score() (r float64, exists bool) {
+	v := m.score
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldScore returns the old "score" field's value of the ProjectScore entity.
+// If the ProjectScore object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProjectScoreMutation) OldScore(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldScore is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldScore requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldScore: %w", err)
+	}
+	return oldValue.Score, nil
+}
+
+// AddScore adds f to the "score" field.
+func (m *ProjectScoreMutation) AddScore(f float64) {
+	if m.addscore != nil {
+		*m.addscore += f
+	} else {
+		m.addscore = &f
+	}
+}
+
+// AddedScore returns the value that was added to the "score" field in this mutation.
+func (m *ProjectScoreMutation) AddedScore() (r float64, exists bool) {
+	v := m.addscore
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetScore resets all changes to the "score" field.
+func (m *ProjectScoreMutation) ResetScore() {
+	m.score = nil
+	m.addscore = nil
+}
+
+// SetTeamID sets the "team" edge to the ProjectTeam entity by id.
+func (m *ProjectScoreMutation) SetTeamID(id int) {
+	m.team = &id
+}
+
+// ClearTeam clears the "team" edge to the ProjectTeam entity.
+func (m *ProjectScoreMutation) ClearTeam() {
+	m.clearedteam = true
+}
+
+// TeamCleared reports if the "team" edge to the ProjectTeam entity was cleared.
+func (m *ProjectScoreMutation) TeamCleared() bool {
+	return m.clearedteam
+}
+
+// TeamID returns the "team" edge ID in the mutation.
+func (m *ProjectScoreMutation) TeamID() (id int, exists bool) {
+	if m.team != nil {
+		return *m.team, true
+	}
+	return
+}
+
+// TeamIDs returns the "team" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// TeamID instead. It exists only for internal usage by the builders.
+func (m *ProjectScoreMutation) TeamIDs() (ids []int) {
+	if id := m.team; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetTeam resets all changes to the "team" edge.
+func (m *ProjectScoreMutation) ResetTeam() {
+	m.team = nil
+	m.clearedteam = false
+}
+
+// Where appends a list predicates to the ProjectScoreMutation builder.
+func (m *ProjectScoreMutation) Where(ps ...predicate.ProjectScore) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *ProjectScoreMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (ProjectScore).
+func (m *ProjectScoreMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ProjectScoreMutation) Fields() []string {
+	fields := make([]string, 0, 4)
+	if m.create_time != nil {
+		fields = append(fields, projectscore.FieldCreateTime)
+	}
+	if m.update_time != nil {
+		fields = append(fields, projectscore.FieldUpdateTime)
+	}
+	if m.case_id != nil {
+		fields = append(fields, projectscore.FieldCaseID)
+	}
+	if m.score != nil {
+		fields = append(fields, projectscore.FieldScore)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ProjectScoreMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case projectscore.FieldCreateTime:
+		return m.CreateTime()
+	case projectscore.FieldUpdateTime:
+		return m.UpdateTime()
+	case projectscore.FieldCaseID:
+		return m.CaseID()
+	case projectscore.FieldScore:
+		return m.Score()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ProjectScoreMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case projectscore.FieldCreateTime:
+		return m.OldCreateTime(ctx)
+	case projectscore.FieldUpdateTime:
+		return m.OldUpdateTime(ctx)
+	case projectscore.FieldCaseID:
+		return m.OldCaseID(ctx)
+	case projectscore.FieldScore:
+		return m.OldScore(ctx)
+	}
+	return nil, fmt.Errorf("unknown ProjectScore field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ProjectScoreMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case projectscore.FieldCreateTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreateTime(v)
+		return nil
+	case projectscore.FieldUpdateTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdateTime(v)
+		return nil
+	case projectscore.FieldCaseID:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCaseID(v)
+		return nil
+	case projectscore.FieldScore:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetScore(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ProjectScore field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ProjectScoreMutation) AddedFields() []string {
+	var fields []string
+	if m.addcase_id != nil {
+		fields = append(fields, projectscore.FieldCaseID)
+	}
+	if m.addscore != nil {
+		fields = append(fields, projectscore.FieldScore)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ProjectScoreMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case projectscore.FieldCaseID:
+		return m.AddedCaseID()
+	case projectscore.FieldScore:
+		return m.AddedScore()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ProjectScoreMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case projectscore.FieldCaseID:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCaseID(v)
+		return nil
+	case projectscore.FieldScore:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddScore(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ProjectScore numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ProjectScoreMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ProjectScoreMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ProjectScoreMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown ProjectScore nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ProjectScoreMutation) ResetField(name string) error {
+	switch name {
+	case projectscore.FieldCreateTime:
+		m.ResetCreateTime()
+		return nil
+	case projectscore.FieldUpdateTime:
+		m.ResetUpdateTime()
+		return nil
+	case projectscore.FieldCaseID:
+		m.ResetCaseID()
+		return nil
+	case projectscore.FieldScore:
+		m.ResetScore()
+		return nil
+	}
+	return fmt.Errorf("unknown ProjectScore field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ProjectScoreMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.team != nil {
+		edges = append(edges, projectscore.EdgeTeam)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ProjectScoreMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case projectscore.EdgeTeam:
+		if id := m.team; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ProjectScoreMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ProjectScoreMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ProjectScoreMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedteam {
+		edges = append(edges, projectscore.EdgeTeam)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ProjectScoreMutation) EdgeCleared(name string) bool {
+	switch name {
+	case projectscore.EdgeTeam:
+		return m.clearedteam
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ProjectScoreMutation) ClearEdge(name string) error {
+	switch name {
+	case projectscore.EdgeTeam:
+		m.ClearTeam()
+		return nil
+	}
+	return fmt.Errorf("unknown ProjectScore unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ProjectScoreMutation) ResetEdge(name string) error {
+	switch name {
+	case projectscore.EdgeTeam:
+		m.ResetTeam()
+		return nil
+	}
+	return fmt.Errorf("unknown ProjectScore edge %s", name)
+}
+
+// ProjectTeamMutation represents an operation that mutates the ProjectTeam nodes in the graph.
+type ProjectTeamMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int
+	create_time   *time.Time
+	update_time   *time.Time
+	team_id       *int32
+	addteam_id    *int32
+	name          *string
+	clearedFields map[string]struct{}
+	scores        map[int]struct{}
+	removedscores map[int]struct{}
+	clearedscores bool
+	done          bool
+	oldValue      func(context.Context) (*ProjectTeam, error)
+	predicates    []predicate.ProjectTeam
+}
+
+var _ ent.Mutation = (*ProjectTeamMutation)(nil)
+
+// projectteamOption allows management of the mutation configuration using functional options.
+type projectteamOption func(*ProjectTeamMutation)
+
+// newProjectTeamMutation creates new mutation for the ProjectTeam entity.
+func newProjectTeamMutation(c config, op Op, opts ...projectteamOption) *ProjectTeamMutation {
+	m := &ProjectTeamMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeProjectTeam,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withProjectTeamID sets the ID field of the mutation.
+func withProjectTeamID(id int) projectteamOption {
+	return func(m *ProjectTeamMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *ProjectTeam
+		)
+		m.oldValue = func(ctx context.Context) (*ProjectTeam, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().ProjectTeam.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withProjectTeam sets the old ProjectTeam of the mutation.
+func withProjectTeam(node *ProjectTeam) projectteamOption {
+	return func(m *ProjectTeamMutation) {
+		m.oldValue = func(context.Context) (*ProjectTeam, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ProjectTeamMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ProjectTeamMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("generated: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ProjectTeamMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ProjectTeamMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().ProjectTeam.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreateTime sets the "create_time" field.
+func (m *ProjectTeamMutation) SetCreateTime(t time.Time) {
+	m.create_time = &t
+}
+
+// CreateTime returns the value of the "create_time" field in the mutation.
+func (m *ProjectTeamMutation) CreateTime() (r time.Time, exists bool) {
+	v := m.create_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreateTime returns the old "create_time" field's value of the ProjectTeam entity.
+// If the ProjectTeam object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProjectTeamMutation) OldCreateTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreateTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreateTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreateTime: %w", err)
+	}
+	return oldValue.CreateTime, nil
+}
+
+// ResetCreateTime resets all changes to the "create_time" field.
+func (m *ProjectTeamMutation) ResetCreateTime() {
+	m.create_time = nil
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (m *ProjectTeamMutation) SetUpdateTime(t time.Time) {
+	m.update_time = &t
+}
+
+// UpdateTime returns the value of the "update_time" field in the mutation.
+func (m *ProjectTeamMutation) UpdateTime() (r time.Time, exists bool) {
+	v := m.update_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdateTime returns the old "update_time" field's value of the ProjectTeam entity.
+// If the ProjectTeam object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProjectTeamMutation) OldUpdateTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdateTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdateTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdateTime: %w", err)
+	}
+	return oldValue.UpdateTime, nil
+}
+
+// ResetUpdateTime resets all changes to the "update_time" field.
+func (m *ProjectTeamMutation) ResetUpdateTime() {
+	m.update_time = nil
+}
+
+// SetTeamID sets the "team_id" field.
+func (m *ProjectTeamMutation) SetTeamID(i int32) {
+	m.team_id = &i
+	m.addteam_id = nil
+}
+
+// TeamID returns the value of the "team_id" field in the mutation.
+func (m *ProjectTeamMutation) TeamID() (r int32, exists bool) {
+	v := m.team_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTeamID returns the old "team_id" field's value of the ProjectTeam entity.
+// If the ProjectTeam object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProjectTeamMutation) OldTeamID(ctx context.Context) (v int32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTeamID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTeamID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTeamID: %w", err)
+	}
+	return oldValue.TeamID, nil
+}
+
+// AddTeamID adds i to the "team_id" field.
+func (m *ProjectTeamMutation) AddTeamID(i int32) {
+	if m.addteam_id != nil {
+		*m.addteam_id += i
+	} else {
+		m.addteam_id = &i
+	}
+}
+
+// AddedTeamID returns the value that was added to the "team_id" field in this mutation.
+func (m *ProjectTeamMutation) AddedTeamID() (r int32, exists bool) {
+	v := m.addteam_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetTeamID resets all changes to the "team_id" field.
+func (m *ProjectTeamMutation) ResetTeamID() {
+	m.team_id = nil
+	m.addteam_id = nil
+}
+
+// SetName sets the "name" field.
+func (m *ProjectTeamMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *ProjectTeamMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the ProjectTeam entity.
+// If the ProjectTeam object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProjectTeamMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *ProjectTeamMutation) ResetName() {
+	m.name = nil
+}
+
+// AddScoreIDs adds the "scores" edge to the ProjectScore entity by ids.
+func (m *ProjectTeamMutation) AddScoreIDs(ids ...int) {
+	if m.scores == nil {
+		m.scores = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.scores[ids[i]] = struct{}{}
+	}
+}
+
+// ClearScores clears the "scores" edge to the ProjectScore entity.
+func (m *ProjectTeamMutation) ClearScores() {
+	m.clearedscores = true
+}
+
+// ScoresCleared reports if the "scores" edge to the ProjectScore entity was cleared.
+func (m *ProjectTeamMutation) ScoresCleared() bool {
+	return m.clearedscores
+}
+
+// RemoveScoreIDs removes the "scores" edge to the ProjectScore entity by IDs.
+func (m *ProjectTeamMutation) RemoveScoreIDs(ids ...int) {
+	if m.removedscores == nil {
+		m.removedscores = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.scores, ids[i])
+		m.removedscores[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedScores returns the removed IDs of the "scores" edge to the ProjectScore entity.
+func (m *ProjectTeamMutation) RemovedScoresIDs() (ids []int) {
+	for id := range m.removedscores {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ScoresIDs returns the "scores" edge IDs in the mutation.
+func (m *ProjectTeamMutation) ScoresIDs() (ids []int) {
+	for id := range m.scores {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetScores resets all changes to the "scores" edge.
+func (m *ProjectTeamMutation) ResetScores() {
+	m.scores = nil
+	m.clearedscores = false
+	m.removedscores = nil
+}
+
+// Where appends a list predicates to the ProjectTeamMutation builder.
+func (m *ProjectTeamMutation) Where(ps ...predicate.ProjectTeam) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *ProjectTeamMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (ProjectTeam).
+func (m *ProjectTeamMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ProjectTeamMutation) Fields() []string {
+	fields := make([]string, 0, 4)
+	if m.create_time != nil {
+		fields = append(fields, projectteam.FieldCreateTime)
+	}
+	if m.update_time != nil {
+		fields = append(fields, projectteam.FieldUpdateTime)
+	}
+	if m.team_id != nil {
+		fields = append(fields, projectteam.FieldTeamID)
+	}
+	if m.name != nil {
+		fields = append(fields, projectteam.FieldName)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ProjectTeamMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case projectteam.FieldCreateTime:
+		return m.CreateTime()
+	case projectteam.FieldUpdateTime:
+		return m.UpdateTime()
+	case projectteam.FieldTeamID:
+		return m.TeamID()
+	case projectteam.FieldName:
+		return m.Name()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ProjectTeamMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case projectteam.FieldCreateTime:
+		return m.OldCreateTime(ctx)
+	case projectteam.FieldUpdateTime:
+		return m.OldUpdateTime(ctx)
+	case projectteam.FieldTeamID:
+		return m.OldTeamID(ctx)
+	case projectteam.FieldName:
+		return m.OldName(ctx)
+	}
+	return nil, fmt.Errorf("unknown ProjectTeam field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ProjectTeamMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case projectteam.FieldCreateTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreateTime(v)
+		return nil
+	case projectteam.FieldUpdateTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdateTime(v)
+		return nil
+	case projectteam.FieldTeamID:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTeamID(v)
+		return nil
+	case projectteam.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ProjectTeam field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ProjectTeamMutation) AddedFields() []string {
+	var fields []string
+	if m.addteam_id != nil {
+		fields = append(fields, projectteam.FieldTeamID)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ProjectTeamMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case projectteam.FieldTeamID:
+		return m.AddedTeamID()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ProjectTeamMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case projectteam.FieldTeamID:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTeamID(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ProjectTeam numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ProjectTeamMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ProjectTeamMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ProjectTeamMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown ProjectTeam nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ProjectTeamMutation) ResetField(name string) error {
+	switch name {
+	case projectteam.FieldCreateTime:
+		m.ResetCreateTime()
+		return nil
+	case projectteam.FieldUpdateTime:
+		m.ResetUpdateTime()
+		return nil
+	case projectteam.FieldTeamID:
+		m.ResetTeamID()
+		return nil
+	case projectteam.FieldName:
+		m.ResetName()
+		return nil
+	}
+	return fmt.Errorf("unknown ProjectTeam field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ProjectTeamMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.scores != nil {
+		edges = append(edges, projectteam.EdgeScores)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ProjectTeamMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case projectteam.EdgeScores:
+		ids := make([]ent.Value, 0, len(m.scores))
+		for id := range m.scores {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ProjectTeamMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.removedscores != nil {
+		edges = append(edges, projectteam.EdgeScores)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ProjectTeamMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case projectteam.EdgeScores:
+		ids := make([]ent.Value, 0, len(m.removedscores))
+		for id := range m.removedscores {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ProjectTeamMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedscores {
+		edges = append(edges, projectteam.EdgeScores)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ProjectTeamMutation) EdgeCleared(name string) bool {
+	switch name {
+	case projectteam.EdgeScores:
+		return m.clearedscores
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ProjectTeamMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown ProjectTeam unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ProjectTeamMutation) ResetEdge(name string) error {
+	switch name {
+	case projectteam.EdgeScores:
+		m.ResetScores()
+		return nil
+	}
+	return fmt.Errorf("unknown ProjectTeam edge %s", name)
 }
 
 // UserMutation represents an operation that mutates the User nodes in the graph.

@@ -181,6 +181,46 @@ func (ctcd *CodingTestCaseDataQuery) collectField(ctx *graphql.OperationContext,
 }
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (ps *ProjectScoreQuery) CollectFields(ctx context.Context, satisfies ...string) *ProjectScoreQuery {
+	if fc := graphql.GetFieldContext(ctx); fc != nil {
+		ps = ps.collectField(graphql.GetOperationContext(ctx), fc.Field, satisfies...)
+	}
+	return ps
+}
+
+func (ps *ProjectScoreQuery) collectField(ctx *graphql.OperationContext, field graphql.CollectedField, satisfies ...string) *ProjectScoreQuery {
+	for _, field := range graphql.CollectFields(ctx, field.Selections, satisfies) {
+		switch field.Name {
+		case "team":
+			ps = ps.WithTeam(func(query *ProjectTeamQuery) {
+				query.collectField(ctx, field)
+			})
+		}
+	}
+	return ps
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (pt *ProjectTeamQuery) CollectFields(ctx context.Context, satisfies ...string) *ProjectTeamQuery {
+	if fc := graphql.GetFieldContext(ctx); fc != nil {
+		pt = pt.collectField(graphql.GetOperationContext(ctx), fc.Field, satisfies...)
+	}
+	return pt
+}
+
+func (pt *ProjectTeamQuery) collectField(ctx *graphql.OperationContext, field graphql.CollectedField, satisfies ...string) *ProjectTeamQuery {
+	for _, field := range graphql.CollectFields(ctx, field.Selections, satisfies) {
+		switch field.Name {
+		case "scores":
+			pt = pt.WithScores(func(query *ProjectScoreQuery) {
+				query.collectField(ctx, field)
+			})
+		}
+	}
+	return pt
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
 func (u *UserQuery) CollectFields(ctx context.Context, satisfies ...string) *UserQuery {
 	if fc := graphql.GetFieldContext(ctx); fc != nil {
 		u = u.collectField(graphql.GetOperationContext(ctx), fc.Field, satisfies...)

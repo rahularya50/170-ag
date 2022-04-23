@@ -10,6 +10,8 @@ import (
 	"170-ag/ent/generated/codingsubmissionstaffdata"
 	"170-ag/ent/generated/codingtestcase"
 	"170-ag/ent/generated/codingtestcasedata"
+	"170-ag/ent/generated/projectscore"
+	"170-ag/ent/generated/projectteam"
 	"170-ag/ent/generated/user"
 	"context"
 	"encoding/base64"
@@ -1825,6 +1827,460 @@ func (ctcd *CodingTestCaseData) ToEdge(order *CodingTestCaseDataOrder) *CodingTe
 	return &CodingTestCaseDataEdge{
 		Node:   ctcd,
 		Cursor: order.Field.toCursor(ctcd),
+	}
+}
+
+// ProjectScoreEdge is the edge representation of ProjectScore.
+type ProjectScoreEdge struct {
+	Node   *ProjectScore `json:"node"`
+	Cursor Cursor        `json:"cursor"`
+}
+
+// ProjectScoreConnection is the connection containing edges to ProjectScore.
+type ProjectScoreConnection struct {
+	Edges      []*ProjectScoreEdge `json:"edges"`
+	PageInfo   PageInfo            `json:"pageInfo"`
+	TotalCount int                 `json:"totalCount"`
+}
+
+// ProjectScorePaginateOption enables pagination customization.
+type ProjectScorePaginateOption func(*projectScorePager) error
+
+// WithProjectScoreOrder configures pagination ordering.
+func WithProjectScoreOrder(order *ProjectScoreOrder) ProjectScorePaginateOption {
+	if order == nil {
+		order = DefaultProjectScoreOrder
+	}
+	o := *order
+	return func(pager *projectScorePager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultProjectScoreOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithProjectScoreFilter configures pagination filter.
+func WithProjectScoreFilter(filter func(*ProjectScoreQuery) (*ProjectScoreQuery, error)) ProjectScorePaginateOption {
+	return func(pager *projectScorePager) error {
+		if filter == nil {
+			return errors.New("ProjectScoreQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type projectScorePager struct {
+	order  *ProjectScoreOrder
+	filter func(*ProjectScoreQuery) (*ProjectScoreQuery, error)
+}
+
+func newProjectScorePager(opts []ProjectScorePaginateOption) (*projectScorePager, error) {
+	pager := &projectScorePager{}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultProjectScoreOrder
+	}
+	return pager, nil
+}
+
+func (p *projectScorePager) applyFilter(query *ProjectScoreQuery) (*ProjectScoreQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *projectScorePager) toCursor(ps *ProjectScore) Cursor {
+	return p.order.Field.toCursor(ps)
+}
+
+func (p *projectScorePager) applyCursors(query *ProjectScoreQuery, after, before *Cursor) *ProjectScoreQuery {
+	for _, predicate := range cursorsToPredicates(
+		p.order.Direction, after, before,
+		p.order.Field.field, DefaultProjectScoreOrder.Field.field,
+	) {
+		query = query.Where(predicate)
+	}
+	return query
+}
+
+func (p *projectScorePager) applyOrder(query *ProjectScoreQuery, reverse bool) *ProjectScoreQuery {
+	direction := p.order.Direction
+	if reverse {
+		direction = direction.reverse()
+	}
+	query = query.Order(direction.orderFunc(p.order.Field.field))
+	if p.order.Field != DefaultProjectScoreOrder.Field {
+		query = query.Order(direction.orderFunc(DefaultProjectScoreOrder.Field.field))
+	}
+	return query
+}
+
+// Paginate executes the query and returns a relay based cursor connection to ProjectScore.
+func (ps *ProjectScoreQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...ProjectScorePaginateOption,
+) (*ProjectScoreConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newProjectScorePager(opts)
+	if err != nil {
+		return nil, err
+	}
+
+	if ps, err = pager.applyFilter(ps); err != nil {
+		return nil, err
+	}
+
+	conn := &ProjectScoreConnection{Edges: []*ProjectScoreEdge{}}
+	if !hasCollectedField(ctx, edgesField) || first != nil && *first == 0 || last != nil && *last == 0 {
+		if hasCollectedField(ctx, totalCountField) ||
+			hasCollectedField(ctx, pageInfoField) {
+			count, err := ps.Count(ctx)
+			if err != nil {
+				return nil, err
+			}
+			conn.TotalCount = count
+			conn.PageInfo.HasNextPage = first != nil && count > 0
+			conn.PageInfo.HasPreviousPage = last != nil && count > 0
+		}
+		return conn, nil
+	}
+
+	if (after != nil || first != nil || before != nil || last != nil) && hasCollectedField(ctx, totalCountField) {
+		count, err := ps.Clone().Count(ctx)
+		if err != nil {
+			return nil, err
+		}
+		conn.TotalCount = count
+	}
+
+	ps = pager.applyCursors(ps, after, before)
+	ps = pager.applyOrder(ps, last != nil)
+	var limit int
+	if first != nil {
+		limit = *first + 1
+	} else if last != nil {
+		limit = *last + 1
+	}
+	if limit > 0 {
+		ps = ps.Limit(limit)
+	}
+
+	if field := getCollectedField(ctx, edgesField, nodeField); field != nil {
+		ps = ps.collectField(graphql.GetOperationContext(ctx), *field)
+	}
+
+	nodes, err := ps.All(ctx)
+	if err != nil || len(nodes) == 0 {
+		return conn, err
+	}
+
+	if len(nodes) == limit {
+		conn.PageInfo.HasNextPage = first != nil
+		conn.PageInfo.HasPreviousPage = last != nil
+		nodes = nodes[:len(nodes)-1]
+	}
+
+	var nodeAt func(int) *ProjectScore
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *ProjectScore {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *ProjectScore {
+			return nodes[i]
+		}
+	}
+
+	conn.Edges = make([]*ProjectScoreEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		conn.Edges[i] = &ProjectScoreEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+
+	conn.PageInfo.StartCursor = &conn.Edges[0].Cursor
+	conn.PageInfo.EndCursor = &conn.Edges[len(conn.Edges)-1].Cursor
+	if conn.TotalCount == 0 {
+		conn.TotalCount = len(nodes)
+	}
+
+	return conn, nil
+}
+
+// ProjectScoreOrderField defines the ordering field of ProjectScore.
+type ProjectScoreOrderField struct {
+	field    string
+	toCursor func(*ProjectScore) Cursor
+}
+
+// ProjectScoreOrder defines the ordering of ProjectScore.
+type ProjectScoreOrder struct {
+	Direction OrderDirection          `json:"direction"`
+	Field     *ProjectScoreOrderField `json:"field"`
+}
+
+// DefaultProjectScoreOrder is the default ordering of ProjectScore.
+var DefaultProjectScoreOrder = &ProjectScoreOrder{
+	Direction: OrderDirectionAsc,
+	Field: &ProjectScoreOrderField{
+		field: projectscore.FieldID,
+		toCursor: func(ps *ProjectScore) Cursor {
+			return Cursor{ID: ps.ID}
+		},
+	},
+}
+
+// ToEdge converts ProjectScore into ProjectScoreEdge.
+func (ps *ProjectScore) ToEdge(order *ProjectScoreOrder) *ProjectScoreEdge {
+	if order == nil {
+		order = DefaultProjectScoreOrder
+	}
+	return &ProjectScoreEdge{
+		Node:   ps,
+		Cursor: order.Field.toCursor(ps),
+	}
+}
+
+// ProjectTeamEdge is the edge representation of ProjectTeam.
+type ProjectTeamEdge struct {
+	Node   *ProjectTeam `json:"node"`
+	Cursor Cursor       `json:"cursor"`
+}
+
+// ProjectTeamConnection is the connection containing edges to ProjectTeam.
+type ProjectTeamConnection struct {
+	Edges      []*ProjectTeamEdge `json:"edges"`
+	PageInfo   PageInfo           `json:"pageInfo"`
+	TotalCount int                `json:"totalCount"`
+}
+
+// ProjectTeamPaginateOption enables pagination customization.
+type ProjectTeamPaginateOption func(*projectTeamPager) error
+
+// WithProjectTeamOrder configures pagination ordering.
+func WithProjectTeamOrder(order *ProjectTeamOrder) ProjectTeamPaginateOption {
+	if order == nil {
+		order = DefaultProjectTeamOrder
+	}
+	o := *order
+	return func(pager *projectTeamPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultProjectTeamOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithProjectTeamFilter configures pagination filter.
+func WithProjectTeamFilter(filter func(*ProjectTeamQuery) (*ProjectTeamQuery, error)) ProjectTeamPaginateOption {
+	return func(pager *projectTeamPager) error {
+		if filter == nil {
+			return errors.New("ProjectTeamQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type projectTeamPager struct {
+	order  *ProjectTeamOrder
+	filter func(*ProjectTeamQuery) (*ProjectTeamQuery, error)
+}
+
+func newProjectTeamPager(opts []ProjectTeamPaginateOption) (*projectTeamPager, error) {
+	pager := &projectTeamPager{}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultProjectTeamOrder
+	}
+	return pager, nil
+}
+
+func (p *projectTeamPager) applyFilter(query *ProjectTeamQuery) (*ProjectTeamQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *projectTeamPager) toCursor(pt *ProjectTeam) Cursor {
+	return p.order.Field.toCursor(pt)
+}
+
+func (p *projectTeamPager) applyCursors(query *ProjectTeamQuery, after, before *Cursor) *ProjectTeamQuery {
+	for _, predicate := range cursorsToPredicates(
+		p.order.Direction, after, before,
+		p.order.Field.field, DefaultProjectTeamOrder.Field.field,
+	) {
+		query = query.Where(predicate)
+	}
+	return query
+}
+
+func (p *projectTeamPager) applyOrder(query *ProjectTeamQuery, reverse bool) *ProjectTeamQuery {
+	direction := p.order.Direction
+	if reverse {
+		direction = direction.reverse()
+	}
+	query = query.Order(direction.orderFunc(p.order.Field.field))
+	if p.order.Field != DefaultProjectTeamOrder.Field {
+		query = query.Order(direction.orderFunc(DefaultProjectTeamOrder.Field.field))
+	}
+	return query
+}
+
+// Paginate executes the query and returns a relay based cursor connection to ProjectTeam.
+func (pt *ProjectTeamQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...ProjectTeamPaginateOption,
+) (*ProjectTeamConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newProjectTeamPager(opts)
+	if err != nil {
+		return nil, err
+	}
+
+	if pt, err = pager.applyFilter(pt); err != nil {
+		return nil, err
+	}
+
+	conn := &ProjectTeamConnection{Edges: []*ProjectTeamEdge{}}
+	if !hasCollectedField(ctx, edgesField) || first != nil && *first == 0 || last != nil && *last == 0 {
+		if hasCollectedField(ctx, totalCountField) ||
+			hasCollectedField(ctx, pageInfoField) {
+			count, err := pt.Count(ctx)
+			if err != nil {
+				return nil, err
+			}
+			conn.TotalCount = count
+			conn.PageInfo.HasNextPage = first != nil && count > 0
+			conn.PageInfo.HasPreviousPage = last != nil && count > 0
+		}
+		return conn, nil
+	}
+
+	if (after != nil || first != nil || before != nil || last != nil) && hasCollectedField(ctx, totalCountField) {
+		count, err := pt.Clone().Count(ctx)
+		if err != nil {
+			return nil, err
+		}
+		conn.TotalCount = count
+	}
+
+	pt = pager.applyCursors(pt, after, before)
+	pt = pager.applyOrder(pt, last != nil)
+	var limit int
+	if first != nil {
+		limit = *first + 1
+	} else if last != nil {
+		limit = *last + 1
+	}
+	if limit > 0 {
+		pt = pt.Limit(limit)
+	}
+
+	if field := getCollectedField(ctx, edgesField, nodeField); field != nil {
+		pt = pt.collectField(graphql.GetOperationContext(ctx), *field)
+	}
+
+	nodes, err := pt.All(ctx)
+	if err != nil || len(nodes) == 0 {
+		return conn, err
+	}
+
+	if len(nodes) == limit {
+		conn.PageInfo.HasNextPage = first != nil
+		conn.PageInfo.HasPreviousPage = last != nil
+		nodes = nodes[:len(nodes)-1]
+	}
+
+	var nodeAt func(int) *ProjectTeam
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *ProjectTeam {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *ProjectTeam {
+			return nodes[i]
+		}
+	}
+
+	conn.Edges = make([]*ProjectTeamEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		conn.Edges[i] = &ProjectTeamEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+
+	conn.PageInfo.StartCursor = &conn.Edges[0].Cursor
+	conn.PageInfo.EndCursor = &conn.Edges[len(conn.Edges)-1].Cursor
+	if conn.TotalCount == 0 {
+		conn.TotalCount = len(nodes)
+	}
+
+	return conn, nil
+}
+
+// ProjectTeamOrderField defines the ordering field of ProjectTeam.
+type ProjectTeamOrderField struct {
+	field    string
+	toCursor func(*ProjectTeam) Cursor
+}
+
+// ProjectTeamOrder defines the ordering of ProjectTeam.
+type ProjectTeamOrder struct {
+	Direction OrderDirection         `json:"direction"`
+	Field     *ProjectTeamOrderField `json:"field"`
+}
+
+// DefaultProjectTeamOrder is the default ordering of ProjectTeam.
+var DefaultProjectTeamOrder = &ProjectTeamOrder{
+	Direction: OrderDirectionAsc,
+	Field: &ProjectTeamOrderField{
+		field: projectteam.FieldID,
+		toCursor: func(pt *ProjectTeam) Cursor {
+			return Cursor{ID: pt.ID}
+		},
+	},
+}
+
+// ToEdge converts ProjectTeam into ProjectTeamEdge.
+func (pt *ProjectTeam) ToEdge(order *ProjectTeamOrder) *ProjectTeamEdge {
+	if order == nil {
+		order = DefaultProjectTeamOrder
+	}
+	return &ProjectTeamEdge{
+		Node:   pt,
+		Cursor: order.Field.toCursor(pt),
 	}
 }
 
