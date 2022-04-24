@@ -58,6 +58,7 @@ func (ProjectTeam) Policy() ent.Policy {
 			privacy.AlwaysDenyRule(),
 		},
 		Query: privacy.QueryPolicy{
+			privacyrules.AllowWithPrivacyAccessToken(privacyrules.GradescopeProjectSubmissionAccessToken),
 			privacyrules.AllowWithPrivacyAccessToken(privacyrules.CloudflareCacheAccessToken),
 			policy.DenyIfNoViewer(),
 			policy.AllowIfViewerIsStaff(),
