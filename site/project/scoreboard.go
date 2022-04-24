@@ -11,6 +11,7 @@ import (
 	"os"
 	"sort"
 	"strconv"
+	"strings"
 )
 
 type Scoreboard struct {
@@ -52,8 +53,30 @@ func (s *scoreboardHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 			r.Context(), privacyrules.CloudflareCacheAccessToken,
 		))
 	}
-	values := r.URL.Query()
-	raw_case_id := values.Get("caseID")
+	parts := strings.Split(r.URL.Path, "/")
+
+	// path begins with /scoreboard/
+	parts = parts[2:]
+	if parts[len(parts)-1] == "" {
+		parts = parts[:len(parts)-1]
+	}
+
+	var raw_case_id, raw_case_type string
+	switch len(parts) {
+	case 0:
+		values := r.URL.Query()
+		raw_case_id = values.Get("caseID")
+		raw_case_type = values.Get("caseType")
+	case 1:
+		raw_case_type = parts[0]
+	case 2:
+		raw_case_type = parts[0]
+		raw_case_id = parts[1]
+	default:
+		rw.WriteHeader(http.StatusNotFound)
+		return
+	}
+
 	var case_id *int32
 
 	if raw_case_id != "" {
@@ -66,7 +89,6 @@ func (s *scoreboardHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		case_id = &parsed_case_id_i32
 	}
 
-	raw_case_type := values.Get("caseType")
 	var case_type *projectscore.Type
 	if raw_case_type != "" {
 		parsed_case_type := projectscore.Type(raw_case_type)
