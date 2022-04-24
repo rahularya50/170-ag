@@ -10,6 +10,8 @@ import (
 	"170-ag/ent/generated/codingsubmissionstaffdata"
 	"170-ag/ent/generated/codingtestcase"
 	"170-ag/ent/generated/codingtestcasedata"
+	"170-ag/ent/generated/projectscore"
+	"170-ag/ent/generated/projectteam"
 	"170-ag/ent/generated/user"
 	"170-ag/ent/schema"
 	"context"
@@ -263,6 +265,72 @@ func init() {
 	codingtestcasedataDescOutput := codingtestcasedataFields[1].Descriptor()
 	// codingtestcasedata.DefaultOutput holds the default value on creation for the output field.
 	codingtestcasedata.DefaultOutput = codingtestcasedataDescOutput.Default.(string)
+	projectscoreMixin := schema.ProjectScore{}.Mixin()
+	projectscore.Policy = privacy.NewPolicies(schema.ProjectScore{})
+	projectscore.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := projectscore.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	projectscoreMixinFields0 := projectscoreMixin[0].Fields()
+	_ = projectscoreMixinFields0
+	projectscoreFields := schema.ProjectScore{}.Fields()
+	_ = projectscoreFields
+	// projectscoreDescCreateTime is the schema descriptor for create_time field.
+	projectscoreDescCreateTime := projectscoreMixinFields0[0].Descriptor()
+	// projectscore.DefaultCreateTime holds the default value on creation for the create_time field.
+	projectscore.DefaultCreateTime = projectscoreDescCreateTime.Default.(func() time.Time)
+	// projectscoreDescUpdateTime is the schema descriptor for update_time field.
+	projectscoreDescUpdateTime := projectscoreMixinFields0[1].Descriptor()
+	// projectscore.DefaultUpdateTime holds the default value on creation for the update_time field.
+	projectscore.DefaultUpdateTime = projectscoreDescUpdateTime.Default.(func() time.Time)
+	// projectscore.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	projectscore.UpdateDefaultUpdateTime = projectscoreDescUpdateTime.UpdateDefault.(func() time.Time)
+	projectteamMixin := schema.ProjectTeam{}.Mixin()
+	projectteam.Policy = privacy.NewPolicies(schema.ProjectTeam{})
+	projectteam.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := projectteam.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	projectteamMixinFields0 := projectteamMixin[0].Fields()
+	_ = projectteamMixinFields0
+	projectteamFields := schema.ProjectTeam{}.Fields()
+	_ = projectteamFields
+	// projectteamDescCreateTime is the schema descriptor for create_time field.
+	projectteamDescCreateTime := projectteamMixinFields0[0].Descriptor()
+	// projectteam.DefaultCreateTime holds the default value on creation for the create_time field.
+	projectteam.DefaultCreateTime = projectteamDescCreateTime.Default.(func() time.Time)
+	// projectteamDescUpdateTime is the schema descriptor for update_time field.
+	projectteamDescUpdateTime := projectteamMixinFields0[1].Descriptor()
+	// projectteam.DefaultUpdateTime holds the default value on creation for the update_time field.
+	projectteam.DefaultUpdateTime = projectteamDescUpdateTime.Default.(func() time.Time)
+	// projectteam.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	projectteam.UpdateDefaultUpdateTime = projectteamDescUpdateTime.UpdateDefault.(func() time.Time)
+	// projectteamDescName is the schema descriptor for name field.
+	projectteamDescName := projectteamFields[1].Descriptor()
+	// projectteam.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	projectteam.NameValidator = func() func(string) error {
+		validators := projectteamDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	userMixin := schema.User{}.Mixin()
 	user.Policy = privacy.NewPolicies(schema.User{})
 	user.Hooks[0] = func(next ent.Mutator) ent.Mutator {

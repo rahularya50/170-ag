@@ -332,6 +332,54 @@ func (f CodingTestCaseDataMutationRuleFunc) EvalMutation(ctx context.Context, m 
 	return Denyf("generated/privacy: unexpected mutation type %T, expect *generated.CodingTestCaseDataMutation", m)
 }
 
+// The ProjectScoreQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type ProjectScoreQueryRuleFunc func(context.Context, *generated.ProjectScoreQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f ProjectScoreQueryRuleFunc) EvalQuery(ctx context.Context, q generated.Query) error {
+	if q, ok := q.(*generated.ProjectScoreQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("generated/privacy: unexpected query type %T, expect *generated.ProjectScoreQuery", q)
+}
+
+// The ProjectScoreMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type ProjectScoreMutationRuleFunc func(context.Context, *generated.ProjectScoreMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f ProjectScoreMutationRuleFunc) EvalMutation(ctx context.Context, m generated.Mutation) error {
+	if m, ok := m.(*generated.ProjectScoreMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("generated/privacy: unexpected mutation type %T, expect *generated.ProjectScoreMutation", m)
+}
+
+// The ProjectTeamQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type ProjectTeamQueryRuleFunc func(context.Context, *generated.ProjectTeamQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f ProjectTeamQueryRuleFunc) EvalQuery(ctx context.Context, q generated.Query) error {
+	if q, ok := q.(*generated.ProjectTeamQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("generated/privacy: unexpected query type %T, expect *generated.ProjectTeamQuery", q)
+}
+
+// The ProjectTeamMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type ProjectTeamMutationRuleFunc func(context.Context, *generated.ProjectTeamMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f ProjectTeamMutationRuleFunc) EvalMutation(ctx context.Context, m generated.Mutation) error {
+	if m, ok := m.(*generated.ProjectTeamMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("generated/privacy: unexpected mutation type %T, expect *generated.ProjectTeamMutation", m)
+}
+
 // The UserQueryRuleFunc type is an adapter to allow the use of ordinary
 // functions as a query rule.
 type UserQueryRuleFunc func(context.Context, *generated.UserQuery) error
@@ -405,6 +453,10 @@ func queryFilter(q generated.Query) (Filter, error) {
 		return q.Filter(), nil
 	case *generated.CodingTestCaseDataQuery:
 		return q.Filter(), nil
+	case *generated.ProjectScoreQuery:
+		return q.Filter(), nil
+	case *generated.ProjectTeamQuery:
+		return q.Filter(), nil
 	case *generated.UserQuery:
 		return q.Filter(), nil
 	default:
@@ -427,6 +479,10 @@ func mutationFilter(m generated.Mutation) (Filter, error) {
 	case *generated.CodingTestCaseMutation:
 		return m.Filter(), nil
 	case *generated.CodingTestCaseDataMutation:
+		return m.Filter(), nil
+	case *generated.ProjectScoreMutation:
+		return m.Filter(), nil
+	case *generated.ProjectTeamMutation:
 		return m.Filter(), nil
 	case *generated.UserMutation:
 		return m.Filter(), nil
