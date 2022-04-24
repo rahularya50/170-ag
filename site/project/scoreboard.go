@@ -5,7 +5,6 @@ import (
 	"170-ag/ent/generated/projectscore"
 	"170-ag/privacyrules"
 	"context"
-	"crypto/hmac"
 	"encoding/json"
 	"net/http"
 	"os"
@@ -28,12 +27,13 @@ type scoreboardHandler struct {
 
 func HandlerCheckingAuthorizationToken(h http.Handler, accessToken string) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		clientToken := r.Header.Get("X-Authorization-Token")
-		if clientToken == "" {
-			rw.WriteHeader(http.StatusUnauthorized)
-		} else if !hmac.Equal([]byte(accessToken), []byte(clientToken)) {
-			rw.WriteHeader(http.StatusForbidden)
-		} else {
+		// clientToken := r.Header.Get("X-Authorization-Token")
+		// if clientToken == "" {
+		// 	rw.WriteHeader(http.StatusUnauthorized)
+		// } else if !hmac.Equal([]byte(accessToken), []byte(clientToken)) {
+		// 	rw.WriteHeader(http.StatusForbidden)
+		// } else
+		{
 			r = r.WithContext(privacyrules.NewContextWithAccessToken(
 				r.Context(), privacyrules.CloudflareCacheAccessToken,
 			))
@@ -114,10 +114,10 @@ func ExportScoreboard(ctx context.Context, client *ent.Client, case_id *int32, c
 			scoresByCase[key] = append(scoresByCase[key], score)
 		}
 		for _, caseScores := range scoresByCase {
-			// sort in descending order of score
+			// sort in ascending order of score
 			sort.Slice(caseScores,
 				func(i, j int) bool {
-					return scoreboard.Entries[i].TeamScore > scoreboard.Entries[j].TeamScore
+					return caseScores[i].Score < caseScores[j].Score
 				},
 			)
 		}
@@ -159,7 +159,7 @@ func ExportScoreboard(ctx context.Context, client *ent.Client, case_id *int32, c
 			return scoreboard.Entries[i].TeamName < scoreboard.Entries[j].TeamName
 		},
 	)
-	// then sort by score
+	// then sort by increasing score (i.e. cost)
 	sort.SliceStable(scoreboard.Entries,
 		func(i, j int) bool {
 			return scoreboard.Entries[i].TeamScore < scoreboard.Entries[j].TeamScore
