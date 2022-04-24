@@ -90,6 +90,25 @@ func main() {
 		http.ServeFile(rw, r, "frontend/build/index.html")
 	})
 
+	scoreboardToken := os.Getenv("SCOREBOARD_TOKEN")
+	if scoreboardToken == "" {
+		panic("scoreboard API token must be provided")
+	}
+
+	if os.Getenv("ENV") == "dev" {
+		http.Handle(
+			"/scoreboard",
+			project.ScoreboardHandler(client),
+		)
+	} else {
+		http.HandleFunc(
+			"/scoreboard",
+			project.HandlerCheckingAuthorizationToken(
+				project.ScoreboardHandler(client), scoreboardToken,
+			),
+		)
+	}
+
 	httpSrv := &http.Server{
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
