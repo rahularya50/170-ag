@@ -7,21 +7,9 @@ import (
 	"170-ag/site/grading"
 	"170-ag/site/roles"
 	"170-ag/site/scaling"
-	"fmt"
-	"net"
 
 	"google.golang.org/grpc"
 )
-
-func serveOnPort(server *grpc.Server, port int) {
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
-	if err != nil {
-		panic(err)
-	}
-	if err := server.Serve(lis); err != nil {
-		panic(err)
-	}
-}
 
 func main() {
 	client, err := site.GetEntClient()
@@ -37,7 +25,7 @@ func main() {
 		),
 	)
 	schemas.RegisterExternalScalerServer(scalerServer, &scaling.ExternalScalerServer{Client: client})
-	go serveOnPort(scalerServer, 6001)
+	go site.ServeOnPort(scalerServer, 6001)
 
 	gradingServer := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
@@ -45,5 +33,5 @@ func main() {
 		),
 	)
 	schemas.RegisterJudgingServerServer(gradingServer, &grading.JudgingServer{Client: client})
-	serveOnPort(gradingServer, 6000)
+	site.ServeOnPort(gradingServer, 6000)
 }
