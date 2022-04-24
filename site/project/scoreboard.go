@@ -40,7 +40,6 @@ func HandlerCheckingAuthorizationToken(h http.Handler, accessToken string) http.
 			h.ServeHTTP(rw, r)
 		}
 	})
-
 }
 
 func ScoreboardHandler(client *ent.Client) *scoreboardHandler {
