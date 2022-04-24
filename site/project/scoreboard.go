@@ -5,6 +5,7 @@ import (
 	"170-ag/ent/generated/projectscore"
 	"170-ag/privacyrules"
 	"context"
+	"crypto/hmac"
 	"encoding/json"
 	"net/http"
 	"os"
@@ -27,13 +28,12 @@ type scoreboardHandler struct {
 
 func HandlerCheckingAuthorizationToken(h http.Handler, accessToken string) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		// clientToken := r.Header.Get("X-Authorization-Token")
-		// if clientToken == "" {
-		// 	rw.WriteHeader(http.StatusUnauthorized)
-		// } else if !hmac.Equal([]byte(accessToken), []byte(clientToken)) {
-		// 	rw.WriteHeader(http.StatusForbidden)
-		// } else
-		{
+		clientToken := r.Header.Get("X-Authorization-Token")
+		if clientToken == "" {
+			rw.WriteHeader(http.StatusUnauthorized)
+		} else if !hmac.Equal([]byte(accessToken), []byte(clientToken)) {
+			rw.WriteHeader(http.StatusForbidden)
+		} else {
 			r = r.WithContext(privacyrules.NewContextWithAccessToken(
 				r.Context(), privacyrules.CloudflareCacheAccessToken,
 			))
