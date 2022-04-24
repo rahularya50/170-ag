@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+option go_package = "proto/schemas";
+
+service ProjectScores {
+  rpc RecordSubmission(ProjectSubmission) returns (SubmissionReply) {}
+}
+
+message ProjectSubmission {
+  int32 teamId = 1;
+  string teamName = 2;
+  repeated Score score = 3;
+}
+
+enum CaseType {
+  SMALL = 0;
+  MEDIUM = 1;
+  LARGE = 2;
+}
+
+message Score {
+  int32 caseId = 1;
+  CaseType caseType = 2;
+  double score = 3;
+}
+
+enum Status {
+  SUCCESS = 0;
+  DUPLICATE_TEAM_NAME = 1;
+}
+
+message SubmissionReply { Status status = 1; }
