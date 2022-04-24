@@ -5027,6 +5027,7 @@ type ProjectScoreMutation struct {
 	addcase_id    *int32
 	score         *float64
 	addscore      *float64
+	_type         *projectscore.Type
 	clearedFields map[string]struct{}
 	team          *int
 	clearedteam   bool
@@ -5317,6 +5318,42 @@ func (m *ProjectScoreMutation) ResetScore() {
 	m.addscore = nil
 }
 
+// SetType sets the "type" field.
+func (m *ProjectScoreMutation) SetType(pr projectscore.Type) {
+	m._type = &pr
+}
+
+// GetType returns the value of the "type" field in the mutation.
+func (m *ProjectScoreMutation) GetType() (r projectscore.Type, exists bool) {
+	v := m._type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldType returns the old "type" field's value of the ProjectScore entity.
+// If the ProjectScore object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProjectScoreMutation) OldType(ctx context.Context) (v projectscore.Type, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldType: %w", err)
+	}
+	return oldValue.Type, nil
+}
+
+// ResetType resets all changes to the "type" field.
+func (m *ProjectScoreMutation) ResetType() {
+	m._type = nil
+}
+
 // SetTeamID sets the "team" edge to the ProjectTeam entity by id.
 func (m *ProjectScoreMutation) SetTeamID(id int) {
 	m.team = &id
@@ -5375,7 +5412,7 @@ func (m *ProjectScoreMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ProjectScoreMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
 	if m.create_time != nil {
 		fields = append(fields, projectscore.FieldCreateTime)
 	}
@@ -5387,6 +5424,9 @@ func (m *ProjectScoreMutation) Fields() []string {
 	}
 	if m.score != nil {
 		fields = append(fields, projectscore.FieldScore)
+	}
+	if m._type != nil {
+		fields = append(fields, projectscore.FieldType)
 	}
 	return fields
 }
@@ -5404,6 +5444,8 @@ func (m *ProjectScoreMutation) Field(name string) (ent.Value, bool) {
 		return m.CaseID()
 	case projectscore.FieldScore:
 		return m.Score()
+	case projectscore.FieldType:
+		return m.GetType()
 	}
 	return nil, false
 }
@@ -5421,6 +5463,8 @@ func (m *ProjectScoreMutation) OldField(ctx context.Context, name string) (ent.V
 		return m.OldCaseID(ctx)
 	case projectscore.FieldScore:
 		return m.OldScore(ctx)
+	case projectscore.FieldType:
+		return m.OldType(ctx)
 	}
 	return nil, fmt.Errorf("unknown ProjectScore field %s", name)
 }
@@ -5457,6 +5501,13 @@ func (m *ProjectScoreMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetScore(v)
+		return nil
+	case projectscore.FieldType:
+		v, ok := value.(projectscore.Type)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetType(v)
 		return nil
 	}
 	return fmt.Errorf("unknown ProjectScore field %s", name)
@@ -5545,6 +5596,9 @@ func (m *ProjectScoreMutation) ResetField(name string) error {
 		return nil
 	case projectscore.FieldScore:
 		m.ResetScore()
+		return nil
+	case projectscore.FieldType:
+		m.ResetType()
 		return nil
 	}
 	return fmt.Errorf("unknown ProjectScore field %s", name)

@@ -63,6 +63,12 @@ func (psc *ProjectScoreCreate) SetScore(f float64) *ProjectScoreCreate {
 	return psc
 }
 
+// SetType sets the "type" field.
+func (psc *ProjectScoreCreate) SetType(pr projectscore.Type) *ProjectScoreCreate {
+	psc.mutation.SetType(pr)
+	return psc
+}
+
 // SetTeamID sets the "team" edge to the ProjectTeam entity by ID.
 func (psc *ProjectScoreCreate) SetTeamID(id int) *ProjectScoreCreate {
 	psc.mutation.SetTeamID(id)
@@ -186,6 +192,14 @@ func (psc *ProjectScoreCreate) check() error {
 	if _, ok := psc.mutation.Score(); !ok {
 		return &ValidationError{Name: "score", err: errors.New(`generated: missing required field "ProjectScore.score"`)}
 	}
+	if _, ok := psc.mutation.GetType(); !ok {
+		return &ValidationError{Name: "type", err: errors.New(`generated: missing required field "ProjectScore.type"`)}
+	}
+	if v, ok := psc.mutation.GetType(); ok {
+		if err := projectscore.TypeValidator(v); err != nil {
+			return &ValidationError{Name: "type", err: fmt.Errorf(`generated: validator failed for field "ProjectScore.type": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -245,6 +259,14 @@ func (psc *ProjectScoreCreate) createSpec() (*ProjectScore, *sqlgraph.CreateSpec
 			Column: projectscore.FieldScore,
 		})
 		_node.Score = value
+	}
+	if value, ok := psc.mutation.GetType(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeEnum,
+			Value:  value,
+			Column: projectscore.FieldType,
+		})
+		_node.Type = value
 	}
 	if nodes := psc.mutation.TeamIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -380,6 +402,18 @@ func (u *ProjectScoreUpsert) AddScore(v float64) *ProjectScoreUpsert {
 	return u
 }
 
+// SetType sets the "type" field.
+func (u *ProjectScoreUpsert) SetType(v projectscore.Type) *ProjectScoreUpsert {
+	u.Set(projectscore.FieldType, v)
+	return u
+}
+
+// UpdateType sets the "type" field to the value that was provided on create.
+func (u *ProjectScoreUpsert) UpdateType() *ProjectScoreUpsert {
+	u.SetExcluded(projectscore.FieldType)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
@@ -494,6 +528,20 @@ func (u *ProjectScoreUpsertOne) AddScore(v float64) *ProjectScoreUpsertOne {
 func (u *ProjectScoreUpsertOne) UpdateScore() *ProjectScoreUpsertOne {
 	return u.Update(func(s *ProjectScoreUpsert) {
 		s.UpdateScore()
+	})
+}
+
+// SetType sets the "type" field.
+func (u *ProjectScoreUpsertOne) SetType(v projectscore.Type) *ProjectScoreUpsertOne {
+	return u.Update(func(s *ProjectScoreUpsert) {
+		s.SetType(v)
+	})
+}
+
+// UpdateType sets the "type" field to the value that was provided on create.
+func (u *ProjectScoreUpsertOne) UpdateType() *ProjectScoreUpsertOne {
+	return u.Update(func(s *ProjectScoreUpsert) {
+		s.UpdateType()
 	})
 }
 
@@ -775,6 +823,20 @@ func (u *ProjectScoreUpsertBulk) AddScore(v float64) *ProjectScoreUpsertBulk {
 func (u *ProjectScoreUpsertBulk) UpdateScore() *ProjectScoreUpsertBulk {
 	return u.Update(func(s *ProjectScoreUpsert) {
 		s.UpdateScore()
+	})
+}
+
+// SetType sets the "type" field.
+func (u *ProjectScoreUpsertBulk) SetType(v projectscore.Type) *ProjectScoreUpsertBulk {
+	return u.Update(func(s *ProjectScoreUpsert) {
+		s.SetType(v)
+	})
+}
+
+// UpdateType sets the "type" field to the value that was provided on create.
+func (u *ProjectScoreUpsertBulk) UpdateType() *ProjectScoreUpsertBulk {
+	return u.Update(func(s *ProjectScoreUpsert) {
+		s.UpdateType()
 	})
 }
 

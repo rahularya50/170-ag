@@ -3,6 +3,9 @@
 package projectscore
 
 import (
+	"fmt"
+	"io"
+	"strconv"
 	"time"
 
 	"entgo.io/ent"
@@ -21,6 +24,8 @@ const (
 	FieldCaseID = "case_id"
 	// FieldScore holds the string denoting the score field in the database.
 	FieldScore = "score"
+	// FieldType holds the string denoting the type field in the database.
+	FieldType = "type"
 	// EdgeTeam holds the string denoting the team edge name in mutations.
 	EdgeTeam = "team"
 	// Table holds the table name of the projectscore in the database.
@@ -41,6 +46,7 @@ var Columns = []string{
 	FieldUpdateTime,
 	FieldCaseID,
 	FieldScore,
+	FieldType,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "project_scores"
@@ -80,3 +86,45 @@ var (
 	// UpdateDefaultUpdateTime holds the default value on update for the "update_time" field.
 	UpdateDefaultUpdateTime func() time.Time
 )
+
+// Type defines the type for the "type" enum field.
+type Type string
+
+// Type values.
+const (
+	TypeSmall  Type = "small"
+	TypeMedium Type = "medium"
+	TypeLarge  Type = "large"
+)
+
+func (_type Type) String() string {
+	return string(_type)
+}
+
+// TypeValidator is a validator for the "type" field enum values. It is called by the builders before save.
+func TypeValidator(_type Type) error {
+	switch _type {
+	case TypeSmall, TypeMedium, TypeLarge:
+		return nil
+	default:
+		return fmt.Errorf("projectscore: invalid enum value for type field: %q", _type)
+	}
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (_type Type) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(_type.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (_type *Type) UnmarshalGQL(val interface{}) error {
+	str, ok := val.(string)
+	if !ok {
+		return fmt.Errorf("enum %T must be a string", val)
+	}
+	*_type = Type(str)
+	if err := TypeValidator(*_type); err != nil {
+		return fmt.Errorf("%s is not a valid Type", str)
+	}
+	return nil
+}
