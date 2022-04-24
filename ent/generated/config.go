@@ -31,6 +31,8 @@ type hooks struct {
 	CodingSubmissionStaffData []ent.Hook
 	CodingTestCase            []ent.Hook
 	CodingTestCaseData        []ent.Hook
+	ProjectScore              []ent.Hook
+	ProjectTeam               []ent.Hook
 	User                      []ent.Hook
 }
 

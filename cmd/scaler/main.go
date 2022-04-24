@@ -28,6 +28,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	defer client.Close()
 
 	scalerServer := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(

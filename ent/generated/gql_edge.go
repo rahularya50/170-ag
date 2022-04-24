@@ -124,6 +124,22 @@ func (ctcd *CodingTestCaseData) TestCase(ctx context.Context) (*CodingTestCase, 
 	return result, err
 }
 
+func (ps *ProjectScore) Team(ctx context.Context) (*ProjectTeam, error) {
+	result, err := ps.Edges.TeamOrErr()
+	if IsNotLoaded(err) {
+		result, err = ps.QueryTeam().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (pt *ProjectTeam) Scores(ctx context.Context) ([]*ProjectScore, error) {
+	result, err := pt.Edges.ScoresOrErr()
+	if IsNotLoaded(err) {
+		result, err = pt.QueryScores().All(ctx)
+	}
+	return result, err
+}
+
 func (u *User) Drafts(ctx context.Context) ([]*CodingDraft, error) {
 	result, err := u.Edges.DraftsOrErr()
 	if IsNotLoaded(err) {

@@ -10,6 +10,8 @@ import (
 	"170-ag/ent/generated/codingsubmissionstaffdata"
 	"170-ag/ent/generated/codingtestcase"
 	"170-ag/ent/generated/codingtestcasedata"
+	"170-ag/ent/generated/projectscore"
+	"170-ag/ent/generated/projectteam"
 	"170-ag/ent/generated/user"
 	"errors"
 	"fmt"
@@ -43,6 +45,8 @@ func columnChecker(table string) func(string) error {
 		codingsubmissionstaffdata.Table: codingsubmissionstaffdata.ValidColumn,
 		codingtestcase.Table:            codingtestcase.ValidColumn,
 		codingtestcasedata.Table:        codingtestcasedata.ValidColumn,
+		projectscore.Table:              projectscore.ValidColumn,
+		projectteam.Table:               projectteam.ValidColumn,
 		user.Table:                      user.ValidColumn,
 	}
 	check, ok := checks[table]

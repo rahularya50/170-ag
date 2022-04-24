@@ -10,6 +10,8 @@ import (
 	"170-ag/ent/generated/codingsubmissionstaffdata"
 	"170-ag/ent/generated/codingtestcase"
 	"170-ag/ent/generated/codingtestcasedata"
+	"170-ag/ent/generated/projectscore"
+	"170-ag/ent/generated/projectteam"
 	"170-ag/ent/generated/user"
 	"context"
 	"encoding/json"
@@ -560,6 +562,120 @@ func (ctcd *CodingTestCaseData) Node(ctx context.Context) (node *Node, err error
 	return node, nil
 }
 
+func (ps *ProjectScore) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     ps.ID,
+		Type:   "ProjectScore",
+		Fields: make([]*Field, 5),
+		Edges:  make([]*Edge, 1),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(ps.CreateTime); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "time.Time",
+		Name:  "create_time",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(ps.UpdateTime); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "time.Time",
+		Name:  "update_time",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(ps.CaseID); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "int32",
+		Name:  "case_id",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(ps.Score); err != nil {
+		return nil, err
+	}
+	node.Fields[3] = &Field{
+		Type:  "float64",
+		Name:  "score",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(ps.Type); err != nil {
+		return nil, err
+	}
+	node.Fields[4] = &Field{
+		Type:  "projectscore.Type",
+		Name:  "type",
+		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "ProjectTeam",
+		Name: "team",
+	}
+	err = ps.QueryTeam().
+		Select(projectteam.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	return node, nil
+}
+
+func (pt *ProjectTeam) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     pt.ID,
+		Type:   "ProjectTeam",
+		Fields: make([]*Field, 4),
+		Edges:  make([]*Edge, 1),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(pt.CreateTime); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "time.Time",
+		Name:  "create_time",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(pt.UpdateTime); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "time.Time",
+		Name:  "update_time",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(pt.TeamID); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "int32",
+		Name:  "team_id",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(pt.Name); err != nil {
+		return nil, err
+	}
+	node.Fields[3] = &Field{
+		Type:  "string",
+		Name:  "name",
+		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "ProjectScore",
+		Name: "scores",
+	}
+	err = pt.QueryScores().
+		Select(projectscore.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	return node, nil
+}
+
 func (u *User) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     u.ID,
@@ -771,6 +887,24 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 			return nil, err
 		}
 		return n, nil
+	case projectscore.Table:
+		n, err := c.ProjectScore.Query().
+			Where(projectscore.ID(id)).
+			CollectFields(ctx, "ProjectScore").
+			Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case projectteam.Table:
+		n, err := c.ProjectTeam.Query().
+			Where(projectteam.ID(id)).
+			CollectFields(ctx, "ProjectTeam").
+			Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
 	case user.Table:
 		n, err := c.User.Query().
 			Where(user.ID(id)).
@@ -935,6 +1069,32 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		nodes, err := c.CodingTestCaseData.Query().
 			Where(codingtestcasedata.IDIn(ids...)).
 			CollectFields(ctx, "CodingTestCaseData").
+			All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case projectscore.Table:
+		nodes, err := c.ProjectScore.Query().
+			Where(projectscore.IDIn(ids...)).
+			CollectFields(ctx, "ProjectScore").
+			All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case projectteam.Table:
+		nodes, err := c.ProjectTeam.Query().
+			Where(projectteam.IDIn(ids...)).
+			CollectFields(ctx, "ProjectTeam").
 			All(ctx)
 		if err != nil {
 			return nil, err

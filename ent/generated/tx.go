@@ -26,6 +26,10 @@ type Tx struct {
 	CodingTestCase *CodingTestCaseClient
 	// CodingTestCaseData is the client for interacting with the CodingTestCaseData builders.
 	CodingTestCaseData *CodingTestCaseDataClient
+	// ProjectScore is the client for interacting with the ProjectScore builders.
+	ProjectScore *ProjectScoreClient
+	// ProjectTeam is the client for interacting with the ProjectTeam builders.
+	ProjectTeam *ProjectTeamClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 
@@ -170,6 +174,8 @@ func (tx *Tx) init() {
 	tx.CodingSubmissionStaffData = NewCodingSubmissionStaffDataClient(tx.config)
 	tx.CodingTestCase = NewCodingTestCaseClient(tx.config)
 	tx.CodingTestCaseData = NewCodingTestCaseDataClient(tx.config)
+	tx.ProjectScore = NewProjectScoreClient(tx.config)
+	tx.ProjectTeam = NewProjectTeamClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }
 
