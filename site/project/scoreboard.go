@@ -91,24 +91,67 @@ func (s *scoreboardHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	rw.Write(out)
 }
 
+type caseKey struct {
+	caseID   int32
+	caseType projectscore.Type
+}
+
 func ExportScoreboard(ctx context.Context, client *ent.Client, case_id *int32, case_type *projectscore.Type) (*Scoreboard, error) {
 	query := client.ProjectScore.Query()
-	if case_id != nil {
-		query = query.Where(projectscore.CaseID(*case_id))
-	}
+	scoreboard := &Scoreboard{Entries: []ScoreboardEntry{}}
+
 	if case_type != nil {
 		query = query.Where(projectscore.TypeEQ(*case_type))
 	}
-	scores, err := query.WithTeam().All(ctx)
-	if err != nil {
-		return nil, err
-	}
-	scoreboard := &Scoreboard{Entries: []ScoreboardEntry{}}
-	for _, score := range scores {
-		scoreboard.Entries = append(scoreboard.Entries, ScoreboardEntry{
-			TeamName:  score.Edges.Team.Name,
-			TeamScore: score.Score,
-		})
+	if case_id == nil || case_type == nil {
+		scores, err := query.WithTeam().All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		scoresByCase := make(map[caseKey][]*ent.ProjectScore)
+		for _, score := range scores {
+			key := caseKey{caseID: score.CaseID, caseType: score.Type}
+			scoresByCase[key] = append(scoresByCase[key], score)
+		}
+		for _, caseScores := range scoresByCase {
+			// sort in descending order of score
+			sort.Slice(caseScores,
+				func(i, j int) bool {
+					return scoreboard.Entries[i].TeamScore > scoreboard.Entries[j].TeamScore
+				},
+			)
+		}
+		totalRanks := make(map[string]float64)
+		for _, caseScores := range scoresByCase {
+			currScore := caseScores[0].Score
+			currRank := 0
+			for _, score := range caseScores {
+				if score.Score > currScore {
+					currScore = score.Score
+					currRank += 1
+				}
+				totalRanks[score.Edges.Team.Name] += float64(currRank)
+			}
+		}
+		for teamName, totalRank := range totalRanks {
+			scoreboard.Entries = append(scoreboard.Entries, ScoreboardEntry{
+				TeamName:  teamName,
+				TeamScore: totalRank / float64(len(totalRanks)),
+			})
+		}
+	} else {
+		// filter to single case
+		query = query.Where(projectscore.CaseID(*case_id))
+		scores, err := query.WithTeam().All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, score := range scores {
+			scoreboard.Entries = append(scoreboard.Entries, ScoreboardEntry{
+				TeamName:  score.Edges.Team.Name,
+				TeamScore: score.Score,
+			})
+		}
 	}
 	// break ties by team name
 	sort.Slice(scoreboard.Entries,
