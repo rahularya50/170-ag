@@ -16,8 +16,8 @@ var leaderboardURL = os.Getenv("LEADERBOARD_URL")
 const maxFineGrainedInvalidations = 20
 
 type invalidationPayload struct {
-	PurgeEverything bool     `json:"purge_everything"`
-	Files           []string `json:"files"`
+	PurgeEverything bool     `json:"purge_everything,omitempty"`
+	Files           []string `json:"files,omitempty"`
 }
 
 func invalidateWorker(payload invalidationPayload) error {
@@ -31,6 +31,7 @@ func invalidateWorker(payload invalidationPayload) error {
 		return err
 	}
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", os.Getenv("CLOUDFLARE_TOKEN")))
+	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
