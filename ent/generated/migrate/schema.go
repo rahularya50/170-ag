@@ -232,6 +232,63 @@ var (
 		Columns:    CodingTestCaseDataColumns,
 		PrimaryKey: []*schema.Column{CodingTestCaseDataColumns[0]},
 	}
+	// ProjectScoresColumns holds the columns for the "project_scores" table.
+	ProjectScoresColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "update_time", Type: field.TypeTime},
+		{Name: "case_id", Type: field.TypeInt32},
+		{Name: "score", Type: field.TypeFloat64},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"small", "medium", "large"}},
+		{Name: "project_team_scores", Type: field.TypeInt, Nullable: true},
+	}
+	// ProjectScoresTable holds the schema information for the "project_scores" table.
+	ProjectScoresTable = &schema.Table{
+		Name:       "project_scores",
+		Columns:    ProjectScoresColumns,
+		PrimaryKey: []*schema.Column{ProjectScoresColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "project_scores_project_teams_scores",
+				Columns:    []*schema.Column{ProjectScoresColumns[6]},
+				RefColumns: []*schema.Column{ProjectTeamsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "projectscore_project_team_scores",
+				Unique:  false,
+				Columns: []*schema.Column{ProjectScoresColumns[6]},
+			},
+			{
+				Name:    "projectscore_case_id_type_project_team_scores",
+				Unique:  true,
+				Columns: []*schema.Column{ProjectScoresColumns[3], ProjectScoresColumns[5], ProjectScoresColumns[6]},
+			},
+		},
+	}
+	// ProjectTeamsColumns holds the columns for the "project_teams" table.
+	ProjectTeamsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "update_time", Type: field.TypeTime},
+		{Name: "team_id", Type: field.TypeInt32, Unique: true},
+		{Name: "name", Type: field.TypeString, Unique: true, Size: 100},
+	}
+	// ProjectTeamsTable holds the schema information for the "project_teams" table.
+	ProjectTeamsTable = &schema.Table{
+		Name:       "project_teams",
+		Columns:    ProjectTeamsColumns,
+		PrimaryKey: []*schema.Column{ProjectTeamsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "projectteam_team_id",
+				Unique:  true,
+				Columns: []*schema.Column{ProjectTeamsColumns[3]},
+			},
+		},
+	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -263,6 +320,8 @@ var (
 		CodingSubmissionStaffDataTable,
 		CodingTestCasesTable,
 		CodingTestCaseDataTable,
+		ProjectScoresTable,
+		ProjectTeamsTable,
 		UsersTable,
 	}
 )
@@ -277,4 +336,5 @@ func init() {
 	CodingSubmissionsTable.ForeignKeys[2].RefTable = CodingSubmissionStaffDataTable
 	CodingTestCasesTable.ForeignKeys[0].RefTable = CodingProblemsTable
 	CodingTestCasesTable.ForeignKeys[1].RefTable = CodingTestCaseDataTable
+	ProjectScoresTable.ForeignKeys[0].RefTable = ProjectTeamsTable
 }

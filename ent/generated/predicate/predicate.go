@@ -27,5 +27,11 @@ type CodingTestCase func(*sql.Selector)
 // CodingTestCaseData is the predicate function for codingtestcasedata builders.
 type CodingTestCaseData func(*sql.Selector)
 
+// ProjectScore is the predicate function for projectscore builders.
+type ProjectScore func(*sql.Selector)
+
+// ProjectTeam is the predicate function for projectteam builders.
+type ProjectTeam func(*sql.Selector)
+
 // User is the predicate function for user builders.
 type User func(*sql.Selector)
