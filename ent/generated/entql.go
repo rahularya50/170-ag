@@ -165,6 +165,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			projectscore.FieldUpdateTime: {Type: field.TypeTime, Column: projectscore.FieldUpdateTime},
 			projectscore.FieldCaseID:     {Type: field.TypeInt32, Column: projectscore.FieldCaseID},
 			projectscore.FieldScore:      {Type: field.TypeFloat64, Column: projectscore.FieldScore},
+			projectscore.FieldType:       {Type: field.TypeEnum, Column: projectscore.FieldType},
 		},
 	}
 	graph.Nodes[8] = &sqlgraph.Node{
@@ -1166,6 +1167,11 @@ func (f *ProjectScoreFilter) WhereCaseID(p entql.Int32P) {
 // WhereScore applies the entql float64 predicate on the score field.
 func (f *ProjectScoreFilter) WhereScore(p entql.Float64P) {
 	f.Where(p.Field(projectscore.FieldScore))
+}
+
+// WhereType applies the entql string predicate on the type field.
+func (f *ProjectScoreFilter) WhereType(p entql.StringP) {
+	f.Where(p.Field(projectscore.FieldType))
 }
 
 // WhereHasTeam applies a predicate to check if query has an edge team.

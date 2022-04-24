@@ -566,7 +566,7 @@ func (ps *ProjectScore) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     ps.ID,
 		Type:   "ProjectScore",
-		Fields: make([]*Field, 4),
+		Fields: make([]*Field, 5),
 		Edges:  make([]*Edge, 1),
 	}
 	var buf []byte
@@ -600,6 +600,14 @@ func (ps *ProjectScore) Node(ctx context.Context) (node *Node, err error) {
 	node.Fields[3] = &Field{
 		Type:  "float64",
 		Name:  "score",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(ps.Type); err != nil {
+		return nil, err
+	}
+	node.Fields[4] = &Field{
+		Type:  "projectscore.Type",
+		Name:  "type",
 		Value: string(buf),
 	}
 	node.Edges[0] = &Edge{

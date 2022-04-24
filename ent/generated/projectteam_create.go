@@ -187,9 +187,6 @@ func (ptc *ProjectTeamCreate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`generated: validator failed for field "ProjectTeam.name": %w`, err)}
 		}
 	}
-	if len(ptc.mutation.ScoresIDs()) == 0 {
-		return &ValidationError{Name: "scores", err: errors.New(`generated: missing required edge "ProjectTeam.scores"`)}
-	}
 	return nil
 }
 

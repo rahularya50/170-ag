@@ -30,7 +30,7 @@ func (ProjectTeam) Fields() []ent.Field {
 // Edges of the ProjectTeam.
 func (ProjectTeam) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("scores", ProjectScore.Type).Required().Annotations(
+		edge.To("scores", ProjectScore.Type).Annotations(
 			entgql.Bind(),
 			entsql.Annotation{OnDelete: entsql.Cascade},
 		),

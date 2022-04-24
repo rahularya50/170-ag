@@ -23,6 +23,7 @@ func (ProjectScore) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int32("case_id"),
 		field.Float("score"),
+		field.Enum("type").Values("small", "medium", "large"),
 	}
 }
 
@@ -42,7 +43,7 @@ func (ProjectScore) Mixin() []ent.Mixin {
 func (ProjectScore) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Edges("team"),
-		index.Fields("case_id").Edges("team").Unique(),
+		index.Fields("case_id", "type").Edges("team").Unique(),
 	}
 }
 
