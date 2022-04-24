@@ -99,6 +99,32 @@ func (f CodingTestCaseDataFunc) Mutate(ctx context.Context, m generated.Mutation
 	return f(ctx, mv)
 }
 
+// The ProjectScoreFunc type is an adapter to allow the use of ordinary
+// function as ProjectScore mutator.
+type ProjectScoreFunc func(context.Context, *generated.ProjectScoreMutation) (generated.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ProjectScoreFunc) Mutate(ctx context.Context, m generated.Mutation) (generated.Value, error) {
+	mv, ok := m.(*generated.ProjectScoreMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *generated.ProjectScoreMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The ProjectTeamFunc type is an adapter to allow the use of ordinary
+// function as ProjectTeam mutator.
+type ProjectTeamFunc func(context.Context, *generated.ProjectTeamMutation) (generated.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ProjectTeamFunc) Mutate(ctx context.Context, m generated.Mutation) (generated.Value, error) {
+	mv, ok := m.(*generated.ProjectTeamMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *generated.ProjectTeamMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The UserFunc type is an adapter to allow the use of ordinary
 // function as User mutator.
 type UserFunc func(context.Context, *generated.UserMutation) (generated.Value, error)

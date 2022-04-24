@@ -12,6 +12,8 @@ type privacyAccessToken int
 var JudgeScalingServerAccessToken privacyAccessToken = 0
 var SubmissionEnqueuingAccessToken privacyAccessToken = 1
 var FullSubmissionTestCaseAccessToken privacyAccessToken = 2
+var GradescopeProjectSubmissionAccessToken privacyAccessToken = 3
+var CloudflareCacheAccessToken privacyAccessToken = 4
 
 func AllowWithPrivacyAccessToken(token privacyAccessToken) privacy.QueryMutationRule {
 	return privacy.ContextQueryMutationRule(func(c context.Context) error {
