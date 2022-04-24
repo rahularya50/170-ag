@@ -23,6 +23,7 @@ flow:
 view: export SESSION_KEY = abcdef
 view: export ENV = dev
 view: export GRADESCOPE_TOKEN = abcdef
+view: export GRPC_PORT = 12345
 
 view:
 	go run ./cmd/site

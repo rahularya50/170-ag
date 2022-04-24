@@ -2,12 +2,14 @@ package project
 
 import (
 	ent "170-ag/ent/generated"
+	"170-ag/ent/generated/projectscore"
 	"170-ag/ent/generated/projectteam"
 	"170-ag/privacyrules"
 	"170-ag/proto/schemas"
 	"170-ag/site"
 	"context"
 	"crypto/hmac"
+	"strings"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -26,7 +28,7 @@ func AuthProjectRequest(client *ent.Client, gradescopeToken string) grpc.UnarySe
 		if !ok {
 			return nil, status.Errorf(codes.Unauthenticated, "Metadata not found")
 		}
-		tokens, ok := metadata["Authorization-Token"]
+		tokens, ok := metadata["authorization-token"]
 		if !ok {
 			return nil, status.Errorf(codes.Unauthenticated, "Token not found")
 		}
@@ -58,9 +60,12 @@ func (s *ProjectScoresServer) RecordSubmission(ctx context.Context, submission *
 		return nil, err
 	}
 
-	team, err := tx.ProjectTeam.Create().SetTeamID(submission.TeamId).Save(ctx)
+	team, err := tx.ProjectTeam.Create().
+		SetTeamID(submission.TeamId).
+		SetName(submission.TeamName).
+		Save(ctx)
 	if err != nil {
-		if _, ok := err.(ent.ConstraintError); ok {
+		if _, ok := err.(*ent.ConstraintError); ok {
 			return &schemas.SubmissionReply{Status: schemas.Status_DUPLICATE_TEAM_NAME}, nil
 		}
 		return nil, err
@@ -71,12 +76,22 @@ func (s *ProjectScoresServer) RecordSubmission(ctx context.Context, submission *
 		scores[i] = tx.ProjectScore.Create().
 			SetTeam(team).
 			SetCaseID(score.CaseId).
+			SetType(projectscore.Type(strings.ToLower(score.CaseType.String()))).
 			SetScore(score.Score)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	_, err = tx.ProjectScore.CreateBulk(scores...).Save(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return &schemas.SubmissionReply{}, nil
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, err
+	}
+
+	return &schemas.SubmissionReply{Status: schemas.Status_SUCCESS}, nil
 }

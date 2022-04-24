@@ -29,6 +29,17 @@ spec:
           envFrom:
             - secretRef:
                 name: web-secrets
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+
         - name: cloud-sql-proxy
           image: gcr.io/cloudsql-docker/gce-proxy:1.28.0
           command:

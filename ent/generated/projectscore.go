@@ -25,6 +25,8 @@ type ProjectScore struct {
 	CaseID int32 `json:"case_id,omitempty"`
 	// Score holds the value of the "score" field.
 	Score float64 `json:"score,omitempty"`
+	// Type holds the value of the "type" field.
+	Type projectscore.Type `json:"type,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ProjectScoreQuery when eager-loading is set.
 	Edges               ProjectScoreEdges `json:"edges"`
@@ -63,6 +65,8 @@ func (*ProjectScore) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullFloat64)
 		case projectscore.FieldID, projectscore.FieldCaseID:
 			values[i] = new(sql.NullInt64)
+		case projectscore.FieldType:
+			values[i] = new(sql.NullString)
 		case projectscore.FieldCreateTime, projectscore.FieldUpdateTime:
 			values[i] = new(sql.NullTime)
 		case projectscore.ForeignKeys[0]: // project_team_scores
@@ -112,6 +116,12 @@ func (ps *ProjectScore) assignValues(columns []string, values []interface{}) err
 			} else if value.Valid {
 				ps.Score = value.Float64
 			}
+		case projectscore.FieldType:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field type", values[i])
+			} else if value.Valid {
+				ps.Type = projectscore.Type(value.String)
+			}
 		case projectscore.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field project_team_scores", value)
@@ -160,6 +170,8 @@ func (ps *ProjectScore) String() string {
 	builder.WriteString(fmt.Sprintf("%v", ps.CaseID))
 	builder.WriteString(", score=")
 	builder.WriteString(fmt.Sprintf("%v", ps.Score))
+	builder.WriteString(", type=")
+	builder.WriteString(fmt.Sprintf("%v", ps.Type))
 	builder.WriteByte(')')
 	return builder.String()
 }

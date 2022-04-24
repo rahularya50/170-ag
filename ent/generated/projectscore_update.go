@@ -61,6 +61,12 @@ func (psu *ProjectScoreUpdate) AddScore(f float64) *ProjectScoreUpdate {
 	return psu
 }
 
+// SetType sets the "type" field.
+func (psu *ProjectScoreUpdate) SetType(pr projectscore.Type) *ProjectScoreUpdate {
+	psu.mutation.SetType(pr)
+	return psu
+}
+
 // SetTeamID sets the "team" edge to the ProjectTeam entity by ID.
 func (psu *ProjectScoreUpdate) SetTeamID(id int) *ProjectScoreUpdate {
 	psu.mutation.SetTeamID(id)
@@ -101,12 +107,18 @@ func (psu *ProjectScoreUpdate) Save(ctx context.Context) (int, error) {
 		return 0, err
 	}
 	if len(psu.hooks) == 0 {
+		if err = psu.check(); err != nil {
+			return 0, err
+		}
 		affected, err = psu.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*ProjectScoreMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
+			}
+			if err = psu.check(); err != nil {
+				return 0, err
 			}
 			psu.mutation = mutation
 			affected, err = psu.sqlSave(ctx)
@@ -156,6 +168,16 @@ func (psu *ProjectScoreUpdate) defaults() error {
 		}
 		v := projectscore.UpdateDefaultUpdateTime()
 		psu.mutation.SetUpdateTime(v)
+	}
+	return nil
+}
+
+// check runs all checks and user-defined validators on the builder.
+func (psu *ProjectScoreUpdate) check() error {
+	if v, ok := psu.mutation.GetType(); ok {
+		if err := projectscore.TypeValidator(v); err != nil {
+			return &ValidationError{Name: "type", err: fmt.Errorf(`generated: validator failed for field "ProjectScore.type": %w`, err)}
+		}
 	}
 	return nil
 }
@@ -211,6 +233,13 @@ func (psu *ProjectScoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeFloat64,
 			Value:  value,
 			Column: projectscore.FieldScore,
+		})
+	}
+	if value, ok := psu.mutation.GetType(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeEnum,
+			Value:  value,
+			Column: projectscore.FieldType,
 		})
 	}
 	if psu.mutation.TeamCleared() {
@@ -299,6 +328,12 @@ func (psuo *ProjectScoreUpdateOne) AddScore(f float64) *ProjectScoreUpdateOne {
 	return psuo
 }
 
+// SetType sets the "type" field.
+func (psuo *ProjectScoreUpdateOne) SetType(pr projectscore.Type) *ProjectScoreUpdateOne {
+	psuo.mutation.SetType(pr)
+	return psuo
+}
+
 // SetTeamID sets the "team" edge to the ProjectTeam entity by ID.
 func (psuo *ProjectScoreUpdateOne) SetTeamID(id int) *ProjectScoreUpdateOne {
 	psuo.mutation.SetTeamID(id)
@@ -346,12 +381,18 @@ func (psuo *ProjectScoreUpdateOne) Save(ctx context.Context) (*ProjectScore, err
 		return nil, err
 	}
 	if len(psuo.hooks) == 0 {
+		if err = psuo.check(); err != nil {
+			return nil, err
+		}
 		node, err = psuo.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*ProjectScoreMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
+			}
+			if err = psuo.check(); err != nil {
+				return nil, err
 			}
 			psuo.mutation = mutation
 			node, err = psuo.sqlSave(ctx)
@@ -401,6 +442,16 @@ func (psuo *ProjectScoreUpdateOne) defaults() error {
 		}
 		v := projectscore.UpdateDefaultUpdateTime()
 		psuo.mutation.SetUpdateTime(v)
+	}
+	return nil
+}
+
+// check runs all checks and user-defined validators on the builder.
+func (psuo *ProjectScoreUpdateOne) check() error {
+	if v, ok := psuo.mutation.GetType(); ok {
+		if err := projectscore.TypeValidator(v); err != nil {
+			return &ValidationError{Name: "type", err: fmt.Errorf(`generated: validator failed for field "ProjectScore.type": %w`, err)}
+		}
 	}
 	return nil
 }
@@ -473,6 +524,13 @@ func (psuo *ProjectScoreUpdateOne) sqlSave(ctx context.Context) (_node *ProjectS
 			Type:   field.TypeFloat64,
 			Value:  value,
 			Column: projectscore.FieldScore,
+		})
+	}
+	if value, ok := psuo.mutation.GetType(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeEnum,
+			Value:  value,
+			Column: projectscore.FieldType,
 		})
 	}
 	if psuo.mutation.TeamCleared() {

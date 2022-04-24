@@ -239,6 +239,7 @@ var (
 		{Name: "update_time", Type: field.TypeTime},
 		{Name: "case_id", Type: field.TypeInt32},
 		{Name: "score", Type: field.TypeFloat64},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"small", "medium", "large"}},
 		{Name: "project_team_scores", Type: field.TypeInt, Nullable: true},
 	}
 	// ProjectScoresTable holds the schema information for the "project_scores" table.
@@ -249,7 +250,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "project_scores_project_teams_scores",
-				Columns:    []*schema.Column{ProjectScoresColumns[5]},
+				Columns:    []*schema.Column{ProjectScoresColumns[6]},
 				RefColumns: []*schema.Column{ProjectTeamsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -258,12 +259,12 @@ var (
 			{
 				Name:    "projectscore_project_team_scores",
 				Unique:  false,
-				Columns: []*schema.Column{ProjectScoresColumns[5]},
+				Columns: []*schema.Column{ProjectScoresColumns[6]},
 			},
 			{
-				Name:    "projectscore_case_id_project_team_scores",
+				Name:    "projectscore_case_id_type_project_team_scores",
 				Unique:  true,
-				Columns: []*schema.Column{ProjectScoresColumns[3], ProjectScoresColumns[5]},
+				Columns: []*schema.Column{ProjectScoresColumns[3], ProjectScoresColumns[5], ProjectScoresColumns[6]},
 			},
 		},
 	}
