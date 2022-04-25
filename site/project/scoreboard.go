@@ -65,10 +65,10 @@ func getAllRanks(scores []*ent.ProjectScore) map[string]map[caseKey]int {
 	for testCase, caseScores := range scoresByCase {
 		currScore := caseScores[0].Score
 		currRank := 0
-		for _, score := range caseScores {
+		for i, score := range caseScores {
 			if score.Score > currScore {
 				currScore = score.Score
-				currRank += 1
+				currRank = i
 			}
 			if ranks[score.Edges.Team.Name] == nil {
 				ranks[score.Edges.Team.Name] = make(map[caseKey]int)
