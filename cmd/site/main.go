@@ -95,29 +95,18 @@ func main() {
 		panic("scoreboard API token must be provided")
 	}
 
-	if os.Getenv("ENV") == "dev" {
-		http.Handle(
-			"/scoreboard/",
-			project.ScoreboardHandler(client, false /* forTeam */),
-		)
-		http.Handle(
-			"/team/",
-			project.ScoreboardHandler(client, true /* forTeam */),
-		)
-	} else {
-		http.HandleFunc(
-			"/scoreboard/",
-			project.HandlerCheckingAuthorizationToken(
-				project.ScoreboardHandler(client, false /* forTeam */), scoreboardToken,
-			),
-		)
-		http.HandleFunc(
-			"/team/",
-			project.HandlerCheckingAuthorizationToken(
-				project.ScoreboardHandler(client, true /* forTeam */), scoreboardToken,
-			),
-		)
-	}
+	http.HandleFunc(
+		"/scoreboard/",
+		project.HandlerCheckingAuthorizationToken(
+			project.ScoreboardHandler(client), scoreboardToken,
+		),
+	)
+	http.HandleFunc(
+		"/team/",
+		project.HandlerCheckingAuthorizationToken(
+			project.TeamScoreboardHandler(client), scoreboardToken,
+		),
+	)
 
 	httpSrv := &http.Server{
 		ReadTimeout:  5 * time.Second,
