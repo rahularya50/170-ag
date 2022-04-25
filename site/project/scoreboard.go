@@ -3,7 +3,6 @@ package project
 import (
 	ent "170-ag/ent/generated"
 	"170-ag/ent/generated/projectscore"
-	"170-ag/ent/generated/projectteam"
 	"context"
 	"sort"
 )
@@ -15,6 +14,15 @@ type Scoreboard struct {
 type ScoreboardEntry struct {
 	TeamName  string
 	TeamScore float64
+}
+
+type TeamScoreboard struct {
+	Entries []TeamScoreboardEntry
+}
+
+type TeamScoreboardEntry struct {
+	TeamScore float64
+	TeamRank  int
 	TestCase  caseKey
 }
 
@@ -26,7 +34,6 @@ type caseKey struct {
 type scoreboardFilter struct {
 	case_id   *int32
 	case_type *projectscore.Type
-	team_name *string
 }
 
 func queryScores(ctx context.Context, client *ent.Client, filter scoreboardFilter) ([]*ent.ProjectScore, error) {
@@ -37,15 +44,10 @@ func queryScores(ctx context.Context, client *ent.Client, filter scoreboardFilte
 	if filter.case_id != nil {
 		query = query.Where(projectscore.CaseID(*filter.case_id))
 	}
-	if filter.team_name != nil {
-		query = query.Where(projectscore.HasTeamWith(projectteam.Name(*filter.team_name)))
-	}
 	return query.WithTeam().All(ctx)
 }
 
-func scoreByRank(scores []*ent.ProjectScore) *Scoreboard {
-	scoreboard := &Scoreboard{Entries: []ScoreboardEntry{}}
-
+func getAllRanks(scores []*ent.ProjectScore) map[string]map[caseKey]int {
 	scoresByCase := make(map[caseKey][]*ent.ProjectScore)
 	for _, score := range scores {
 		key := caseKey{CaseID: score.CaseID, CaseType: score.Type}
@@ -59,8 +61,8 @@ func scoreByRank(scores []*ent.ProjectScore) *Scoreboard {
 			},
 		)
 	}
-	totalRanks := make(map[string]float64)
-	for _, caseScores := range scoresByCase {
+	ranks := make(map[string]map[caseKey]int) // teamName -> case -> rank
+	for testCase, caseScores := range scoresByCase {
 		currScore := caseScores[0].Score
 		currRank := 0
 		for _, score := range caseScores {
@@ -68,13 +70,26 @@ func scoreByRank(scores []*ent.ProjectScore) *Scoreboard {
 				currScore = score.Score
 				currRank += 1
 			}
-			totalRanks[score.Edges.Team.Name] += float64(currRank)
+			if ranks[score.Edges.Team.Name] == nil {
+				ranks[score.Edges.Team.Name] = make(map[caseKey]int)
+			}
+			ranks[score.Edges.Team.Name][testCase] = currRank
 		}
 	}
-	for teamName, totalRank := range totalRanks {
+	return ranks
+}
+
+func scoreByRank(scores []*ent.ProjectScore) *Scoreboard {
+	scoreboard := &Scoreboard{Entries: []ScoreboardEntry{}}
+	ranks := getAllRanks(scores)
+	for teamName, allRanks := range ranks {
+		totalRank := 0
+		for _, rank := range allRanks {
+			totalRank += rank
+		}
 		scoreboard.Entries = append(scoreboard.Entries, ScoreboardEntry{
 			TeamName:  teamName,
-			TeamScore: totalRank / float64(len(totalRanks)),
+			TeamScore: float64(totalRank) / float64(len(allRanks)),
 		})
 	}
 	return scoreboard
@@ -86,23 +101,23 @@ func scoreByPoints(scores []*ent.ProjectScore) *Scoreboard {
 		scoreboard.Entries = append(scoreboard.Entries, ScoreboardEntry{
 			TeamName:  score.Edges.Team.Name,
 			TeamScore: score.Score,
-			TestCase:  caseKey{CaseID: score.CaseID, CaseType: score.Type},
 		})
 	}
 	return scoreboard
 }
 
-func sortScoreboard(scoreboard *Scoreboard) {
-	// break ties by team name
-	sort.Slice(scoreboard.Entries,
-		func(i, j int) bool {
-			return scoreboard.Entries[i].TeamName < scoreboard.Entries[j].TeamName
-		},
-	)
-	// then sort by increasing score (i.e. cost)
-	sort.SliceStable(scoreboard.Entries,
-		func(i, j int) bool {
-			return scoreboard.Entries[i].TeamScore < scoreboard.Entries[j].TeamScore
-		},
-	)
+func scoreTeamPointsAndRank(scores []*ent.ProjectScore, ranks map[string]map[caseKey]int, team string) *TeamScoreboard {
+	scoreboard := &TeamScoreboard{Entries: []TeamScoreboardEntry{}}
+	for _, score := range scores {
+		if score.Edges.Team.Name != team {
+			continue
+		}
+		testCase := caseKey{CaseID: score.CaseID, CaseType: score.Type}
+		scoreboard.Entries = append(scoreboard.Entries, TeamScoreboardEntry{
+			TeamScore: score.Score,
+			TeamRank:  ranks[team][testCase],
+			TestCase:  testCase,
+		})
+	}
+	return scoreboard
 }
