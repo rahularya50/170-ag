@@ -59,6 +59,7 @@ func (s *scoreboardHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		switch len(parts) {
 		case 1:
 			raw_team_name = parts[0]
+			sort_by_rank = false
 		default:
 			rw.WriteHeader(http.StatusNotFound)
 			return
@@ -66,9 +67,7 @@ func (s *scoreboardHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	} else {
 		switch len(parts) {
 		case 0:
-			values := r.URL.Query()
-			raw_case_id = values.Get("caseID")
-			raw_case_type = values.Get("caseType")
+			/* no-op */
 		case 1:
 			raw_case_type = parts[0]
 		case 2:
