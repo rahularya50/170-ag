@@ -26,6 +26,10 @@ spec:
               value: "6000"
             - name: ENDPOINT
               value: "cal/cs170/sp22"
+            - name: CLOUDFLARE_ZONE
+              value: "ef77efc0233a87a84ceecfdebbbc9415"
+            - name: LEADERBOARD_URL
+              value: "https://project.cs170.dev/scoreboard/"
           envFrom:
             - secretRef:
                 name: web-secrets

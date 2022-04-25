@@ -27,6 +27,7 @@ message Score {
 enum Status {
   SUCCESS = 0;
   DUPLICATE_TEAM_NAME = 1;
+  CACHE_INVALIDATION_FAILURE = 2;
 }
 
 message SubmissionReply { Status status = 1; }
