@@ -98,13 +98,23 @@ func main() {
 	if os.Getenv("ENV") == "dev" {
 		http.Handle(
 			"/scoreboard/",
-			project.ScoreboardHandler(client),
+			project.ScoreboardHandler(client, false),
+		)
+		http.Handle(
+			"/team/",
+			project.ScoreboardHandler(client, true),
 		)
 	} else {
 		http.HandleFunc(
 			"/scoreboard/",
 			project.HandlerCheckingAuthorizationToken(
-				project.ScoreboardHandler(client), scoreboardToken,
+				project.ScoreboardHandler(client, false), scoreboardToken,
+			),
+		)
+		http.HandleFunc(
+			"/team/",
+			project.HandlerCheckingAuthorizationToken(
+				project.ScoreboardHandler(client, true), scoreboardToken,
 			),
 		)
 	}
