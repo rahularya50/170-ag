@@ -15,11 +15,12 @@ type Scoreboard struct {
 type ScoreboardEntry struct {
 	TeamName  string
 	TeamScore float64
+	TestCase  caseKey
 }
 
 type caseKey struct {
-	caseID   int32
-	caseType projectscore.Type
+	CaseID   int32
+	CaseType projectscore.Type
 }
 
 type scoreboardFilter struct {
@@ -47,7 +48,7 @@ func scoreByRank(scores []*ent.ProjectScore) *Scoreboard {
 
 	scoresByCase := make(map[caseKey][]*ent.ProjectScore)
 	for _, score := range scores {
-		key := caseKey{caseID: score.CaseID, caseType: score.Type}
+		key := caseKey{CaseID: score.CaseID, CaseType: score.Type}
 		scoresByCase[key] = append(scoresByCase[key], score)
 	}
 	for _, caseScores := range scoresByCase {
@@ -85,6 +86,7 @@ func scoreByPoints(scores []*ent.ProjectScore) *Scoreboard {
 		scoreboard.Entries = append(scoreboard.Entries, ScoreboardEntry{
 			TeamName:  score.Edges.Team.Name,
 			TeamScore: score.Score,
+			TestCase:  caseKey{CaseID: score.CaseID, CaseType: score.Type},
 		})
 	}
 	return scoreboard
