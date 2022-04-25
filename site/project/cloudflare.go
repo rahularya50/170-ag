@@ -50,7 +50,7 @@ func invalidateWorker(payload invalidationPayload) error {
 }
 
 func urlOfCase(testCase caseKey) string {
-	return fmt.Sprintf("%s/%s/%d", leaderboardURL, testCase.caseType, testCase.caseID)
+	return fmt.Sprintf("%s/%s/%d", leaderboardURL, testCase.CaseType, testCase.CaseID)
 }
 
 func invalidateList(cases []caseKey) error {

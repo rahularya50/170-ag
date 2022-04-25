@@ -79,7 +79,7 @@ func (s *ProjectScoresServer) RecordSubmission(ctx context.Context, submission *
 
 	score_lookup := make(map[caseKey]float64)
 	for _, score := range old_scores {
-		score_lookup[caseKey{caseID: score.CaseID, caseType: score.Type}] = score.Score
+		score_lookup[caseKey{CaseID: score.CaseID, CaseType: score.Type}] = score.Score
 	}
 
 	scores := make([]*ent.ProjectScoreCreate, len(submission.Score))
@@ -89,7 +89,7 @@ func (s *ProjectScoresServer) RecordSubmission(ctx context.Context, submission *
 		if err := projectscore.TypeValidator(caseType); err != nil {
 			return nil, err
 		}
-		key := caseKey{caseID: score.CaseId, caseType: caseType}
+		key := caseKey{CaseID: score.CaseId, CaseType: caseType}
 		best_score, ok := score_lookup[key]
 		if !ok || best_score > score.Score {
 			best_score = score.Score
