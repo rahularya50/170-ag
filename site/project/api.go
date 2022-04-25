@@ -56,10 +56,15 @@ func (s *ProjectScoresServer) RecordSubmission(ctx context.Context, submission *
 	}
 	defer tx.Rollback()
 
+	is_same_name, err := tx.ProjectTeam.Query().Where(projectteam.Name(submission.TeamName)).Exist(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	team, err := tx.ProjectTeam.Create().
 		SetTeamID(submission.TeamId).
 		SetName(submission.TeamName).
-		OnConflictColumns(projectteam.FieldName).
+		OnConflictColumns(projectteam.FieldTeamID).
 		UpdateNewValues().
 		ID(ctx)
 	if err != nil {
@@ -122,7 +127,13 @@ func (s *ProjectScoresServer) RecordSubmission(ctx context.Context, submission *
 		return nil, err
 	}
 
-	err = invalidateCases(to_invalidate)
+	if is_same_name {
+		// invalidate case-by-case
+		err = invalidateCases(to_invalidate, submission.TeamName)
+	} else {
+		// name changed, invalidate everything
+		err = invalidateAll()
+	}
 	if err != nil {
 		log.Default().Println(err.Error())
 		return &schemas.SubmissionReply{Status: schemas.Status_CACHE_INVALIDATION_FAILURE}, nil

@@ -7,21 +7,32 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 )
 
 var cloudflareZone = os.Getenv("CLOUDFLARE_ZONE")
-var leaderboardURL = os.Getenv("LEADERBOARD_URL")
+var leaderboardURL = fmt.Sprintf("%s/scoreboard", os.Getenv("LEADERBOARD_URL"))
+var teamURL = fmt.Sprintf("%s/team", os.Getenv("LEADERBOARD_URL"))
 
 const maxFineGrainedInvalidations = 20
 
 type invalidationPayload struct {
-	PurgeEverything bool     `json:"purge_everything,omitempty"`
-	Files           []string `json:"files,omitempty"`
+	PurgeEverything bool   `json:"purge_everything,omitempty"`
+	Files           []file `json:"files,omitempty"`
+}
+
+type file struct {
+	Url     string            `json:"url"`
+	Headers map[string]string `json:"headers"`
 }
 
 func invalidateWorker(payload invalidationPayload) error {
 	endpoint := fmt.Sprintf("https://api.cloudflare.com/client/v4/zones/%s/purge_cache", cloudflareZone)
+	for _, file := range payload.Files {
+		file.Headers = make(map[string]string)
+		file.Headers["Origin"] = os.Getenv("LEADERBOARD_ORIGIN")
+	}
 	body, err := json.Marshal(payload)
 	if err != nil {
 		return err
@@ -50,18 +61,19 @@ func invalidateWorker(payload invalidationPayload) error {
 }
 
 func urlOfCase(testCase caseKey) string {
-	return fmt.Sprintf("%s/%s/%d", leaderboardURL, testCase.CaseType, testCase.CaseID)
+	return fmt.Sprintf("%s/%s/%d/", leaderboardURL, testCase.CaseType, testCase.CaseID)
 }
 
-func invalidateList(cases []caseKey) error {
-	files := make([]string, len(cases))
+func invalidateList(cases []caseKey, team string) error {
+	files := make([]file, len(cases))
 	for i, testCase := range cases {
-		files[i] = urlOfCase(testCase)
+		files[i] = file{Url: urlOfCase(testCase)}
 	}
 	for _, size := range []projectscore.Type{projectscore.TypeSmall, projectscore.TypeSmall, projectscore.TypeSmall} {
-		files = append(files, fmt.Sprintf("%s/%s", leaderboardURL, size))
+		files = append(files, file{Url: fmt.Sprintf("%s/%s/", leaderboardURL, size)})
 	}
-	files = append(files, leaderboardURL)
+	files = append(files, file{Url: fmt.Sprintf("%s/", leaderboardURL)})
+	files = append(files, file{Url: fmt.Sprintf("%s/%s/", teamURL, url.QueryEscape(team))})
 	return invalidateWorker(invalidationPayload{Files: files})
 }
 
@@ -69,12 +81,12 @@ func invalidateAll() error {
 	return invalidateWorker(invalidationPayload{PurgeEverything: true})
 }
 
-func invalidateCases(cases []caseKey) error {
+func invalidateCases(cases []caseKey, team string) error {
 	switch {
 	case len(cases) == 0:
 		return nil
 	case len(cases) <= maxFineGrainedInvalidations:
-		return invalidateList(cases)
+		return invalidateList(cases, team)
 	default:
 		return invalidateAll()
 	}

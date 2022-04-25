@@ -29,7 +29,9 @@ spec:
             - name: CLOUDFLARE_ZONE
               value: "ef77efc0233a87a84ceecfdebbbc9415"
             - name: LEADERBOARD_URL
-              value: "https://project.cs170.dev/scoreboard/"
+              value: "https://project.cs170.dev/scoreboard"
+            - name: LEADERBOARD_ORIGIN
+              value: "https://leaderboard.cs170.dev"
           envFrom:
             - secretRef:
                 name: web-secrets
