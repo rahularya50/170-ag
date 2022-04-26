@@ -39,7 +39,7 @@ func HandlerCheckingAuthorizationToken(h http.Handler, accessToken string) http.
 }
 
 func getRequestArgs(r *http.Request) []string {
-	parts := strings.Split(r.URL.Path, "/")
+	parts := strings.Split(r.URL.EscapedPath(), "/")
 
 	// path begins with /scoreboard/
 	parts = parts[2:]
@@ -140,7 +140,7 @@ func (s *teamScoreboardHandler) ServeHTTP(rw http.ResponseWriter, r *http.Reques
 
 	var team_name *string
 	if raw_team_name != "" {
-		parsed_team_name, err := url.QueryUnescape(raw_team_name)
+		parsed_team_name, err := url.PathUnescape(raw_team_name)
 		if err != nil {
 			rw.WriteHeader(http.StatusBadRequest)
 			return
