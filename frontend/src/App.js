@@ -7,19 +7,20 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import { useLazyLoadQuery } from "react-relay";
 import { LinkContainer } from "react-router-bootstrap";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { generatePath, Navigate, Route, Routes } from "react-router-dom";
 
 import Home from "./Home";
 import Problem from "./Problem";
 import Problems from "./Problems";
 import Submission from "./Submission";
+import User from "./User";
 
 export default function App(): React.Node {
   const { viewer } = useLazyLoadQuery(
     graphql`
       query AppQuery {
         viewer {
-          __typename
+          id
         }
       }
     `,
@@ -41,6 +42,13 @@ export default function App(): React.Node {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/problems" element={<Problems />} />
+        <Route
+          path="/whoami"
+          element={
+            <Navigate to={generatePath("/user/:id", { id: viewer.id })} />
+          }
+        />
+        <Route path="/user/:id" element={<User />} />
         <Route path="/problem/:id" element={<Problem />} />
         <Route path="/submission/:id" element={<Submission />} />
         <Route path="*" element={<Navigate to="/" />} />
@@ -67,6 +75,11 @@ export default function App(): React.Node {
                 </LinkContainer>
                 <LinkContainer to="/problems/">
                   <Nav.Link>Problems</Nav.Link>
+                </LinkContainer>
+                <LinkContainer
+                  to={generatePath("/user/:id", { id: viewer.id })}
+                >
+                  <Nav.Link>Account</Nav.Link>
                 </LinkContainer>
                 <Nav.Link href="/logout">Log Out</Nav.Link>
               </Nav>
