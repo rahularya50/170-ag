@@ -13,7 +13,7 @@ type Scoreboard struct {
 
 type ScoreboardEntry struct {
 	TeamName  string
-	TeamScore float64
+	TeamScore roundedFloat
 }
 
 type TeamScoreboard struct {
@@ -21,7 +21,7 @@ type TeamScoreboard struct {
 }
 
 type TeamScoreboardEntry struct {
-	TeamScore float64
+	TeamScore roundedFloat
 	TeamRank  int
 	TestCase  caseKey
 }
@@ -57,17 +57,17 @@ func getAllRanks(scores []*ent.ProjectScore) map[string]map[caseKey]int {
 		// sort in ascending order of score
 		sort.Slice(caseScores,
 			func(i, j int) bool {
-				return caseScores[i].Score < caseScores[j].Score
+				return roundFloat(caseScores[i].Score) < roundFloat(caseScores[j].Score)
 			},
 		)
 	}
 	ranks := make(map[string]map[caseKey]int) // teamName -> case -> rank
 	for testCase, caseScores := range scoresByCase {
-		currScore := caseScores[0].Score
+		currScore := roundFloat(caseScores[0].Score)
 		currRank := 0
 		for i, score := range caseScores {
-			if score.Score > currScore {
-				currScore = score.Score
+			if roundFloat(score.Score) > currScore {
+				currScore = roundFloat(score.Score)
 				currRank = i
 			}
 			if ranks[score.Edges.Team.Name] == nil {
@@ -89,7 +89,7 @@ func scoreByRank(scores []*ent.ProjectScore) *Scoreboard {
 		}
 		scoreboard.Entries = append(scoreboard.Entries, ScoreboardEntry{
 			TeamName:  teamName,
-			TeamScore: float64(totalRank) / float64(len(allRanks)),
+			TeamScore: roundFloat(float64(totalRank) / float64(len(allRanks))),
 		})
 	}
 	return scoreboard
@@ -100,7 +100,7 @@ func scoreByPoints(scores []*ent.ProjectScore) *Scoreboard {
 	for _, score := range scores {
 		scoreboard.Entries = append(scoreboard.Entries, ScoreboardEntry{
 			TeamName:  score.Edges.Team.Name,
-			TeamScore: score.Score,
+			TeamScore: roundFloat(score.Score),
 		})
 	}
 	return scoreboard
@@ -114,7 +114,7 @@ func scoreTeamPointsAndRank(scores []*ent.ProjectScore, ranks map[string]map[cas
 		}
 		testCase := caseKey{CaseID: score.CaseID, CaseType: score.Type}
 		scoreboard.Entries = append(scoreboard.Entries, TeamScoreboardEntry{
-			TeamScore: score.Score,
+			TeamScore: roundedFloat(score.Score),
 			TeamRank:  ranks[team][testCase],
 			TestCase:  testCase,
 		})
