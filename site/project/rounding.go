@@ -1,11 +1,19 @@
 package project
 
-import "math"
+import (
+	"strconv"
+)
 
-const precision = 1e-6
+const precision = 6
 
 type roundedFloat float64
 
 func roundFloat(val float64) roundedFloat {
-	return roundedFloat(math.Round(val/precision) * precision)
+	temp := roundedFloat(val)
+	out, _ := strconv.ParseFloat(temp.String(), 64)
+	return roundedFloat(out)
+}
+
+func (f roundedFloat) String() string {
+	return strconv.FormatFloat(float64(f), 'f', precision, 64)
 }
