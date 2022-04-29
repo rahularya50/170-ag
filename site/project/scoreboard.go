@@ -17,11 +17,11 @@ type ScoreboardEntry struct {
 	TeamScoreStr string
 }
 
-func NewScoreboardEntry(name string, score roundedFloat) ScoreboardEntry {
+func NewScoreboardEntry(name string, score roundedFloatWithStr) ScoreboardEntry {
 	return ScoreboardEntry{
 		TeamName:     name,
-		TeamScore:    score,
-		TeamScoreStr: score.String(),
+		TeamScore:    score.val,
+		TeamScoreStr: score.str,
 	}
 }
 
@@ -36,10 +36,10 @@ type TeamScoreboardEntry struct {
 	TestCase     caseKey
 }
 
-func NewTeamScoreboardEntry(score roundedFloat, rank int, testCase caseKey) TeamScoreboardEntry {
+func NewTeamScoreboardEntry(score roundedFloatWithStr, rank int, testCase caseKey) TeamScoreboardEntry {
 	return TeamScoreboardEntry{
-		TeamScore:    score,
-		TeamScoreStr: score.String(),
+		TeamScore:    score.val,
+		TeamScoreStr: score.str,
 		TeamRank:     rank,
 		TestCase:     testCase,
 	}
@@ -76,7 +76,7 @@ func getAllRanks(scores []*ent.ProjectScore) map[string]map[caseKey]int {
 		// sort in ascending order of score
 		sort.Slice(caseScores,
 			func(i, j int) bool {
-				return roundFloat(caseScores[i].Score) < roundFloat(caseScores[j].Score)
+				return roundFloat(caseScores[i].Score).Lt(roundFloat(caseScores[j].Score))
 			},
 		)
 	}
@@ -85,7 +85,7 @@ func getAllRanks(scores []*ent.ProjectScore) map[string]map[caseKey]int {
 		currScore := roundFloat(caseScores[0].Score)
 		currRank := 0
 		for i, score := range caseScores {
-			if roundFloat(score.Score) > currScore {
+			if roundFloat(score.Score).Gt(currScore) {
 				currScore = roundFloat(score.Score)
 				currRank = i
 			}
@@ -135,7 +135,7 @@ func scoreTeamPointsAndRank(scores []*ent.ProjectScore, ranks map[string]map[cas
 		scoreboard.Entries = append(
 			scoreboard.Entries,
 			NewTeamScoreboardEntry(
-				roundedFloat(score.Score),
+				roundFloat(score.Score),
 				ranks[team][testCase],
 				testCase,
 			))
