@@ -12,8 +12,17 @@ type Scoreboard struct {
 }
 
 type ScoreboardEntry struct {
-	TeamName  string
-	TeamScore float64
+	TeamName     string
+	TeamScore    roundedFloat
+	TeamScoreStr string
+}
+
+func NewScoreboardEntry(name string, score roundedFloatWithStr) ScoreboardEntry {
+	return ScoreboardEntry{
+		TeamName:     name,
+		TeamScore:    score.val,
+		TeamScoreStr: score.str,
+	}
 }
 
 type TeamScoreboard struct {
@@ -21,9 +30,19 @@ type TeamScoreboard struct {
 }
 
 type TeamScoreboardEntry struct {
-	TeamScore float64
-	TeamRank  int
-	TestCase  caseKey
+	TeamScore    roundedFloat
+	TeamScoreStr string
+	TeamRank     int
+	TestCase     caseKey
+}
+
+func NewTeamScoreboardEntry(score roundedFloatWithStr, rank int, testCase caseKey) TeamScoreboardEntry {
+	return TeamScoreboardEntry{
+		TeamScore:    score.val,
+		TeamScoreStr: score.str,
+		TeamRank:     rank,
+		TestCase:     testCase,
+	}
 }
 
 type caseKey struct {
@@ -57,17 +76,17 @@ func getAllRanks(scores []*ent.ProjectScore) map[string]map[caseKey]int {
 		// sort in ascending order of score
 		sort.Slice(caseScores,
 			func(i, j int) bool {
-				return caseScores[i].Score < caseScores[j].Score
+				return roundFloat(caseScores[i].Score).Lt(roundFloat(caseScores[j].Score))
 			},
 		)
 	}
 	ranks := make(map[string]map[caseKey]int) // teamName -> case -> rank
 	for testCase, caseScores := range scoresByCase {
-		currScore := caseScores[0].Score
+		currScore := roundFloat(caseScores[0].Score)
 		currRank := 0
 		for i, score := range caseScores {
-			if score.Score > currScore {
-				currScore = score.Score
+			if roundFloat(score.Score).Gt(currScore) {
+				currScore = roundFloat(score.Score)
 				currRank = i
 			}
 			if ranks[score.Edges.Team.Name] == nil {
@@ -87,10 +106,10 @@ func scoreByRank(scores []*ent.ProjectScore) *Scoreboard {
 		for _, rank := range allRanks {
 			totalRank += rank
 		}
-		scoreboard.Entries = append(scoreboard.Entries, ScoreboardEntry{
-			TeamName:  teamName,
-			TeamScore: float64(totalRank) / float64(len(allRanks)),
-		})
+		scoreboard.Entries = append(scoreboard.Entries, NewScoreboardEntry(
+			teamName,
+			roundFloat(float64(totalRank)/float64(len(allRanks))),
+		))
 	}
 	return scoreboard
 }
@@ -98,10 +117,10 @@ func scoreByRank(scores []*ent.ProjectScore) *Scoreboard {
 func scoreByPoints(scores []*ent.ProjectScore) *Scoreboard {
 	scoreboard := &Scoreboard{Entries: []ScoreboardEntry{}}
 	for _, score := range scores {
-		scoreboard.Entries = append(scoreboard.Entries, ScoreboardEntry{
-			TeamName:  score.Edges.Team.Name,
-			TeamScore: score.Score,
-		})
+		scoreboard.Entries = append(scoreboard.Entries, NewScoreboardEntry(
+			score.Edges.Team.Name,
+			roundFloat(score.Score),
+		))
 	}
 	return scoreboard
 }
@@ -113,11 +132,13 @@ func scoreTeamPointsAndRank(scores []*ent.ProjectScore, ranks map[string]map[cas
 			continue
 		}
 		testCase := caseKey{CaseID: score.CaseID, CaseType: score.Type}
-		scoreboard.Entries = append(scoreboard.Entries, TeamScoreboardEntry{
-			TeamScore: score.Score,
-			TeamRank:  ranks[team][testCase],
-			TestCase:  testCase,
-		})
+		scoreboard.Entries = append(
+			scoreboard.Entries,
+			NewTeamScoreboardEntry(
+				roundFloat(score.Score),
+				ranks[team][testCase],
+				testCase,
+			))
 	}
 	return scoreboard
 }
