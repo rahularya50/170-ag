@@ -52,14 +52,10 @@ func queryStudentScores(ctx context.Context, problem *ent.CodingProblem) ([]scor
 
 			// join with extensions, if available
 			LeftJoin(extensions).
-			On(s.C(codingsubmission.AuthorColumn), extensions.C(codingextension.StudentColumn)).
-
-			// remove invalid (but nonnull) extensions
-			Where(
-				sql.Or(
-					sql.EQ(extensions.C(codingextension.CodingProblemColumn), problem.ID),
-					sql.IsNull(extensions.C(codingextension.CodingProblemColumn)),
-				)).
+			OnP(sql.And(
+				sql.EQ(s.C(codingsubmission.AuthorColumn), sql.Raw(extensions.C(codingextension.StudentColumn))),
+				sql.EQ(extensions.C(codingextension.CodingProblemColumn), problem.ID),
+			)).
 
 			// filter to submissions made before deadline
 			Where(

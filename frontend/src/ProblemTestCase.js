@@ -123,7 +123,9 @@ export default function TestCase(props: Props): React.Node {
       (resp) => {
         downloadText(resp.test_case.data.input, "input.txt");
       },
-      alert
+      (e) => {
+        alert(e);
+      }
     );
 
   const [downloadOutput, isDownloadingOutput] =
@@ -141,7 +143,9 @@ export default function TestCase(props: Props): React.Node {
       (resp) => {
         downloadText(resp.test_case.data.output, "output.txt");
       },
-      alert
+      (e) => {
+        alert(e);
+      }
     );
 
   return (

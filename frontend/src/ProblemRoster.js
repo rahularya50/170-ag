@@ -43,7 +43,9 @@ export default function ProblemRoster(props: Props): React.Node {
       (resp) => {
         downloadText(resp.coding_problem.score_roster, "scores.csv");
       },
-      alert
+      (e) => {
+        alert(e);
+      }
     );
 
   return (
